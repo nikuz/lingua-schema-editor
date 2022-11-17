@@ -24,7 +24,7 @@ code {
 .form-element-horizontal {
   overflow: hidden;
   display: inline-block;
-  margin: 0 20px 0 0;
+  margin: 5px 20px 5px 0;
 }
 
 .search-button {

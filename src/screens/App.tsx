@@ -6,6 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormLabel from '@mui/material/FormLabel';
 import { translateController } from '../controllers';
 import { localStorageProvider } from '../providers';
+import { JsonEditor } from '../components';
 import supportedLanguages from './supported-languages.json';
 import './App.css';
 
@@ -24,7 +25,7 @@ function App() {
     const [bodyParameterValue, setBodyParameterValue] = useState<string>('');
     const [bodyParameterValidationError, setBodyParameterValidationError] = useState(false);
     const [variablesValues, setVariablesValues] = useState<Map<string, string>>(new Map());
-    const [translateResponse, setTranslateResponse] = useState('');
+    const [translateResponse, setTranslateResponse] = useState<JSON>();
 
     const requestHandler = useCallback(async () => {
         let body = bodyParameterValue;
@@ -51,7 +52,9 @@ function App() {
                 }
             }
             if (translationResult !== '') {
-                setTranslateResponse(JSON.stringify(JSON.parse(JSON.parse(translationResult)[0][2]), null, 4));
+                const data = JSON.parse(translationResult);
+                data[0][2] = JSON.parse(data[0][2]);
+                setTranslateResponse(data);
             }
         }
     }, [url, bodyParameterName, bodyParameterValue, variablesValues]);
@@ -197,9 +200,15 @@ function App() {
                     Translate
                 </Button>
             </div>
-            <pre>
-                {translateResponse}
-            </pre>
+            {translateResponse && (
+                <JsonEditor
+                    mode="tree"
+                    data={translateResponse}
+                    onSelect={(path) => {
+                        console.log(path);
+                    }}
+                />
+            )}
         </div>
     );
 }
