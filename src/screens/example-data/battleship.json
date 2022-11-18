@@ -1,0 +1,79 @@
+[
+  [
+    null,
+    null,
+    null,
+    [
+      [
+        [
+          0,
+          [
+            [
+              [
+                null,
+                17
+              ]
+            ],
+            [
+              true
+            ]
+          ]
+        ]
+      ],
+      17
+    ],
+    [
+      [
+        "battleship flight",
+        null,
+        null,
+        17
+      ]
+    ]
+  ],
+  [
+    [
+      [
+        null,
+        "polet linkora",
+        null,
+        null,
+        null,
+        [
+          [
+            "полет линкора",
+            null,
+            null,
+            null,
+            [
+              [
+                "полет линкора",
+                [
+                  5
+                ],
+                []
+              ],
+              [
+                "линкор полет",
+                [
+                  11
+                ],
+                []
+              ]
+            ]
+          ]
+        ]
+      ]
+    ],
+    "ru",
+    1,
+    "en",
+    [
+      "battleship flight",
+      "en",
+      "ru",
+      true
+    ]
+  ],
+  "en"
+]

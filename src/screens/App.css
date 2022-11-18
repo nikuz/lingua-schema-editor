@@ -27,6 +27,15 @@ code {
   margin: 5px 20px 5px 0;
 }
 
-.search-button {
-  margin-left: 10px;
+.response-preview-container {
+  display: flex;
+  margin: 20px 0;
+}
+
+.rpc-side {
+  flex: 1;
+}
+
+.rpc-side:first-child {
+  padding-right: 20px;
 }

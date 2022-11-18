@@ -1,13 +1,21 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import FormLabel from '@mui/material/FormLabel';
+import {
+    TextField,
+    Button,
+    Select,
+    MenuItem,
+    FormLabel,
+    Alert,
+} from '@mui/material';
 import { translateController } from '../controllers';
 import { localStorageProvider } from '../providers';
 import { JsonEditor } from '../components';
+import { jsonUtils } from '../utils';
+import Definitions from './components/definitions';
+import Examples from './components/examples';
+import AlternativeTranslations from './components/alternative-translations';
 import supportedLanguages from './supported-languages.json';
+import data from './example-data/man.json';
 import './App.css';
 
 const {
@@ -19,13 +27,15 @@ const {
 
 const bodyParameterMandatoryVariables = ['{marker}', '{word}', '{sourceLanguage}', '{targetLanguage}'];
 
-function App() {
+export default function App() {
     const [url, setUrl] = useState<string>('');
     const [bodyParameterName, setBodyParameterName] = useState<string>('');
     const [bodyParameterValue, setBodyParameterValue] = useState<string>('');
     const [bodyParameterValidationError, setBodyParameterValidationError] = useState(false);
     const [variablesValues, setVariablesValues] = useState<Map<string, string>>(new Map());
-    const [translateResponse, setTranslateResponse] = useState<JSON>();
+    const [translateResponseText, setTranslateResponseText] = useState<string>();
+    const [translateResponseJson, setTranslateResponseJson] = useState<JSON>();
+    const [error, setError] = useState<Error>();
 
     const requestHandler = useCallback(async () => {
         let body = bodyParameterValue;
@@ -52,9 +62,20 @@ function App() {
                 }
             }
             if (translationResult !== '') {
-                const data = JSON.parse(translationResult);
-                data[0][2] = JSON.parse(data[0][2]);
-                setTranslateResponse(data);
+                let data;
+                try {
+                    data = JSON.parse(translationResult);
+                    const allJsonStrings = jsonUtils.findAllJsonStrings(data);
+
+                    if (allJsonStrings.length) {
+                        data = JSON.parse(allJsonStrings[0]);
+                    }
+
+                    setTranslateResponseJson(data);
+                } catch (e) {
+                    setError(new Error('Can\'t parse response JSON'));
+                    setTranslateResponseText(translationResult);
+                }
             }
         }
     }, [url, bodyParameterName, bodyParameterValue, variablesValues]);
@@ -200,17 +221,59 @@ function App() {
                     Translate
                 </Button>
             </div>
-            {translateResponse && (
-                <JsonEditor
-                    mode="tree"
-                    data={translateResponse}
-                    onSelect={(path) => {
-                        console.log(path);
-                    }}
-                />
+            {/*{translateResponseJson && (*/}
+            <div className="response-preview-container">
+                <div className="rpc-side">
+                    <div className="form-row">
+                        <TextField
+                            variant="outlined"
+                            label="Translation"
+                            size="small"
+                            fullWidth
+                            value=""
+                        />
+                    </div>
+                    <div className="form-row">
+                        <TextField
+                            variant="outlined"
+                            label="Auto Spelling Fix"
+                            size="small"
+                            fullWidth
+                            value=""
+                        />
+                    </div>
+                    <div className="form-row">
+                        <TextField
+                            variant="outlined"
+                            label="Transcription"
+                            size="small"
+                            fullWidth
+                            value=""
+                        />
+                    </div>
+                    <AlternativeTranslations />
+                    <Examples />
+                    <Definitions />
+                </div>
+                <div className="rpc-side">
+                    <JsonEditor
+                        mode="tree"
+                        data={data}
+                        onSelect={(path) => {
+                            console.log(path);
+                        }}
+                    />
+                </div>
+            </div>
+            {/*)}*/}
+            {error && (
+                <div>
+                    <Alert severity="error">{error.message}</Alert>
+                    <pre>
+                        {translateResponseText}
+                    </pre>
+                </div>
             )}
         </div>
     );
 }
-
-export default App;
