@@ -227,7 +227,7 @@ export default function App() {
                     <div className="form-row">
                         <TextField
                             variant="outlined"
-                            label="Translation"
+                            label="Word"
                             size="small"
                             fullWidth
                             value=""
