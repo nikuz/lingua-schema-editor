@@ -1,11 +1,11 @@
 import React from 'react';
 import { FormTree } from '../../../components';
-import { SchemaRenderSelectedItem } from '../../../types';
+import { FieldsSelectedItem } from '../../../types';
 import schema from './schema';
 
 interface Props {
-    selectedField?: SchemaRenderSelectedItem,
-    onFieldFocus: (field: SchemaRenderSelectedItem) => void,
+    selectedField?: FieldsSelectedItem,
+    onFieldFocus: (field: FieldsSelectedItem) => void,
 }
 
 export default function Definitions(props: Props) {

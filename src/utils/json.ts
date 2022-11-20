@@ -15,3 +15,7 @@ export function findAllJsonStrings(json: JSON, result?: string[]): string[] {
 
     return strings;
 }
+
+export function getValueByJMESPath(json: JSON, path: string) {
+
+}

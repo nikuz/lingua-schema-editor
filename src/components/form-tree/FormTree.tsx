@@ -5,18 +5,18 @@ import {
     Chip,
 } from '@mui/material';
 import {
-    SchemaRenderItem,
-    SchemaRenderSelectedItem,
+    FieldsItem,
+    FieldsSelectedItem,
 } from '../../types';
 import FormTreeItem from './FormTreeItem';
 
 interface Props {
-    fields: SchemaRenderItem[],
+    fields: FieldsItem[],
     indent: number,
     path?: string,
     dividerText?: string,
-    selectedField?: SchemaRenderSelectedItem,
-    onFieldFocus: (field: SchemaRenderSelectedItem) => void,
+    selectedField?: FieldsSelectedItem,
+    onFieldFocus: (field: FieldsSelectedItem) => void,
 }
 
 export default function FormTree(props: Props) {

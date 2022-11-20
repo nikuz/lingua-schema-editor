@@ -8,10 +8,10 @@ import 'jsoneditor/dist/jsoneditor.css';
 import './JsonEditor.css';
 
 interface Props {
-    data?: any,
+    data?: JSON,
     mode?: JSONEditorMode,
     onChange?: (value: string) => void,
-    onSelect?: (path: JSONPath) => void,
+    onSelect?: (path: string) => void,
 }
 
 export default class JsonEditor extends React.Component<Props> {
@@ -47,9 +47,23 @@ export default class JsonEditor extends React.Component<Props> {
         const { onSelect } = this.props;
 
         if (event.type === 'mousedown' && onSelect) {
-            onSelect(node.path);
+            onSelect(this.getJMESPath(node.path));
         }
     };
+
+    getJMESPath = (path: JSONPath): string => {
+        let JMESPath = '';
+        for (let i = 0, l = path.length; i < l; i++) {
+            const part = path[i];
+            if (typeof part === 'string') {
+                JMESPath += `${i !== 0 ? '.' : ''}${part}`;
+            } else {
+                JMESPath += `[${part}]`;
+            }
+        }
+
+        return JMESPath;
+    }
 
     render() {
         return (

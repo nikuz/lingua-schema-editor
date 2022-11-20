@@ -9,18 +9,23 @@ import {
 } from '@mui/material';
 import { translateController } from '../controllers';
 import { localStorageProvider } from '../providers';
-import { JsonEditor } from '../components';
+import {
+    JsonEditor,
+    SchemaRenderer,
+} from '../components';
 import { jsonUtils } from '../utils';
 import {
-    JSONPath,
-    SchemaRenderSelectedItem,
+    FieldsSelectedItem,
+    TranslationSchema,
 } from '../types';
 import Definitions from './components/definitions';
 import Examples from './components/examples';
 import AlternativeTranslations from './components/alternative-translations';
-import supportedLanguages from './supported-languages.json';
-import data from './example-data/man.json';
+import supportedLanguages from './data/supported-languages.json';
+import data from './data/man.json';
 import './App.css';
+
+const dataJson: JSON = data as unknown as JSON;
 
 const {
     REACT_APP_TRANSLATION_URL,
@@ -39,8 +44,8 @@ export default function App() {
     const [variablesValues, setVariablesValues] = useState<Map<string, string>>(new Map());
     const [translateResponseText, setTranslateResponseText] = useState<string>();
     const [translateResponseJson, setTranslateResponseJson] = useState<JSON>();
-    const [selectedField, setSelectedField] = useState<SchemaRenderSelectedItem>();
-    const [fieldsValues, setFieldsValues] = useState({});
+    const [selectedField, setSelectedField] = useState<FieldsSelectedItem>();
+    const [resultSchema, setResultSchema] = useState<TranslationSchema>({});
     const [error, setError] = useState<Error>();
 
     const requestHandler = useCallback(async () => {
@@ -103,31 +108,31 @@ export default function App() {
         }
     }, [bodyParameterValidationError]);
 
-    const setFieldsValuesHandler = useCallback((value: JSONPath) => {
+    const populateSchemaHandler = useCallback((path: string) => {
         if (!selectedField) {
             return;
         }
         // deep copy
-        const values = JSON.parse(JSON.stringify(fieldsValues));
+        const schema = JSON.parse(JSON.stringify(resultSchema));
         const pathParts = selectedField.path.split('.');
-        let valuesObjectPointer = values;
+        let schemaPointer = schema;
 
         for (let i = 0, l = pathParts.length; i < l; i++) {
             const part = pathParts[i];
-            if (!valuesObjectPointer[part]) {
-                valuesObjectPointer[part] = {};
+            if (!schemaPointer[part]) {
+                schemaPointer[part] = {};
             }
-            valuesObjectPointer = valuesObjectPointer[part];
+            schemaPointer = schemaPointer[part];
             if (pathParts[i + 1] === undefined) {
-                valuesObjectPointer.value = value;
+                schemaPointer.value = path;
             }
         }
         setSelectedField({
             ...selectedField,
-            value,
+            value: path,
         });
-        setFieldsValues(values);
-    }, [fieldsValues, selectedField]);
+        setResultSchema(schema);
+    }, [resultSchema, selectedField]);
 
     const variablesValuesChangeHandler = useCallback((id: string, value: string) => {
         const variablesValuesClone = new Map(variablesValues);
@@ -293,12 +298,19 @@ export default function App() {
                 <div className="rpc-side">
                     <JsonEditor
                         mode="tree"
-                        data={data}
-                        onSelect={setFieldsValuesHandler}
+                        data={dataJson}
+                        onSelect={populateSchemaHandler}
                     />
                 </div>
             </div>
             {/*)}*/}
+            <SchemaRenderer
+                data={dataJson}
+                schema={resultSchema}
+            />
+            <pre>
+                {JSON.stringify(resultSchema, null, 4)}
+            </pre>
             {error && (
                 <div>
                     <Alert severity="error">{error.message}</Alert>
@@ -307,9 +319,6 @@ export default function App() {
                     </pre>
                 </div>
             )}
-            <pre>
-                {JSON.stringify(fieldsValues, null, 4)}
-            </pre>
         </div>
     );
 }

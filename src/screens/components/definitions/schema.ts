@@ -1,6 +1,6 @@
-import { SchemaRenderItem } from '../../../types';
+import { FieldsItem } from '../../../types';
 
-const schema: SchemaRenderItem[] = [{
+const schema: FieldsItem[] = [{
     id: 'definitions',
     label: 'Definitions',
     fields: [{

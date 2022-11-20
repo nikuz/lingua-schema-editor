@@ -3,16 +3,16 @@ import {
     TextField,
     ListItem,
 } from '@mui/material';
-import { SchemaRenderSelectedItem } from '../../types';
+import { FieldsSelectedItem } from '../../types';
 
 interface Props {
     id: string,
     label: string,
     description?: string,
     path: string,
-    selectedField?: SchemaRenderSelectedItem,
+    selectedField?: FieldsSelectedItem,
     indent: number,
-    onFieldFocus: (field: SchemaRenderSelectedItem) => void,
+    onFieldFocus: (field: FieldsSelectedItem) => void,
 }
 
 export default function FormTreeItem(props: Props) {
@@ -24,10 +24,9 @@ export default function FormTreeItem(props: Props) {
         if (
             selectedField
             && selectedField.path === path
-            && selectedField.value
-            && selectedField.value.toString() !== value
+            && selectedField.value !== value
         ) {
-            setValue(selectedField.value.toString());
+            setValue(selectedField.value || '');
         }
     }, [value, path, selectedField]);
 

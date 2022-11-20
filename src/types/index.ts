@@ -1,2 +1,2 @@
-export * from './common';
-export * from './schema';
+export * from './translation-schema';
+export * from './fields';
