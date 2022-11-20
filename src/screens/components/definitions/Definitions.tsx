@@ -1,14 +1,22 @@
 import React from 'react';
 import { FormTree } from '../../../components';
+import { SchemaRenderSelectedItem } from '../../../types';
 import schema from './schema';
 
-export default function Definitions() {
+interface Props {
+    selectedField?: SchemaRenderSelectedItem,
+    onFieldFocus: (field: SchemaRenderSelectedItem) => void,
+}
+
+export default function Definitions(props: Props) {
     return (
         <div className="form-row">
             <FormTree
                 fields={schema}
-                intent={0}
+                indent={0}
                 dividerText="Definitions"
+                selectedField={props.selectedField}
+                onFieldFocus={props.onFieldFocus}
             />
         </div>
     );

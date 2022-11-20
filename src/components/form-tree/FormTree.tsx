@@ -1,17 +1,22 @@
 import React from 'react';
 import {
-    TextField,
     List,
-    ListItem,
     Divider,
     Chip,
 } from '@mui/material';
-import { SchemaRenderItem } from '../../types';
+import {
+    SchemaRenderItem,
+    SchemaRenderSelectedItem,
+} from '../../types';
+import FormTreeItem from './FormTreeItem';
 
 interface Props {
     fields: SchemaRenderItem[],
-    intent: number,
+    indent: number,
+    path?: string,
     dividerText?: string,
+    selectedField?: SchemaRenderSelectedItem,
+    onFieldFocus: (field: SchemaRenderSelectedItem) => void,
 }
 
 export default function FormTree(props: Props) {
@@ -21,25 +26,31 @@ export default function FormTree(props: Props) {
                 <Chip label={props.dividerText} />
             </Divider>
         )}
-        {props.fields.map((item) => (
-            <List key={item.id} component="div" disablePadding>
-                <ListItem sx={{ pl: props.intent }}>
-                    <TextField
-                        variant="outlined"
+        {props.fields.map((item) => {
+            const path = props.path ? `${props.path}.${item.id}` : item.id;
+
+            return <React.Fragment key={item.id}>
+                <List component="div" disablePadding>
+                    <FormTreeItem
                         id={item.id}
                         label={item.label}
-                        size="small"
-                        helperText={item.description}
-                        value={item.value}
+                        description={item.description}
+                        path={path}
+                        indent={props.indent}
+                        selectedField={props.selectedField}
+                        onFieldFocus={props.onFieldFocus}
                     />
-                </ListItem>
+                </List>
                 {item.fields && (
                     <FormTree
                         fields={item.fields}
-                        intent={props.intent + 3}
+                        indent={props.indent + 3}
+                        path={path}
+                        selectedField={props.selectedField}
+                        onFieldFocus={props.onFieldFocus}
                     />
                 )}
-            </List>
-        ))}
+            </React.Fragment>;
+        })}
     </>;
 }

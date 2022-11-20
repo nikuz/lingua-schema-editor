@@ -7,14 +7,13 @@ import JSONEditor, {
 import 'jsoneditor/dist/jsoneditor.css';
 import './JsonEditor.css';
 
-export type { JSONPath };
-
 interface Props {
     data?: any,
     mode?: JSONEditorMode,
     onChange?: (value: string) => void,
     onSelect?: (path: JSONPath) => void,
 }
+
 export default class JsonEditor extends React.Component<Props> {
     containerEl: HTMLDivElement | null = null;
 
@@ -34,18 +33,21 @@ export default class JsonEditor extends React.Component<Props> {
         const {
             mode,
             data,
-            onSelect,
         } = this.props;
 
         if (this.containerEl) {
             this.editor = new JSONEditor(this.containerEl, {
                 mode,
-                onEvent: (node: EditableNode, event: Event) => {
-                    if (event.type === 'mousedown' && onSelect) {
-                        onSelect(node.path);
-                    }
-                },
+                onEvent: this.eventHandler,
             }, data);
+        }
+    };
+
+    eventHandler = (node: EditableNode, event: Event) => {
+        const { onSelect } = this.props;
+
+        if (event.type === 'mousedown' && onSelect) {
+            onSelect(node.path);
         }
     };
 

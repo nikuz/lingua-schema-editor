@@ -11,6 +11,10 @@ import { translateController } from '../controllers';
 import { localStorageProvider } from '../providers';
 import { JsonEditor } from '../components';
 import { jsonUtils } from '../utils';
+import {
+    JSONPath,
+    SchemaRenderSelectedItem,
+} from '../types';
 import Definitions from './components/definitions';
 import Examples from './components/examples';
 import AlternativeTranslations from './components/alternative-translations';
@@ -35,6 +39,8 @@ export default function App() {
     const [variablesValues, setVariablesValues] = useState<Map<string, string>>(new Map());
     const [translateResponseText, setTranslateResponseText] = useState<string>();
     const [translateResponseJson, setTranslateResponseJson] = useState<JSON>();
+    const [selectedField, setSelectedField] = useState<SchemaRenderSelectedItem>();
+    const [fieldsValues, setFieldsValues] = useState({});
     const [error, setError] = useState<Error>();
 
     const requestHandler = useCallback(async () => {
@@ -96,6 +102,32 @@ export default function App() {
             setBodyParameterValidationError(false);
         }
     }, [bodyParameterValidationError]);
+
+    const setFieldsValuesHandler = useCallback((value: JSONPath) => {
+        if (!selectedField) {
+            return;
+        }
+        // deep copy
+        const values = JSON.parse(JSON.stringify(fieldsValues));
+        const pathParts = selectedField.path.split('.');
+        let valuesObjectPointer = values;
+
+        for (let i = 0, l = pathParts.length; i < l; i++) {
+            const part = pathParts[i];
+            if (!valuesObjectPointer[part]) {
+                valuesObjectPointer[part] = {};
+            }
+            valuesObjectPointer = valuesObjectPointer[part];
+            if (pathParts[i + 1] === undefined) {
+                valuesObjectPointer.value = value;
+            }
+        }
+        setSelectedField({
+            ...selectedField,
+            value,
+        });
+        setFieldsValues(values);
+    }, [fieldsValues, selectedField]);
 
     const variablesValuesChangeHandler = useCallback((id: string, value: string) => {
         const variablesValuesClone = new Map(variablesValues);
@@ -253,15 +285,16 @@ export default function App() {
                     </div>
                     <AlternativeTranslations />
                     <Examples />
-                    <Definitions />
+                    <Definitions
+                        selectedField={selectedField}
+                        onFieldFocus={setSelectedField}
+                    />
                 </div>
                 <div className="rpc-side">
                     <JsonEditor
                         mode="tree"
                         data={data}
-                        onSelect={(path) => {
-                            console.log(path);
-                        }}
+                        onSelect={setFieldsValuesHandler}
                     />
                 </div>
             </div>
@@ -274,6 +307,9 @@ export default function App() {
                     </pre>
                 </div>
             )}
+            <pre>
+                {JSON.stringify(fieldsValues, null, 4)}
+            </pre>
         </div>
     );
 }
