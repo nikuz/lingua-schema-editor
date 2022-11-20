@@ -1,4 +1,4 @@
-export function findAllJsonStrings(json: JSON, result?: string[]): string[] {
+export function findAllJsonStrings(json: any, result?: string[]): string[] {
     const strings = result || [];
     const values = Object.values(json);
 
@@ -14,8 +14,4 @@ export function findAllJsonStrings(json: JSON, result?: string[]): string[] {
     strings.sort((a: string, b: string) => b.length - a.length);
 
     return strings;
-}
-
-export function getValueByJMESPath(json: JSON, path: string) {
-
 }

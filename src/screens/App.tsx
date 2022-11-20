@@ -25,8 +25,6 @@ import supportedLanguages from './data/supported-languages.json';
 import data from './data/man.json';
 import './App.css';
 
-const dataJson: JSON = data as unknown as JSON;
-
 const {
     REACT_APP_TRANSLATION_URL,
     REACT_APP_TRANSLATION_MARKER,
@@ -298,19 +296,16 @@ export default function App() {
                 <div className="rpc-side">
                     <JsonEditor
                         mode="tree"
-                        data={dataJson}
+                        data={data}
                         onSelect={populateSchemaHandler}
                     />
                 </div>
             </div>
             {/*)}*/}
             <SchemaRenderer
-                data={dataJson}
+                data={data}
                 schema={resultSchema}
             />
-            <pre>
-                {JSON.stringify(resultSchema, null, 4)}
-            </pre>
             {error && (
                 <div>
                     <Alert severity="error">{error.message}</Alert>

@@ -8,7 +8,7 @@ import 'jsoneditor/dist/jsoneditor.css';
 import './JsonEditor.css';
 
 interface Props {
-    data?: JSON,
+    data?: any,
     mode?: JSONEditorMode,
     onChange?: (value: string) => void,
     onSelect?: (path: string) => void,
