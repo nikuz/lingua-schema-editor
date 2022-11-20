@@ -27,14 +27,13 @@ export default function SchemaRendererDefinitions(props: Props) {
                     <Typography variant="subtitle1">Speech parts</Typography>
                     <List>
                         {definitions.map((speechPartItem: any, key) => (
-                            <>
+                            <React.Fragment key={`speech-part-${key}`}>
                                 <SchemaRendererDefinitionsSpeechPart
-                                    key={`speech-part-${key}`}
                                     data={speechPartItem}
                                     definitionsSchema={definitionsSchema}
                                 />
                                 <Divider />
-                            </>
+                            </React.Fragment>
                         ))}
                     </List>
                 </div>
@@ -74,14 +73,13 @@ function SchemaRendererDefinitionsSpeechPart(props: Props) {
                         <Typography variant="subtitle1">Items</Typography>
                         <List>
                             {items.map((definitionItem: any, key) => (
-                                <>
+                                <React.Fragment key={`definition-${key}`}>
                                     <SchemaRendererDefinitionsItem
-                                        key={`definition-${key}`}
                                         data={definitionItem}
                                         definitionsSchema={definitionsSchema}
                                     />
                                     <Divider />
-                                </>
+                                </React.Fragment>
                             ))}
                         </List>
                     </div>
@@ -126,13 +124,16 @@ function SchemaRendererDefinitionsItem(props: Props) {
                     ? <div>
                         <Typography variant="subtitle1">Synonyms</Typography>
                         <List>
-                            {Array.isArray(synonyms) ? synonyms.map((definitionItem: any, key) => (
-                                <SchemaRendererDefinitionsSynonym
-                                    key={`synonym-${key}`}
-                                    data={definitionItem}
-                                    definitionsSchema={definitionsSchema}
-                                />
-                            )) : String(synonyms)}
+                            {Array.isArray(synonyms)
+                                ? synonyms.map((definitionItem: any, key) => (
+                                    <SchemaRendererDefinitionsSynonym
+                                            key={`synonym-${key}`}
+                                            data={definitionItem}
+                                            definitionsSchema={definitionsSchema}
+                                        />
+                                    ))
+                                : String(synonyms)
+                            }
                         </List>
                     </div>
                     : <Alert severity="error">Definition synonyms is not defined in schema</Alert>
@@ -160,17 +161,20 @@ function SchemaRendererDefinitionsSynonym(props: Props) {
                 }
                 {items !== undefined
                     ? <div>
-                        {Array.isArray(items) ? items.map((synonymItem: any, key) => {
-                            const text = definitionsSchema?.items?.synonyms?.items?.text
-                                ? jmespath.search(synonymItem, definitionsSchema.items.synonyms.items.text.value)
-                                : undefined;
+                        {Array.isArray(items)
+                            ? items.map((synonymItem: any, key) => {
+                                const text = definitionsSchema?.items?.synonyms?.items?.text
+                                    ? jmespath.search(synonymItem, definitionsSchema.items.synonyms.items.text.value)
+                                    : undefined;
 
-                            if (text) {
-                                return <span key={key}>{text}, </span>;
-                            }
+                                if (text) {
+                                    return <span key={key}>{text}, </span>;
+                                }
 
-                            return <Alert severity="error" key={key}>Synonyms text is not defined in schema</Alert>;
-                        }) : String(items)}
+                                return <Alert severity="error" key={key}>Synonyms text is not defined in schema</Alert>;
+                            })
+                            : String(items)
+                        }
                     </div>
                     : <Alert severity="error">Synonym items are not defined in schema</Alert>
                 }
