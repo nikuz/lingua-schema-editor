@@ -8,13 +8,12 @@ interface Props {
     onFieldFocus: (field: FieldsSelectedItem) => void,
 }
 
-export default function Examples(props: Props) {
+export default function Translation(props: Props) {
     return (
         <div className="form-row">
             <FormTree
                 fields={schema}
                 indent={0}
-                dividerText="Examples"
                 selectedField={props.selectedField}
                 onFieldFocus={props.onFieldFocus}
             />

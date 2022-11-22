@@ -7,7 +7,10 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { TranslationSchema } from '../../types';
+import SchemaRendererTranslation from './SchemaRendererTranslation';
+import SchemaRendererAlternativeTranslations from './SchemaRendererAlternativeTranslations';
 import SchemaRendererDefinitions from './SchemaRendererDefinitions';
+import SchemaRendererExamples from './SchemaRendererExamples';
 
 interface Props {
     data: any,
@@ -17,8 +20,30 @@ interface Props {
 export default function SchemaRenderer(props: Props) {
     return (
         <div className="schema-renderer">
-            <Typography variant="h4" gutterBottom>Preview</Typography>
-            <Accordion disableGutters sx={{ mb: 2 }}>
+            <Typography
+                variant="h4"
+                sx={{ mt: 3 }}
+                gutterBottom
+            >
+                Preview
+            </Typography>
+            <SchemaRendererTranslation
+                data={props.data}
+                schema={props.schema}
+            />
+            <SchemaRendererAlternativeTranslations
+                data={props.data}
+                schema={props.schema.alternative_translations}
+            />
+            <SchemaRendererDefinitions
+                data={props.data}
+                schema={props.schema.definitions}
+            />
+            <SchemaRendererExamples
+                data={props.data}
+                schema={props.schema.examples}
+            />
+            <Accordion disableGutters sx={{ mt: 2 }}>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel2a-content"
@@ -32,10 +57,6 @@ export default function SchemaRenderer(props: Props) {
                     </pre>
                 </AccordionDetails>
             </Accordion>
-            <SchemaRendererDefinitions
-                data={props.data}
-                definitionsSchema={props.schema.definitions}
-            />
         </div>
     );
 }

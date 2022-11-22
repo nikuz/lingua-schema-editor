@@ -23,6 +23,14 @@ export default class JsonEditor extends React.Component<Props> {
         this.createEditor();
     }
 
+    componentDidUpdate(prevProps: Readonly<Props>) {
+        if (prevProps.data !== this.props.data) {
+            console.log('asdasd');
+            this.editor?.update(this.props.data);
+            this.editor?.collapseAll();
+        }
+    }
+
     componentWillUnmount() {
         if (this.editor) {
             this.editor.destroy();
@@ -38,6 +46,8 @@ export default class JsonEditor extends React.Component<Props> {
         if (this.containerEl) {
             this.editor = new JSONEditor(this.containerEl, {
                 mode,
+                enableSort: false,
+                enableTransform: false,
                 onEvent: this.eventHandler,
             }, data);
         }

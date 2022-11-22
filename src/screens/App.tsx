@@ -7,6 +7,7 @@ import {
     FormLabel,
     Alert,
 } from '@mui/material';
+// import jmespath from 'jmespath';
 import { translateController } from '../controllers';
 import { localStorageProvider } from '../providers';
 import {
@@ -18,6 +19,7 @@ import {
     FieldsSelectedItem,
     TranslationSchema,
 } from '../types';
+import Translation from './components/translation';
 import Definitions from './components/definitions';
 import Examples from './components/examples';
 import AlternativeTranslations from './components/alternative-translations';
@@ -41,7 +43,7 @@ export default function App() {
     const [bodyParameterValidationError, setBodyParameterValidationError] = useState(false);
     const [variablesValues, setVariablesValues] = useState<Map<string, string>>(new Map());
     const [translateResponseText, setTranslateResponseText] = useState<string>();
-    const [translateResponseJson, setTranslateResponseJson] = useState<JSON>();
+    const [translateResponseJson, setTranslateResponseJson] = useState<{}>();
     const [selectedField, setSelectedField] = useState<FieldsSelectedItem>();
     const [resultSchema, setResultSchema] = useState<TranslationSchema>({});
     const [error, setError] = useState<Error>();
@@ -160,6 +162,12 @@ export default function App() {
         bodyParameterValidationHandler(bodyParameterValue);
     }, [bodyParameterValue, bodyParameterValidationHandler]);
 
+    // TODO: remove in production
+    useEffect(() => {
+        setTranslateResponseJson(data);
+    }, []);
+    //
+
     return (
         <div className="app-container">
             <div className="form-row">
@@ -256,56 +264,49 @@ export default function App() {
                     Translate
                 </Button>
             </div>
-            {/*{translateResponseJson && (*/}
-            <div className="response-preview-container">
-                <div className="rpc-side">
-                    <div className="form-row">
-                        <TextField
-                            variant="outlined"
-                            label="Word"
-                            size="small"
-                            fullWidth
-                            value=""
+            {translateResponseJson && (
+                <div className="response-preview-container">
+                    <div className="rpc-side">
+                        <Translation
+                            selectedField={selectedField}
+                            onFieldFocus={setSelectedField}
+                        />
+                        <AlternativeTranslations
+                            selectedField={selectedField}
+                            onFieldFocus={setSelectedField}
+                        />
+                        <Examples
+                            selectedField={selectedField}
+                            onFieldFocus={setSelectedField}
+                        />
+                        <Definitions
+                            selectedField={selectedField}
+                            onFieldFocus={setSelectedField}
                         />
                     </div>
-                    <div className="form-row">
-                        <TextField
-                            variant="outlined"
-                            label="Auto Spelling Fix"
-                            size="small"
-                            fullWidth
-                            value=""
+                    <div className="rpc-side">
+                        <JsonEditor
+                            mode="tree"
+                            data={translateResponseJson}
+                            onSelect={(path: string) => {
+                                // console.log(path);
+                                // const subResponse = jmespath.search(translateResponseJson, path);
+                                // if (typeof subResponse === 'object' && subResponse !== null) {
+                                //     setTranslateResponseJson(jmespath.search(translateResponseJson, path));
+                                // }
+                                // console.log();
+                                populateSchemaHandler(path);
+                            }}
                         />
                     </div>
-                    <div className="form-row">
-                        <TextField
-                            variant="outlined"
-                            label="Transcription"
-                            size="small"
-                            fullWidth
-                            value=""
-                        />
-                    </div>
-                    <AlternativeTranslations />
-                    <Examples />
-                    <Definitions
-                        selectedField={selectedField}
-                        onFieldFocus={setSelectedField}
-                    />
                 </div>
-                <div className="rpc-side">
-                    <JsonEditor
-                        mode="tree"
-                        data={data}
-                        onSelect={populateSchemaHandler}
-                    />
-                </div>
-            </div>
-            {/*)}*/}
-            <SchemaRenderer
-                data={data}
-                schema={resultSchema}
-            />
+            )}
+            {translateResponseJson && (
+                <SchemaRenderer
+                    data={translateResponseJson}
+                    schema={resultSchema}
+                />
+            )}
             {error && (
                 <div>
                     <Alert severity="error">{error.message}</Alert>
