@@ -6,25 +6,15 @@ import {
     MenuItem,
     FormLabel,
     Alert,
+    CircularProgress,
 } from '@mui/material';
-// import jmespath from 'jmespath';
 import { translateController } from '../controllers';
 import { localStorageProvider } from '../providers';
-import {
-    JsonEditor,
-    SchemaRenderer,
-} from '../components';
+import { SchemaRenderer, Collapsable } from '../components';
 import { jsonUtils } from '../utils';
-import {
-    FieldsSelectedItem,
-    TranslationSchema,
-} from '../types';
-import Translation from './components/translation';
-import Definitions from './components/definitions';
-import Examples from './components/examples';
-import AlternativeTranslations from './components/alternative-translations';
+import { TranslationSchema } from '../types';
 import supportedLanguages from './data/supported-languages.json';
-import data from './data/man.json';
+// import data from './data/man.json';
 import './App.css';
 
 const {
@@ -44,51 +34,58 @@ export default function App() {
     const [variablesValues, setVariablesValues] = useState<Map<string, string>>(new Map());
     const [translateResponseText, setTranslateResponseText] = useState<string>();
     const [translateResponseJson, setTranslateResponseJson] = useState<{}>();
-    const [selectedField, setSelectedField] = useState<FieldsSelectedItem>();
     const [resultSchema, setResultSchema] = useState<TranslationSchema>({});
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error>();
 
-    const requestHandler = useCallback(async () => {
+    const requestHandler = useCallback(() => {
+        setLoading(true);
         let body = bodyParameterValue;
         variablesValues.forEach((value, key) => {
             body = body.replace(key, value);
         });
 
-        const response = await translateController.translate({
+        translateController.translate({
             url,
             body: {
                 [bodyParameterName]: body,
             },
-        });
+        }).then(response => {
+            setLoading(false);
+            const marker = variablesValues.get('{marker}');
+            if (marker) {
+                const translationRawStrings = response?.split('\n') ?? [];
+                let translationResult = '';
 
-        const marker = variablesValues.get('{marker}');
-        if (marker) {
-            const translationRawStrings = response?.split('\n') ?? [];
-            let translationResult = '';
-
-            for (let i = 0, l = translationRawStrings.length; i < l; i++) {
-                if (translationRawStrings[i].includes(marker)) {
-                    translationResult = translationRawStrings[i];
-                    break;
-                }
-            }
-            if (translationResult !== '') {
-                let data;
-                try {
-                    data = JSON.parse(translationResult);
-                    const allJsonStrings = jsonUtils.findAllJsonStrings(data);
-
-                    if (allJsonStrings.length) {
-                        data = JSON.parse(allJsonStrings[0]);
+                for (let i = 0, l = translationRawStrings.length; i < l; i++) {
+                    if (translationRawStrings[i].includes(marker)) {
+                        translationResult = translationRawStrings[i];
+                        break;
                     }
+                }
 
-                    setTranslateResponseJson(data);
-                } catch (e) {
-                    setError(new Error('Can\'t parse response JSON'));
-                    setTranslateResponseText(translationResult);
+                setTranslateResponseText(translationResult);
+
+                if (translationResult !== '') {
+                    let data;
+                    try {
+                        data = JSON.parse(translationResult);
+                        const allJsonStrings = jsonUtils.findAllJsonStrings(data);
+
+                        if (allJsonStrings.length) {
+                            data = JSON.parse(allJsonStrings[0]);
+                        }
+
+                        setTranslateResponseJson(data);
+                    } catch (e) {
+                        setError(new Error('Can\'t parse response JSON'));
+                    }
                 }
             }
-        }
+        }).catch(err => {
+            setLoading(false);
+            setError(err);
+        });
     }, [url, bodyParameterName, bodyParameterValue, variablesValues]);
 
     const bodyParameterValidationHandler = useCallback((value: string) => {
@@ -108,31 +105,25 @@ export default function App() {
         }
     }, [bodyParameterValidationError]);
 
-    const populateSchemaHandler = useCallback((path: string) => {
-        if (!selectedField) {
-            return;
-        }
+    const populateSchemaHandler = useCallback((schemaPath: string, dataPath: string) => {
         // deep copy
         const schema = JSON.parse(JSON.stringify(resultSchema));
-        const pathParts = selectedField.path.split('.');
+        const schemaPathParts = schemaPath.split('.');
         let schemaPointer = schema;
 
-        for (let i = 0, l = pathParts.length; i < l; i++) {
-            const part = pathParts[i];
+        for (let i = 0, l = schemaPathParts.length; i < l; i++) {
+            const part = schemaPathParts[i];
             if (!schemaPointer[part]) {
                 schemaPointer[part] = {};
             }
-            schemaPointer = schemaPointer[part];
-            if (pathParts[i + 1] === undefined) {
-                schemaPointer.value = path;
+            if (i === l - 1) {
+                schemaPointer[part] = dataPath;
+                break;
             }
+            schemaPointer = schemaPointer[part];
         }
-        setSelectedField({
-            ...selectedField,
-            value: path,
-        });
         setResultSchema(schema);
-    }, [resultSchema, selectedField]);
+    }, [resultSchema]);
 
     const variablesValuesChangeHandler = useCallback((id: string, value: string) => {
         const variablesValuesClone = new Map(variablesValues);
@@ -163,9 +154,9 @@ export default function App() {
     }, [bodyParameterValue, bodyParameterValidationHandler]);
 
     // TODO: remove in production
-    useEffect(() => {
-        setTranslateResponseJson(data);
-    }, []);
+    // useEffect(() => {
+    //     setTranslateResponseJson(data);
+    // }, []);
     //
 
     return (
@@ -265,56 +256,23 @@ export default function App() {
                 </Button>
             </div>
             {translateResponseJson && (
-                <div className="response-preview-container">
-                    <div className="rpc-side">
-                        <Translation
-                            selectedField={selectedField}
-                            onFieldFocus={setSelectedField}
-                        />
-                        <AlternativeTranslations
-                            selectedField={selectedField}
-                            onFieldFocus={setSelectedField}
-                        />
-                        <Examples
-                            selectedField={selectedField}
-                            onFieldFocus={setSelectedField}
-                        />
-                        <Definitions
-                            selectedField={selectedField}
-                            onFieldFocus={setSelectedField}
-                        />
-                    </div>
-                    <div className="rpc-side">
-                        <JsonEditor
-                            mode="tree"
-                            data={translateResponseJson}
-                            onSelect={(path: string) => {
-                                // console.log(path);
-                                // const subResponse = jmespath.search(translateResponseJson, path);
-                                // if (typeof subResponse === 'object' && subResponse !== null) {
-                                //     setTranslateResponseJson(jmespath.search(translateResponseJson, path));
-                                // }
-                                // console.log();
-                                populateSchemaHandler(path);
-                            }}
-                        />
-                    </div>
-                </div>
-            )}
-            {translateResponseJson && (
                 <SchemaRenderer
                     data={translateResponseJson}
                     schema={resultSchema}
+                    onDataPathSelect={populateSchemaHandler}
                 />
             )}
-            {error && (
-                <div>
-                    <Alert severity="error">{error.message}</Alert>
-                    <pre>
-                        {translateResponseText}
-                    </pre>
+            {translateResponseText && (
+                <Collapsable title="Original response">
+                    {translateResponseText}
+                </Collapsable>
+            )}
+            {loading && (
+                <div className="flex flex-center">
+                    <CircularProgress />
                 </div>
             )}
+            {error && <Alert severity="error">{error.message}</Alert>}
         </div>
     );
 }

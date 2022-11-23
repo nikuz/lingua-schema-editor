@@ -1,28 +1,28 @@
 import React from 'react';
-import jmespath from 'jmespath';
 import {
     ListItem,
     Stack,
     Typography,
 } from '@mui/material';
-import { TranslationSchemaDefinitions } from '../../types';
+import { TranslationSchema } from '../../types';
 import SchemaRendererItem, { SchemaRendererItemType } from './SchemaRendererItem';
 
 interface Props {
     data: any,
-    schema?: TranslationSchemaDefinitions,
+    schema?: TranslationSchema,
 }
 
 export default function SchemaRendererDefinitions(props: Props) {
     const { data, schema } = props;
-    const definitions = schema ? jmespath.search(data, schema.value) : undefined;
 
     return <>
         <Typography variant="h6" sx={{ mt: 2 }}>Definitions</Typography>
         <SchemaRendererItem
             title="Speech parts"
-            value={definitions}
             type={SchemaRendererItemType.list}
+            data={data}
+            schema={schema}
+            schemaPath="definitions.value"
             itemRender={(item) => (
                 <SchemaRendererDefinitionsSpeechPart
                     data={item}
@@ -35,25 +35,28 @@ export default function SchemaRendererDefinitions(props: Props) {
 
 function SchemaRendererDefinitionsSpeechPart(props: Props) {
     const { data, schema } = props;
-    const speechPart = schema?.speech_part
-        ? jmespath.search(data, schema.speech_part.value)
-        : undefined;
-    const type = schema?.type
-        ? jmespath.search(data, schema.type.value)
-        : undefined;
-    const items = schema?.items
-        ? jmespath.search(data, schema.items.value)
-        : undefined;
 
     return (
         <ListItem sx={{ pl: 3 }}>
             <Stack spacing={1}>
-                <SchemaRendererItem title="Speech part" value={speechPart} />
-                <SchemaRendererItem title="Type" value={type} />
+                <SchemaRendererItem
+                    title="Speech part"
+                    data={data}
+                    schema={schema}
+                    schemaPath="definitions.speech_part.value"
+                />
+                <SchemaRendererItem
+                    title="Type"
+                    data={data}
+                    schema={schema}
+                    schemaPath="definitions.type.value"
+                />
                 <SchemaRendererItem
                     title="Items"
-                    value={items}
                     type={SchemaRendererItemType.list}
+                    data={data}
+                    schema={schema}
+                    schemaPath="definitions.items.value"
                     itemRender={(item) => (
                         <SchemaRendererDefinitionsItem
                             data={item}
@@ -68,29 +71,34 @@ function SchemaRendererDefinitionsSpeechPart(props: Props) {
 
 function SchemaRendererDefinitionsItem(props: Props) {
     const { data, schema } = props;
-    const text = schema?.items?.text
-        ? jmespath.search(data, schema.items.text.value)
-        : undefined;
-    const example = schema?.items?.example
-        ? jmespath.search(data, schema.items.example.value)
-        : undefined;
-    const type = schema?.items?.type
-        ? jmespath.search(data, schema.items.type.value)
-        : undefined;
-    const synonyms = schema?.items?.synonyms
-        ? jmespath.search(data, schema.items.synonyms.value)
-        : undefined;
 
     return (
-        <ListItem sx={{ pl: 6 }}>
+        <ListItem sx={{ pl: 3 }}>
             <Stack spacing={1}>
-                <SchemaRendererItem title="Text" value={text} />
-                <SchemaRendererItem title="Example" value={example} />
-                <SchemaRendererItem title="Type" value={type} />
+                <SchemaRendererItem
+                    title="Text"
+                    data={data}
+                    schema={schema}
+                    schemaPath="definitions.items.text.value"
+                />
+                <SchemaRendererItem
+                    title="Example"
+                    data={data}
+                    schema={schema}
+                    schemaPath="definitions.items.example.value"
+                />
+                <SchemaRendererItem
+                    title="Type"
+                    data={data}
+                    schema={schema}
+                    schemaPath="definitions.items.type.value"
+                />
                 <SchemaRendererItem
                     title="Synonyms"
-                    value={synonyms}
                     type={SchemaRendererItemType.list}
+                    data={data}
+                    schema={schema}
+                    schemaPath="definitions.items.synonyms.value"
                     itemRender={(item) => (
                         <SchemaRendererDefinitionsSynonyms
                             data={item}
@@ -105,21 +113,22 @@ function SchemaRendererDefinitionsItem(props: Props) {
 
 function SchemaRendererDefinitionsSynonyms(props: Props) {
     const { data, schema } = props;
-    const type = schema?.items?.synonyms?.type
-        ? jmespath.search(data, schema.items.synonyms.type.value)
-        : undefined;
-    const items = schema?.items?.synonyms?.items
-        ? jmespath.search(data, schema.items.synonyms.items.value)
-        : undefined;
 
     return (
-        <ListItem sx={{ pl: 9 }}>
+        <ListItem sx={{ pl: 3 }}>
             <Stack spacing={1}>
-                <SchemaRendererItem title="Type" value={type} />
+                <SchemaRendererItem
+                    title="Type"
+                    data={data}
+                    schema={schema}
+                    schemaPath="definitions.items.synonyms.type.value"
+                />
                 <SchemaRendererItem
                     title="Items"
-                    value={items}
                     type={SchemaRendererItemType.list}
+                    data={data}
+                    schema={schema}
+                    schemaPath="definitions.items.synonyms.items.value"
                     itemRender={(item) => (
                         <SchemaRendererDefinitionsSynonymItem
                             data={item}
@@ -134,9 +143,15 @@ function SchemaRendererDefinitionsSynonyms(props: Props) {
 
 function SchemaRendererDefinitionsSynonymItem(props: Props) {
     const { data, schema } = props;
-    const text = schema?.items?.synonyms?.items?.text
-        ? jmespath.search(data, schema.items.synonyms.items.text.value)
-        : undefined;
 
-    return <SchemaRendererItem title="Text" value={text} />;
+    return (
+        <ListItem sx={{ pl: 3 }}>
+            <SchemaRendererItem
+                title="Text"
+                data={data}
+                schema={schema}
+                schemaPath="definitions.items.synonyms.items.text.value"
+            />
+        </ListItem>
+    );
 }

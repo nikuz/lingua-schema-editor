@@ -1,62 +1,59 @@
 import React from 'react';
-import {
-    Typography,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-} from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Typography } from '@mui/material';
+import Collapsable from '../collapsable';
 import { TranslationSchema } from '../../types';
 import SchemaRendererTranslation from './SchemaRendererTranslation';
 import SchemaRendererAlternativeTranslations from './SchemaRendererAlternativeTranslations';
 import SchemaRendererDefinitions from './SchemaRendererDefinitions';
 import SchemaRendererExamples from './SchemaRendererExamples';
+import SchemaRendererContext from './SchemaRendererContext';
+import './SchemaRenderer.css';
 
 interface Props {
     data: any,
     schema: TranslationSchema,
+    onDataPathSelect: (schemaPath: string, dataPath: string) => void,
 }
 
 export default function SchemaRenderer(props: Props) {
+    const {
+        data,
+        schema,
+        onDataPathSelect,
+    } = props;
+
     return (
-        <div className="schema-renderer">
-            <Typography
-                variant="h4"
-                sx={{ mt: 3 }}
-                gutterBottom
-            >
-                Preview
-            </Typography>
-            <SchemaRendererTranslation
-                data={props.data}
-                schema={props.schema}
-            />
-            <SchemaRendererAlternativeTranslations
-                data={props.data}
-                schema={props.schema.alternative_translations}
-            />
-            <SchemaRendererDefinitions
-                data={props.data}
-                schema={props.schema.definitions}
-            />
-            <SchemaRendererExamples
-                data={props.data}
-                schema={props.schema.examples}
-            />
-            <Accordion disableGutters sx={{ mt: 2 }}>
-                <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel2a-content"
-                    id="panel2a-header"
+        <SchemaRendererContext.Provider value={{ onDataPathSelect }}>
+            <div className="schema-renderer">
+                <Typography
+                    variant="h4"
+                    sx={{ mt: 3 }}
+                    gutterBottom
                 >
-                    <Typography>Schema</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
+                    Preview
+                </Typography>
+                <SchemaRendererTranslation
+                    data={data}
+                    schema={schema}
+                />
+                <SchemaRendererAlternativeTranslations
+                    data={data}
+                    schema={schema}
+                />
+                <SchemaRendererDefinitions
+                    data={data}
+                    schema={schema}
+                />
+                <SchemaRendererExamples
+                    data={data}
+                    schema={schema}
+                />
+                <Collapsable title="Schema" headerSize="h5" marginTop={5}>
                     <pre>
-                        {JSON.stringify(props.schema, null, 4)}
+                        {JSON.stringify(schema, null, 4)}
                     </pre>
-                </AccordionDetails>
-            </Accordion>
-        </div>
+                </Collapsable>
+            </div>
+        </SchemaRendererContext.Provider>
     );
 }

@@ -1,62 +1,93 @@
 import React from 'react';
-import jmespath from 'jmespath';
 import {
+    ListItem,
     Stack,
     Typography,
 } from '@mui/material';
-import { TranslationSchemaAlternativeTranslations } from '../../types';
+import { TranslationSchema } from '../../types';
 import SchemaRendererItem, { SchemaRendererItemType } from './SchemaRendererItem';
 
 interface Props {
     data: any,
-    schema?: TranslationSchemaAlternativeTranslations,
+    schema?: TranslationSchema,
 }
 
 export default function SchemaRendererAlternativeTranslations(props: Props) {
     const { data, schema } = props;
-    const speechPart = schema?.speech_part
-        ? jmespath.search(data, schema.speech_part.value)
-        : undefined;
-    const items = schema?.items
-        ? jmespath.search(data, schema.items.value)
-        : undefined;
 
     return <>
         <Typography variant="h6" sx={{ mt: 2 }}>Alternative translations</Typography>
-        <Stack spacing={1}>
-            <SchemaRendererItem title="Speech part" value={speechPart} />
-            <SchemaRendererItem
-                title="Items"
-                value={items}
-                type={SchemaRendererItemType.list}
-                itemRender={(item) => (
-                    <SchemaRendererAlternativeTranslationsItem
-                        data={item}
-                        schema={schema}
-                    />
-                )}
-            />
-        </Stack>
+        <SchemaRendererItem
+            title="Speech parts"
+            type={SchemaRendererItemType.list}
+            data={data}
+            schema={schema}
+            schemaPath="alternative_translations.value"
+            itemRender={(item) => (
+                <SchemaRendererAlternativeTranslationsSpeechPart
+                    data={item}
+                    schema={schema}
+                />
+            )}
+        />
     </>;
+}
+
+function SchemaRendererAlternativeTranslationsSpeechPart(props: Props) {
+    const { data, schema } = props;
+
+    return (
+        <ListItem sx={{ pl: 3 }}>
+            <Stack spacing={1}>
+                <SchemaRendererItem
+                    title="Speech part"
+                    data={data}
+                    schema={schema}
+                    schemaPath="alternative_translations.speech_part.value"
+                />
+                <SchemaRendererItem
+                    title="Items"
+                    type={SchemaRendererItemType.list}
+                    data={data}
+                    schema={schema}
+                    schemaPath="alternative_translations.items.value"
+                    itemRender={(item) => (
+                        <SchemaRendererAlternativeTranslationsItem
+                            data={item}
+                            schema={schema}
+                        />
+                    )}
+                />
+            </Stack>
+        </ListItem>
+    );
 }
 
 function SchemaRendererAlternativeTranslationsItem(props: Props) {
     const { data, schema } = props;
-    const translation = schema?.items?.translation
-        ? jmespath.search(data, schema.items.translation.value)
-        : undefined;
-    const words = schema?.items?.words
-        ? jmespath.search(data, schema.items.words.value)
-        : undefined;
-    const frequency = schema?.items?.frequency
-        ? jmespath.search(data, schema.items.frequency.value)
-        : undefined;
 
     return (
-        <Stack spacing={1}>
-            <SchemaRendererItem title="Translation" value={translation} />
-            <SchemaRendererItem title="Words" value={words} />
-            <SchemaRendererItem title="Frequency" value={frequency} />
-        </Stack>
+        <ListItem sx={{ pl: 3 }}>
+            <Stack spacing={1}>
+                <SchemaRendererItem
+                    title="Translation"
+                    data={data}
+                    schema={schema}
+                    schemaPath="alternative_translations.items.translation.value"
+                />
+                <SchemaRendererItem
+                    title="Frequency"
+                    data={data}
+                    schema={schema}
+                    schemaPath="alternative_translations.items.frequency.value"
+                />
+                <SchemaRendererItem
+                    title="Words"
+                    data={data}
+                    schema={schema}
+                    schemaPath="alternative_translations.items.words.value"
+                />
+            </Stack>
+        </ListItem>
     );
 }

@@ -1,3 +1,17 @@
 .schema-renderer {
     margin: 20px 0;
 }
+
+.json-editor-modal-title {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.json-editor-modal-container {
+    height: 100%;
+}
+
+.json-editor-modal-wrapper {
+    height: 80vh;
+    width: 80vw;
+}
