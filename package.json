@@ -17,7 +17,8 @@
     "jmespath": "^0.16.0",
     "jsoneditor": "^9.9.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.4.3"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",

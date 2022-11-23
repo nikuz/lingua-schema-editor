@@ -1,0 +1,14 @@
+.form-row {
+    margin-bottom: 10px;
+}
+
+.form-element-horizontal {
+    overflow: hidden;
+    display: inline-block;
+    margin: 5px 20px 5px 0;
+}
+
+.response-preview-container {
+    display: flex;
+    margin: 20px 0;
+}

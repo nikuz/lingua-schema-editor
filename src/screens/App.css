@@ -37,30 +37,3 @@ code {
 .inline-bloc {
   display: inline-block;
 }
-
-.app-container {
-  padding: 20px;
-}
-
-.form-row {
-  margin-bottom: 10px;
-}
-
-.form-element-horizontal {
-  overflow: hidden;
-  display: inline-block;
-  margin: 5px 20px 5px 0;
-}
-
-.response-preview-container {
-  display: flex;
-  margin: 20px 0;
-}
-
-.rpc-side {
-  flex: 1;
-}
-
-.rpc-side:first-child {
-  padding-right: 20px;
-}
