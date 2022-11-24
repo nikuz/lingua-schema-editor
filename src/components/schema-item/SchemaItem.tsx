@@ -12,33 +12,33 @@ import {
 } from '@mui/material';
 import Collapsable from '../collapsable';
 import JsonEditor from '../json-editor';
-import SchemaRendererContext from './SchemaRendererContext';
+import TranslationSchemaContext from '../../helpers/TranslationSchemaContext';
 
-export enum SchemaRendererItemType {
+export enum SchemaItemRenderType {
     string,
     list,
 }
 
 interface Props {
     title: string,
-    type?: SchemaRendererItemType,
+    renderType?: SchemaItemRenderType,
     data: any,
     schema: any,
     schemaPath: string,
     itemRender?: (item: any) => React.ReactElement,
 }
 
-export default function SchemaRendererItem({
+export default function SchemaItem({
     title,
-    type = SchemaRendererItemType.string,
+    renderType = SchemaItemRenderType.string,
     data,
     schema,
     schemaPath,
     itemRender,
 }: Props) {
     const [pathSelectorIsOpen, setPathSelectorIsOpen] = useState(false);
-    const context = useContext(SchemaRendererContext);
-    const isListExpected = type === SchemaRendererItemType.list;
+    const context = useContext(TranslationSchemaContext);
+    const isListExpected = renderType === SchemaItemRenderType.list;
     const dataPath = useMemo(() => (
         jmespath.search(schema, schemaPath)
     ), [schema, schemaPath]);
@@ -65,7 +65,9 @@ export default function SchemaRendererItem({
                     </Link>
                 </Typography>
                 {/*show only first item to prevent UI pollution*/}
-                {itemRender ? itemRender(value[0]) : null}
+                <List>
+                    {itemRender ? itemRender(value[0]) : null}
+                </List>
 
                 {/*render the rest items under a folded Accordion*/}
                 {value.length > 1 && (
@@ -123,8 +125,6 @@ export default function SchemaRendererItem({
                             mode="tree"
                             data={data}
                             onSelect={(dataPath: string) => {
-                                console.log(schemaPath);
-                                console.log(dataPath);
                                 if (context.onDataPathSelect) {
                                     context.onDataPathSelect(schemaPath, dataPath);
                                 }

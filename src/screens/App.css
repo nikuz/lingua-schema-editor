@@ -37,3 +37,8 @@ code {
 .inline-bloc {
   display: inline-block;
 }
+
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -1,11 +1,11 @@
 import React from 'react';
 import { Stack } from '@mui/material';
-import { TranslationSchema } from '../../types';
-import SchemaRendererItem from './SchemaRendererItem';
+import { TranslationSchemaType } from '../../types';
+import SchemaItem from '../schema-item';
 
 interface Props {
     data: any,
-    schema?: TranslationSchema,
+    schema?: TranslationSchemaType,
 }
 
 /// Component for rendering main translation entities
@@ -14,30 +14,30 @@ interface Props {
 /// * auto spelling fix
 /// * translation
 /// * transcription
-export default function SchemaRendererTranslation(props: Props) {
+export default function TranslationSchemaTranslation(props: Props) {
     const { data, schema } = props;
 
     return (
         <Stack spacing={1}>
-            <SchemaRendererItem
+            <SchemaItem
                 title="Word"
                 data={data}
                 schema={schema}
                 schemaPath="word.value"
             />
-            <SchemaRendererItem
+            <SchemaItem
                 title="Auto spelling fix"
                 data={data}
                 schema={schema}
                 schemaPath="word.auto_spelling_fix.value"
             />
-            <SchemaRendererItem
+            <SchemaItem
                 title="Translation"
                 data={data}
                 schema={schema}
                 schemaPath="word.translation.value"
             />
-            <SchemaRendererItem
+            <SchemaItem
                 title="Transcription"
                 data={data}
                 schema={schema}

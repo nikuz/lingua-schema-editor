@@ -15,3 +15,24 @@ export function findAllJsonStrings(json: any, result?: string[]): string[] {
 
     return strings;
 }
+
+export function populateJsonByPath(json: any, path: string, value: string): any {
+    // deep copy
+    const result = JSON.parse(JSON.stringify(json));
+    const pathParts = path.split('.');
+    let pointer = result;
+
+    for (let i = 0, l = pathParts.length; i < l; i++) {
+        const part = pathParts[i];
+        if (!pointer[part]) {
+            pointer[part] = {};
+        }
+        if (i === l - 1) {
+            pointer[part] = value;
+            break;
+        }
+        pointer = pointer[part];
+    }
+
+    return result;
+}

@@ -1,0 +1,5 @@
+.form-element-horizontal {
+    overflow: hidden;
+    display: inline-block;
+    margin: 5px 20px 5px 0;
+}

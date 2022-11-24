@@ -1,21 +1,21 @@
 import React from 'react';
 import { Typography } from '@mui/material';
 import Collapsable from '../collapsable';
-import { TranslationSchema } from '../../types';
-import SchemaRendererTranslation from './SchemaRendererTranslation';
-import SchemaRendererAlternativeTranslations from './SchemaRendererAlternativeTranslations';
-import SchemaRendererDefinitions from './SchemaRendererDefinitions';
-import SchemaRendererExamples from './SchemaRendererExamples';
-import SchemaRendererContext from './SchemaRendererContext';
-import './SchemaRenderer.css';
+import TranslationSchemaContext from '../../helpers/TranslationSchemaContext';
+import { TranslationSchemaType } from '../../types';
+import TranslationSchemaTranslation from './TranslationSchemaTranslation';
+import TranslationSchemaAlternativeTranslations from './TranslationSchemaAlternativeTranslations';
+import TranslationSchemaDefinitions from './TranslationSchemaDefinitions';
+import TranslationSchemaExamples from './TranslationSchemaExamples';
+import './TranslationSchema.css';
 
 interface Props {
     data: any,
-    schema: TranslationSchema,
+    schema: TranslationSchemaType,
     onDataPathSelect: (schemaPath: string, dataPath: string) => void,
 }
 
-export default function SchemaRenderer(props: Props) {
+export default function TranslationSchema(props: Props) {
     const {
         data,
         schema,
@@ -23,28 +23,28 @@ export default function SchemaRenderer(props: Props) {
     } = props;
 
     return (
-        <SchemaRendererContext.Provider value={{ onDataPathSelect }}>
-            <div className="schema-renderer">
+        <TranslationSchemaContext.Provider value={{ onDataPathSelect }}>
+            <div className="translation-schema-container">
                 <Typography
                     variant="h4"
                     sx={{ mt: 3 }}
                     gutterBottom
                 >
-                    Preview
+                    Translation Schema
                 </Typography>
-                <SchemaRendererTranslation
+                <TranslationSchemaTranslation
                     data={data}
                     schema={schema}
                 />
-                <SchemaRendererAlternativeTranslations
+                <TranslationSchemaAlternativeTranslations
                     data={data}
                     schema={schema}
                 />
-                <SchemaRendererDefinitions
+                <TranslationSchemaDefinitions
                     data={data}
                     schema={schema}
                 />
-                <SchemaRendererExamples
+                <TranslationSchemaExamples
                     data={data}
                     schema={schema}
                 />
@@ -54,6 +54,6 @@ export default function SchemaRenderer(props: Props) {
                     </pre>
                 </Collapsable>
             </div>
-        </SchemaRendererContext.Provider>
+        </TranslationSchemaContext.Provider>
     );
 }

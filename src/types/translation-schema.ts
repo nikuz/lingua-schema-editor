@@ -1,43 +1,41 @@
-export interface TranslationSchema {
-    word?: TranslationSchemaItem,
-    auto_spelling_fix?: TranslationSchemaItem,
-    translation?: TranslationSchemaItem,
-    transcription?: TranslationSchemaItem,
-    alternative_translations?: TranslationSchemaAlternativeTranslations,
-    definitions?: TranslationSchemaDefinitions,
-    examples?: TranslationSchemaExamples,
+import { SchemaItemType } from './schema';
+
+export interface TranslationSchemaType {
+    word?: SchemaItemType,
+    auto_spelling_fix?: SchemaItemType,
+    translation?: SchemaItemType,
+    transcription?: SchemaItemType,
+    alternative_translations?: TranslationSchemaTypeAlternativeTranslations,
+    definitions?: TranslationSchemaTypeDefinitions,
+    examples?: TranslationSchemaTypeExamples,
 }
 
-interface TranslationSchemaItem {
-    value: string,
-}
-
-export type TranslationSchemaAlternativeTranslations = TranslationSchemaItem & {
-    speech_part?: TranslationSchemaItem,
-    items?: TranslationSchemaItem & {
-        translation?: TranslationSchemaItem,
-        words?: TranslationSchemaItem,
-        frequency?: TranslationSchemaItem,
+export type TranslationSchemaTypeAlternativeTranslations = SchemaItemType & {
+    speech_part?: SchemaItemType,
+    items?: SchemaItemType & {
+        translation?: SchemaItemType,
+        words?: SchemaItemType,
+        frequency?: SchemaItemType,
     },
 }
 
-export type TranslationSchemaDefinitions = TranslationSchemaItem & {
-    speech_part?: TranslationSchemaItem,
-    type?: TranslationSchemaItem,
-    items?: TranslationSchemaItem & {
-        text?: TranslationSchemaItem,
-        example?: TranslationSchemaItem,
-        type?: TranslationSchemaItem,
-        synonyms?: TranslationSchemaItem & {
-            type?: TranslationSchemaItem,
-            items?: TranslationSchemaItem & {
-                text?: TranslationSchemaItem,
+export type TranslationSchemaTypeDefinitions = SchemaItemType & {
+    speech_part?: SchemaItemType,
+    type?: SchemaItemType,
+    items?: SchemaItemType & {
+        text?: SchemaItemType,
+        example?: SchemaItemType,
+        type?: SchemaItemType,
+        synonyms?: SchemaItemType & {
+            type?: SchemaItemType,
+            items?: SchemaItemType & {
+                text?: SchemaItemType,
             },
         },
     },
 }
 
-export type TranslationSchemaExamples = TranslationSchemaItem & {
-    text?: TranslationSchemaItem,
+export type TranslationSchemaTypeExamples = SchemaItemType & {
+    text?: SchemaItemType,
 }
 

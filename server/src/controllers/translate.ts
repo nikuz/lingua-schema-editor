@@ -4,7 +4,6 @@ import { Request, Response } from 'express';
 export function translate(req: Request, res: Response) {
     const body = new URLSearchParams();
     for (const item in req.body) {
-        console.log(item);
         body.append(item, req.body[item]);
     }
 

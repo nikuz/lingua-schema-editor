@@ -10,7 +10,6 @@ import {
     Tab,
 } from '@mui/material';
 import { routerConstants } from '../../constants';
-import './SchemaEdit.css';
 
 const tabs = [{
     label: 'Translation',

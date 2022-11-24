@@ -1,26 +1,26 @@
 import React from 'react';
 import { Typography, ListItem } from '@mui/material';
-import { TranslationSchema } from '../../types';
-import SchemaRendererItem, { SchemaRendererItemType } from './SchemaRendererItem';
+import { TranslationSchemaType } from '../../types';
+import SchemaItem, { SchemaItemRenderType } from '../schema-item';
 
 interface Props {
     data: any,
-    schema?: TranslationSchema,
+    schema?: TranslationSchemaType,
 }
 
-export default function SchemaRendererExamples(props: Props) {
+export default function TranslationSchemaExamples(props: Props) {
     const { data, schema } = props;
 
     return <>
         <Typography variant="h6" sx={{ mt: 2 }}>Examples</Typography>
-        <SchemaRendererItem
+        <SchemaItem
             title="Examples"
-            type={SchemaRendererItemType.list}
+            renderType={SchemaItemRenderType.list}
             data={data}
             schema={schema}
             schemaPath="examples.value"
             itemRender={(item) => (
-                <SchemaRendererExamplesItem
+                <TranslationSchemaExamplesItem
                     data={item}
                     schema={schema}
                 />
@@ -29,12 +29,12 @@ export default function SchemaRendererExamples(props: Props) {
     </>;
 }
 
-function SchemaRendererExamplesItem(props: Props) {
+function TranslationSchemaExamplesItem(props: Props) {
     const { data, schema } = props;
 
     return (
         <ListItem sx={{ pl: 3 }}>
-            <SchemaRendererItem
+            <SchemaItem
                 title="Text"
                 data={data}
                 schema={schema}

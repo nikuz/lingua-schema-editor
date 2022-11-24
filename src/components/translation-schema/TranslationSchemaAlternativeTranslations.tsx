@@ -4,27 +4,27 @@ import {
     Stack,
     Typography,
 } from '@mui/material';
-import { TranslationSchema } from '../../types';
-import SchemaRendererItem, { SchemaRendererItemType } from './SchemaRendererItem';
+import { TranslationSchemaType } from '../../types';
+import SchemaItem, { SchemaItemRenderType } from '../schema-item';
 
 interface Props {
     data: any,
-    schema?: TranslationSchema,
+    schema?: TranslationSchemaType,
 }
 
-export default function SchemaRendererAlternativeTranslations(props: Props) {
+export default function TranslationSchemaAlternativeTranslations(props: Props) {
     const { data, schema } = props;
 
     return <>
         <Typography variant="h6" sx={{ mt: 2 }}>Alternative translations</Typography>
-        <SchemaRendererItem
+        <SchemaItem
             title="Speech parts"
-            type={SchemaRendererItemType.list}
+            renderType={SchemaItemRenderType.list}
             data={data}
             schema={schema}
             schemaPath="alternative_translations.value"
             itemRender={(item) => (
-                <SchemaRendererAlternativeTranslationsSpeechPart
+                <TranslationSchemaAlternativeTranslationsSpeechPart
                     data={item}
                     schema={schema}
                 />
@@ -33,26 +33,26 @@ export default function SchemaRendererAlternativeTranslations(props: Props) {
     </>;
 }
 
-function SchemaRendererAlternativeTranslationsSpeechPart(props: Props) {
+function TranslationSchemaAlternativeTranslationsSpeechPart(props: Props) {
     const { data, schema } = props;
 
     return (
         <ListItem sx={{ pl: 3 }}>
             <Stack spacing={1}>
-                <SchemaRendererItem
+                <SchemaItem
                     title="Speech part"
                     data={data}
                     schema={schema}
                     schemaPath="alternative_translations.speech_part.value"
                 />
-                <SchemaRendererItem
+                <SchemaItem
                     title="Items"
-                    type={SchemaRendererItemType.list}
+                    renderType={SchemaItemRenderType.list}
                     data={data}
                     schema={schema}
                     schemaPath="alternative_translations.items.value"
                     itemRender={(item) => (
-                        <SchemaRendererAlternativeTranslationsItem
+                        <TranslationSchemaAlternativeTranslationsItem
                             data={item}
                             schema={schema}
                         />
@@ -63,25 +63,25 @@ function SchemaRendererAlternativeTranslationsSpeechPart(props: Props) {
     );
 }
 
-function SchemaRendererAlternativeTranslationsItem(props: Props) {
+function TranslationSchemaAlternativeTranslationsItem(props: Props) {
     const { data, schema } = props;
 
     return (
         <ListItem sx={{ pl: 3 }}>
             <Stack spacing={1}>
-                <SchemaRendererItem
+                <SchemaItem
                     title="Translation"
                     data={data}
                     schema={schema}
                     schemaPath="alternative_translations.items.translation.value"
                 />
-                <SchemaRendererItem
+                <SchemaItem
                     title="Frequency"
                     data={data}
                     schema={schema}
                     schemaPath="alternative_translations.items.frequency.value"
                 />
-                <SchemaRendererItem
+                <SchemaItem
                     title="Words"
                     data={data}
                     schema={schema}
