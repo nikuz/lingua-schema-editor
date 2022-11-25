@@ -1,7 +1,7 @@
 import React from 'react';
 import { Stack } from '@mui/material';
-import { TranslationSchemaType } from '../../../../../types';
-import { SchemaItem } from '../../../../../components';
+import { TranslationSchemaType } from 'src/types';
+import { SchemaItem } from 'src/components';
 
 interface Props {
     data: any,

@@ -3,9 +3,9 @@ import { Typography } from '@mui/material';
 import {
     Collapsable,
     SchemaItem,
-} from '../../../../../components';
-import TranslationSchemaContext from '../../../../../helpers/TranslationSchemaContext';
-import { PronunciationSchemaType } from '../../../../../types';
+} from 'src/components';
+import { TranslationSchemaContext } from 'src/helpers';
+import { PronunciationSchemaType } from 'src/types';
 
 interface Props {
     data: any,

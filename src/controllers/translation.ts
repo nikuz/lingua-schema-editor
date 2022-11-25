@@ -1,4 +1,4 @@
-import { apiProviders } from '../providers';
+import { apiProviders } from 'src/providers';
 
 interface Props {
     url: string,

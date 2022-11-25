@@ -2,13 +2,13 @@ import React, { useState, useCallback, useMemo } from 'react';
 import {
     Collapsable,
     Form,
-} from '../../../../components';
-import { translationController } from '../../../../controllers';
-import { jsonUtils } from '../../../../utils';
+} from 'src/components';
+import { translationController } from 'src/controllers';
+import { jsonUtils } from 'src/utils';
 import {
     FormFields,
     TranslationSchemaType,
-} from '../../../../types';
+} from 'src/types';
 import TranslationSchema from './schema';
 
 const {

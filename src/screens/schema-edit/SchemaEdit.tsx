@@ -9,7 +9,7 @@ import {
     Tabs,
     Tab,
 } from '@mui/material';
-import { routerConstants } from '../../constants';
+import { routerConstants } from 'src/constants';
 
 const tabs = [{
     label: 'Translation',

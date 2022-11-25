@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import SchemaIcon from '@mui/icons-material/Schema';
 import SaveIcon from '@mui/icons-material/Save';
-import { routerConstants } from '../constants';
+import { routerConstants } from 'src/constants';
 import './App.css';
 
 const DRAWER_WIDTH = 64;

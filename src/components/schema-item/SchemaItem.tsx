@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import Collapsable from '../collapsable';
 import JsonEditor from '../json-editor';
-import TranslationSchemaContext from '../../helpers/TranslationSchemaContext';
+import { TranslationSchemaContext } from 'src/helpers';
 
 export enum SchemaItemRenderType {
     string,

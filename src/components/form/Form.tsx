@@ -9,8 +9,8 @@ import {
     TextField,
     Box,
 } from '@mui/material';
-import { FormFields } from '../../types';
-import supportedLanguages from '../../data/supported-languages.json';
+import { FormFields } from 'src/types';
+import supportedLanguages from 'src/data/supported-languages.json';
 import './Form.css';
 // import data from '../../data/man.json';
 

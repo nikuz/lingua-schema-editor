@@ -4,7 +4,7 @@ import {
     Routes,
     Route,
 } from 'react-router-dom';
-import { routerConstants } from '../constants';
+import { routerConstants } from 'src/constants';
 
 import App from './App';
 import NotFound from './not-found';

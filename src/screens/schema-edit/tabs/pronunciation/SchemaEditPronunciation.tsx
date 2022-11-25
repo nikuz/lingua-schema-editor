@@ -4,13 +4,13 @@ import { Box } from '@mui/material';
 import {
     Collapsable,
     Form,
-} from '../../../../components';
-import { translationController } from '../../../../controllers';
-import { jsonUtils } from '../../../../utils';
+} from 'src/components';
+import { translationController } from 'src/controllers';
+import { jsonUtils } from 'src/utils';
 import {
     FormFields,
     PronunciationSchemaType,
-} from '../../../../types';
+} from 'src/types';
 import PronunciationSchema from './schema';
 
 const {

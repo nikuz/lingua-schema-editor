@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Box } from '@mui/material';
-import { Form, Collapsable } from '../../../../components';
-import { imagesController } from '../../../../controllers';
-import { FormFields, ImagesSchemaType } from '../../../../types';
+import { Form, Collapsable } from 'src/components';
+import { imagesController } from 'src/controllers';
+import { FormFields, ImagesSchemaType } from 'src/types';
 import './SchemaEditImages.css';
 
 const {
