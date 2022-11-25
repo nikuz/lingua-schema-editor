@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
     TranslationSchema,
     Collapsable,
@@ -19,22 +19,28 @@ const {
 } = process.env;
 
 export default function SchemaEditTranslation() {
+    const defaultSchema = useMemo<TranslationSchemaType>(() => ({
+        url: REACT_APP_TRANSLATION_URL || '',
+        parameter: REACT_APP_TRANSLATION_BODY_PARAMETER || '',
+        body: REACT_APP_TRANSLATION_BODY || '',
+        marker: REACT_APP_TRANSLATION_MARKER || '',
+    }), []);
     const [fields, setFields] = useState<FormFields>({
         url: {
             label: 'Url',
-            value: REACT_APP_TRANSLATION_URL || '',
+            value: defaultSchema.url,
             fullWidth: true,
         },
         parameter: {
             label: 'Parameter',
-            value: REACT_APP_TRANSLATION_BODY_PARAMETER || '',
+            value: defaultSchema.parameter,
         },
         body: {
             label: 'Body',
-            value: REACT_APP_TRANSLATION_BODY || '',
+            value: defaultSchema.body,
             variables: ['{marker}', '{word}', '{sourceLanguage}', '{targetLanguage}'],
             variablesValues: {
-                '{marker}': REACT_APP_TRANSLATION_MARKER || '',
+                '{marker}': defaultSchema.marker,
             },
             type: 'textarea',
             fullWidth: true,
@@ -42,14 +48,26 @@ export default function SchemaEditTranslation() {
     });
     const [translateResponseText, setTranslateResponseText] = useState<string>();
     const [translateResponseJson, setTranslateResponseJson] = useState<{}>();
-    const [resultSchema, setResultSchema] = useState<TranslationSchemaType>({});
+    const [resultSchema, setResultSchema] = useState<TranslationSchemaType>(defaultSchema);
+
+    const setFieldsHandler = useCallback((fields: FormFields) => {
+        setFields(fields);
+        const bodyVariables = fields.body.variablesValues;
+        setResultSchema({
+            ...resultSchema,
+            url: fields.url.value,
+            parameter: fields.parameter.value,
+            body: fields.body.value,
+            marker: bodyVariables ? bodyVariables['{marker}'] : resultSchema.marker,
+        });
+    }, [resultSchema]);
 
     const requestHandler = useCallback((): Promise<void> => {
         return new Promise((resolve, reject) => {
             // reset schema state
             setTranslateResponseText(undefined);
             setTranslateResponseJson(undefined);
-            setResultSchema({});
+            setResultSchema(defaultSchema);
 
             const bodyVariables = fields.body.variablesValues;
             const marker = bodyVariables && bodyVariables['{marker}'];
@@ -104,7 +122,7 @@ export default function SchemaEditTranslation() {
                 reject(err);
             });
         });
-    }, [fields]);
+    }, [defaultSchema, fields]);
 
     const populateSchemaHandler = useCallback((schemaPath: string, dataPath: string) => {
         setResultSchema(jsonUtils.populateJsonByPath(resultSchema, schemaPath, dataPath));
@@ -114,7 +132,7 @@ export default function SchemaEditTranslation() {
         <>
             <Form
                 fields={fields}
-                onChange={setFields}
+                onChange={setFieldsHandler}
                 onSubmit={requestHandler}
             />
             {translateResponseJson && (

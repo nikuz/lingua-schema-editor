@@ -1,5 +1,6 @@
-import { SchemaItemType } from './schema';
-
-export type ImagesSchemaType = SchemaItemType & {
-    marker: string,
+export type ImagesSchemaType = {
+    url: string,
+    userAgent: string,
+    regExp: string,
+    minSize: string,
 };

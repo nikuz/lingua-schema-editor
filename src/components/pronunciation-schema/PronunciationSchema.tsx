@@ -32,7 +32,7 @@ export default function PronunciationSchema(props: Props) {
                     title="Value"
                     data={data}
                     schema={schema}
-                    schemaPath="value"
+                    schemaPath="data.value"
                 />
                 <Collapsable title="Schema" headerSize="h5" marginTop={5}>
                     <pre>

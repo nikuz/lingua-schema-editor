@@ -1,7 +1,8 @@
-import React, { useState, useCallback } from 'react';
-import { Form } from '../../../../components';
+import React, { useState, useCallback, useMemo } from 'react';
+import { Box } from '@mui/material';
+import { Form, Collapsable } from '../../../../components';
 import { imagesController } from '../../../../controllers';
-import { FormFields } from '../../../../types';
+import { FormFields, ImagesSchemaType } from '../../../../types';
 import './SchemaEditImages.css';
 
 const {
@@ -12,32 +13,50 @@ const {
 } = process.env;
 
 export default function SchemaEditImages() {
+    const defaultSchema = useMemo<ImagesSchemaType>(() => ({
+        url: REACT_APP_IMAGE_URL || '',
+        userAgent: REACT_APP_IMAGE_USER_AGENT || '',
+        regExp: REACT_APP_IMAGE_REG_EXP || '',
+        minSize: REACT_APP_IMAGE_MIN_SIZE || '',
+    }), []);
     const [fields, setFields] = useState<FormFields>({
         url: {
             label: 'Url',
-            value: REACT_APP_IMAGE_URL || '',
+            value: defaultSchema.url,
             fullWidth: true,
             variables: ['{word}'],
         },
         userAgent: {
             label: 'User Agent',
-            value: REACT_APP_IMAGE_USER_AGENT || '',
+            value: defaultSchema.userAgent,
             fullWidth: true,
         },
-        regexp: {
+        regExp: {
             label: 'RegExp',
-            value: REACT_APP_IMAGE_REG_EXP || '',
+            value: defaultSchema.regExp,
         },
-        size: {
+        minSize: {
             label: 'Min base64 image size',
-            value: REACT_APP_IMAGE_MIN_SIZE || '',
+            value: defaultSchema.minSize,
         },
     });
     const [images, setImages] = useState<string[]>([]);
+    const [resultSchema, setResultSchema] = useState<ImagesSchemaType>(defaultSchema);
+
+    const setFieldsHandler = useCallback((fields: FormFields) => {
+        setFields(fields);
+        setResultSchema({
+            ...resultSchema,
+            url: fields.url.value,
+            userAgent: fields.userAgent.value,
+            regExp: fields.regExp.value,
+            minSize: fields.minSize.value,
+        });
+    }, [resultSchema]);
 
     const requestHandler = useCallback((): Promise<void> => {
         return new Promise((resolve, reject) => {
-
+            setResultSchema(defaultSchema);
             setImages([]);
 
             let url = fields.url.value;
@@ -53,11 +72,11 @@ export default function SchemaEditImages() {
                 url,
                 userAgent: fields.userAgent.value,
             }).then(response => {
-                const regExp = new RegExp(fields.regexp.value, 'g');
+                const regExp = new RegExp(fields.regExp.value, 'g');
                 const imagesMatch = response.match(regExp);
                 if (imagesMatch) {
                     const validImages: string[] = [];
-                    const minSize = Number(fields.size.value);
+                    const minSize = Number(fields.minSize.value);
                     imagesMatch.forEach(item => {
                         const content = item.replace(regExp, '$1');
                         if (content.length >= minSize) {
@@ -81,24 +100,31 @@ export default function SchemaEditImages() {
                 reject(err);
             });
         });
-    }, [fields]);
+    }, [defaultSchema, fields]);
 
     return <>
         <Form
             fields={fields}
-            onChange={setFields}
+            onChange={setFieldsHandler}
             onSubmit={requestHandler}
         />
-        {images.map((item, key) => {
-            return (
-                <div className="image" key={key}>
-                    <img
-                        src={`${item}`}
-                        alt=""
-                        loading="lazy"
-                    />
-                </div>
-            );
-        })}
+        <Collapsable title="Schema" headerSize="h5" marginTop={5}>
+            <pre>
+                {JSON.stringify(resultSchema, null, 4)}
+            </pre>
+        </Collapsable>
+        <Box sx={{ mt: 4 }}>
+            {images.map((item, key) => {
+                return (
+                    <div className="image" key={key}>
+                        <img
+                            src={`${item}`}
+                            alt=""
+                            loading="lazy"
+                        />
+                    </div>
+                );
+            })}
+        </Box>
     </>;
 }
