@@ -2,7 +2,6 @@ import React, { useCallback, useState } from 'react';
 import {
     Alert,
     Button,
-    CircularProgress,
     FormLabel,
     MenuItem,
     Select,
@@ -10,6 +9,7 @@ import {
     Box,
 } from '@mui/material';
 import { FormFields } from 'src/types';
+import Loading from '../loading';
 import supportedLanguages from 'src/data/supported-languages.json';
 import './Form.css';
 // import data from '../../data/man.json';
@@ -199,11 +199,7 @@ export default function Form(props: Props) {
                 Get
             </Button>
         </Box>
-        {loading && (
-            <div className="flex flex-center">
-                <CircularProgress/>
-            </div>
-        )}
+        {loading && <Loading />}
         {error && <Alert severity="error">{error.message}</Alert>}
     </>;
 }
