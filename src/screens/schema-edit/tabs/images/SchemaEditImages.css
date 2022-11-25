@@ -1,0 +1,9 @@
+.image {
+    display: inline-block;
+    border: 1px solid gray;
+    min-width: 50px;
+    min-height: 50px;
+    margin: 5px;
+    vertical-align: top;
+    font-size: 0;
+}

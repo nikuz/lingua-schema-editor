@@ -1,5 +1,7 @@
-import * as translateController from './translate';
+import * as translationController from './translation';
+import * as imagesController from './images';
 
 export {
-    translateController,
+    translationController,
+    imagesController,
 };

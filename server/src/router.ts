@@ -1,11 +1,11 @@
 import express from 'express';
-import { translateController } from './controllers';
+import {
+    translationController,
+    imagesController,
+} from './controllers';
 
 const router = express.Router();
-router.post('/translate', translateController.translate);
+router.post('/translate', translationController.translate);
+router.get('/images', imagesController.get);
 
 export default router;
-
-// export default (app: Express) => {
-//     app.post('/translate', translateController.translate);
-// };

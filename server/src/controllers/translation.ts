@@ -16,6 +16,6 @@ export function translate(req: Request, res: Response) {
     })
         .then(result => res.status(200).send(result.data))
         .catch(error => {
-            res.status(error.response.status).send(error.toString());
+            res.status(404).send(error.toString());
         });
 }
