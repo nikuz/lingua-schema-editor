@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import {
-    TranslationSchema,
     Collapsable,
     Form,
 } from '../../../../components';
@@ -10,6 +9,7 @@ import {
     FormFields,
     TranslationSchemaType,
 } from '../../../../types';
+import TranslationSchema from './schema';
 
 const {
     REACT_APP_TRANSLATION_URL,

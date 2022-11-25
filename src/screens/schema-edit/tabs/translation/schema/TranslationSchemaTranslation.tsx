@@ -1,7 +1,7 @@
 import React from 'react';
 import { Stack } from '@mui/material';
-import { TranslationSchemaType } from '../../types';
-import SchemaItem from '../schema-item';
+import { TranslationSchemaType } from '../../../../../types';
+import { SchemaItem } from '../../../../../components';
 
 interface Props {
     data: any,
@@ -29,19 +29,19 @@ export default function TranslationSchemaTranslation(props: Props) {
                 title="Auto spelling fix"
                 data={data}
                 schema={schema}
-                schemaPath="word.auto_spelling_fix.value"
+                schemaPath="auto_spelling_fix.value"
             />
             <SchemaItem
                 title="Translation"
                 data={data}
                 schema={schema}
-                schemaPath="word.translation.value"
+                schemaPath="translation.value"
             />
             <SchemaItem
                 title="Transcription"
                 data={data}
                 schema={schema}
-                schemaPath="word.transcription.value"
+                schemaPath="transcription.value"
             />
         </Stack>
     );

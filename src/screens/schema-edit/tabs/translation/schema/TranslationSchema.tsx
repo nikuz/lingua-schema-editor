@@ -1,8 +1,8 @@
 import React from 'react';
 import { Typography } from '@mui/material';
-import Collapsable from '../collapsable';
-import TranslationSchemaContext from '../../helpers/TranslationSchemaContext';
-import { TranslationSchemaType } from '../../types';
+import { Collapsable } from '../../../../../components';
+import { TranslationSchemaContext } from '../../../../../helpers';
+import { TranslationSchemaType } from '../../../../../types';
 import TranslationSchemaTranslation from './TranslationSchemaTranslation';
 import TranslationSchemaAlternativeTranslations from './TranslationSchemaAlternativeTranslations';
 import TranslationSchemaDefinitions from './TranslationSchemaDefinitions';

@@ -4,8 +4,8 @@ import {
     Stack,
     Typography,
 } from '@mui/material';
-import { TranslationSchemaType } from '../../types';
-import SchemaItem, { SchemaItemRenderType } from '../schema-item';
+import { TranslationSchemaType } from '../../../../../types';
+import { SchemaItem, SchemaItemRenderType } from '../../../../../components';
 
 interface Props {
     data: any,

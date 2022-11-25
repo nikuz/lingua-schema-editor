@@ -1,9 +1,11 @@
 import React from 'react';
 import { Typography } from '@mui/material';
-import Collapsable from '../collapsable';
-import SchemaItem from '../schema-item';
-import TranslationSchemaContext from '../../helpers/TranslationSchemaContext';
-import { PronunciationSchemaType } from '../../types';
+import {
+    Collapsable,
+    SchemaItem,
+} from '../../../../../components';
+import TranslationSchemaContext from '../../../../../helpers/TranslationSchemaContext';
+import { PronunciationSchemaType } from '../../../../../types';
 
 interface Props {
     data: any,

@@ -4,7 +4,6 @@ import { Box } from '@mui/material';
 import {
     Collapsable,
     Form,
-    PronunciationSchema,
 } from '../../../../components';
 import { translationController } from '../../../../controllers';
 import { jsonUtils } from '../../../../utils';
@@ -12,6 +11,7 @@ import {
     FormFields,
     PronunciationSchemaType,
 } from '../../../../types';
+import PronunciationSchema from './schema';
 
 const {
     REACT_APP_TRANSLATION_URL,

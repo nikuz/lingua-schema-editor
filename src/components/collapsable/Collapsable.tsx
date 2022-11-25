@@ -6,6 +6,7 @@ import {
     Typography,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import './Collapsable.css';
 
 type HeaderSize = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
@@ -33,7 +34,7 @@ export default function Collapsable(props: Props) {
                     {title}
                 </Typography>
             </AccordionSummary>
-            <AccordionDetails>
+            <AccordionDetails className="collapsable-content">
                 {children}
             </AccordionDetails>
         </Accordion>
