@@ -90,11 +90,12 @@ export default function SchemaEditPronunciation() {
                 });
             }
 
+            const body = new URLSearchParams();
+            body.append(fields.parameter.value, bodyValue);
+
             translationController.translate({
                 url: fields.url.value,
-                body: {
-                    [fields.parameter.value]: bodyValue,
-                },
+                body,
             }).then(response => {
                 if (marker) {
                     const translationRawStrings = response?.split('\n') ?? [];
