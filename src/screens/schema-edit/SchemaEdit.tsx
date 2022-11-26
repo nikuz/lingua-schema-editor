@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
     Outlet,
     useLocation,
@@ -18,6 +18,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { routerConstants } from 'src/constants';
 import { routerUtils } from 'src/utils';
 import { ResultSchemaType } from '../../types';
+import { validateSchemaIntegrity } from './utils/schema-validator';
 import {
     SchemaEditCache,
     SetSchemaEditCacheCallback,
@@ -47,18 +48,13 @@ export default function SchemaEdit() {
         images: {},
     });
     const isNew = params.version === 'new';
-    // const isSaveEnabled = useMemo(() => {
-    //     let schemaIsValid = true;
-    //     const currentSchemaKeys = Object.keys(resultSchema);
-    //     const resultSchemaKeys = Object.keys(ResultSchemaKeys);
-    //     for (let key of resultSchemaKeys) {
-    //         if (!currentSchemaKeys.includes(key)) {
-    //             schemaIsValid = false;
-    //             break;
-    //         }
-    //     }
-    //     return schemaIsValid;
-    // }, [resultSchema]);
+    const isSaveEnabled = useMemo(() => {
+        return validateSchemaIntegrity({
+            translation: cache.translation.schema,
+            pronunciation: cache.pronunciation.schema,
+            images: cache.images.schema,
+        });
+    }, [cache]);
 
     const setCacheHandler: SetSchemaEditCacheCallback = useCallback((key, cachePart) => {
         const cacheClone = {
@@ -106,7 +102,7 @@ export default function SchemaEdit() {
                 variant="outlined"
                 size="small"
                 color="success"
-                // disabled={!isSaveEnabled}
+                disabled={!isSaveEnabled}
                 onClick={saveResultSchema}
             >
                 <SaveIcon sx={{ mr: 1 }} />

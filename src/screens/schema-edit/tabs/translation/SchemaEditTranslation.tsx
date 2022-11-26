@@ -15,7 +15,7 @@ import {
     SchemaEditCacheKeys,
     SetSchemaEditCacheCallback,
 } from '../../types';
-import SchemaEditTranslationBuilder from './components/builder';
+import SchemaEditTranslationBuilder from './components/schema-builder';
 import SchemaEditTranslationPreview from './components/preview';
 
 const {

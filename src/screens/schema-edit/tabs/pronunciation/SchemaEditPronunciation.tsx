@@ -15,7 +15,7 @@ import {
     SchemaEditCacheKeys,
     SetSchemaEditCacheCallback,
 } from '../../types';
-import SchemaEditPronunciationBuilder from './components/builder';
+import SchemaEditPronunciationBuilder from './components/schema-builder';
 import SchemaEditPronunciationPreview from './components/preview';
 
 const {
@@ -136,6 +136,7 @@ export default function SchemaEditPronunciation() {
                     }
 
                     if (translationResult !== '') {
+                        setPronunciationResponseText(translationResult);
                         setCache(SchemaEditCacheKeys.pronunciation, {
                             ...cache.pronunciation,
                             responseText: translationResult,

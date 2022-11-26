@@ -3,7 +3,6 @@ import { PronunciationSchemaType } from  './pronunciation-schema';
 import { ImagesSchemaType } from  './images-schema';
 
 export interface ResultSchemaType {
-    version?: string,
     translation?: TranslationSchemaType,
     pronunciation?: PronunciationSchemaType,
     images?: ImagesSchemaType,
