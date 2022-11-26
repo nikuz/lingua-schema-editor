@@ -24,30 +24,32 @@ const {
 export default function SchemaEditImages() {
     const [cache, setCache]: [SchemaEditCache, SetSchemaEditCacheCallback] = useOutletContext();
     const defaultSchema = useMemo<ImagesSchemaType>(() => ({
-        url: REACT_APP_IMAGE_URL || '',
-        userAgent: REACT_APP_IMAGE_USER_AGENT || '',
-        regExp: REACT_APP_IMAGE_REG_EXP || '',
-        minSize: REACT_APP_IMAGE_MIN_SIZE || '',
+        fields: {
+            url: REACT_APP_IMAGE_URL || '',
+            userAgent: REACT_APP_IMAGE_USER_AGENT || '',
+            regExp: REACT_APP_IMAGE_REG_EXP || '',
+            minSize: REACT_APP_IMAGE_MIN_SIZE || '',
+        },
     }), []);
     const [fields, setFields] = useState<FormFields>({
         url: {
             label: 'Url',
-            value: defaultSchema.url,
+            value: defaultSchema.fields.url,
             fullWidth: true,
             variables: ['{word}'],
         },
         userAgent: {
             label: 'User Agent',
-            value: defaultSchema.userAgent,
+            value: defaultSchema.fields.userAgent,
             fullWidth: true,
         },
         regExp: {
             label: 'RegExp',
-            value: defaultSchema.regExp,
+            value: defaultSchema.fields.regExp,
         },
         minSize: {
             label: 'Min base64 image size',
-            value: defaultSchema.minSize,
+            value: defaultSchema.fields.minSize,
         },
     });
     const [images, setImages] = useState<string[]>(cache.images.images || []);
@@ -58,12 +60,14 @@ export default function SchemaEditImages() {
 
     const setFieldsHandler = useCallback((fields: FormFields) => {
         setFields(fields);
-        const schemaClone = {
+        const schemaClone: ImagesSchemaType = {
             ...imagesSchema,
-            url: fields.url.value,
-            userAgent: fields.userAgent.value,
-            regExp: fields.regExp.value,
-            minSize: fields.minSize.value,
+            fields: {
+                url: fields.url.value,
+                userAgent: fields.userAgent.value,
+                regExp: fields.regExp.value,
+                minSize: fields.minSize.value,
+            },
         };
         setImagesSchema(schemaClone);
         setCache(SchemaEditCacheKeys.images, {
@@ -75,10 +79,11 @@ export default function SchemaEditImages() {
     const requestHandler = useCallback((): Promise<void> => {
         return new Promise((resolve, reject) => {
             setImages([]);
-            setImagesSchema(defaultSchema);
             setCache(SchemaEditCacheKeys.images, {
-                images: undefined,
-                schema: defaultSchema,
+                ...cache.images,
+                schema: {
+                    fields: imagesSchema.fields,
+                },
             });
 
             let url = fields.url.value;
@@ -126,7 +131,7 @@ export default function SchemaEditImages() {
                 reject(err);
             });
         });
-    }, [defaultSchema, fields, cache, setCache]);
+    }, [fields, imagesSchema, cache, setCache]);
 
     return <>
         <Form
@@ -134,7 +139,7 @@ export default function SchemaEditImages() {
             onChange={setFieldsHandler}
             onSubmit={requestHandler}
         />
-        <Collapsable title="Schema" headerSize="h5" marginTop={5}>
+        <Collapsable title="Schema" headerSize="h5" marginTop={5} marginBottom={3}>
             <pre>
                 {JSON.stringify(imagesSchema, null, 4)}
             </pre>

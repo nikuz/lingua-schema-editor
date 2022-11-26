@@ -1,0 +1,18 @@
+.json-editor-modal-container {
+    height: 100%;
+}
+
+.json-editor-modal-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+    width: 80vw;
+}
+
+.json-editor-modal-title {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    background-color: #FFF;
+}

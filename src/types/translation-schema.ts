@@ -1,10 +1,12 @@
 import { SchemaItemType } from './schema-item';
 
 export interface TranslationSchemaType {
-    url: string,
-    parameter: string,
-    body: string,
-    marker: string,
+    fields: {
+        url: string,
+        parameter: string,
+        body: string,
+        marker: string,
+    },
     word?: SchemaItemType,
     auto_spelling_fix?: SchemaItemType,
     translation?: SchemaItemType,

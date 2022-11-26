@@ -28,27 +28,29 @@ const {
 export default function SchemaEditTranslation() {
     const [cache, setCache]: [SchemaEditCache, SetSchemaEditCacheCallback] = useOutletContext();
     const defaultSchema = useMemo<TranslationSchemaType>(() => ({
-        url: REACT_APP_TRANSLATION_URL || '',
-        parameter: REACT_APP_TRANSLATION_BODY_PARAMETER || '',
-        body: REACT_APP_TRANSLATION_BODY || '',
-        marker: REACT_APP_TRANSLATION_MARKER || '',
+        fields: {
+            url: REACT_APP_TRANSLATION_URL || '',
+            parameter: REACT_APP_TRANSLATION_BODY_PARAMETER || '',
+            body: REACT_APP_TRANSLATION_BODY || '',
+            marker: REACT_APP_TRANSLATION_MARKER || '',
+        },
     }), []);
     const [fields, setFields] = useState<FormFields>({
         url: {
             label: 'Url',
-            value: defaultSchema.url,
+            value: defaultSchema.fields.url,
             fullWidth: true,
         },
         parameter: {
             label: 'Parameter',
-            value: defaultSchema.parameter,
+            value: defaultSchema.fields.parameter,
         },
         body: {
             label: 'Body',
-            value: defaultSchema.body,
+            value: defaultSchema.fields.body,
             variables: ['{marker}', '{word}', '{sourceLanguage}', '{targetLanguage}'],
             variablesValues: {
-                '{marker}': defaultSchema.marker,
+                '{marker}': defaultSchema.fields.marker,
             },
             type: 'textarea',
             fullWidth: true,
@@ -64,12 +66,14 @@ export default function SchemaEditTranslation() {
     const setFieldsHandler = useCallback((fields: FormFields) => {
         setFields(fields);
         const bodyVariables = fields.body.variablesValues;
-        const schemaClone = {
+        const schemaClone: TranslationSchemaType = {
             ...translationSchema,
-            url: fields.url.value,
-            parameter: fields.parameter.value,
-            body: fields.body.value,
-            marker: bodyVariables ? bodyVariables['{marker}'] : translationSchema.marker,
+            fields: {
+                url: fields.url.value,
+                parameter: fields.parameter.value,
+                body: fields.body.value,
+                marker: bodyVariables ? bodyVariables['{marker}'] : translationSchema.fields.marker,
+            },
         };
         setTranslationSchema(schemaClone);
         setCache(SchemaEditCacheKeys.translation, {
@@ -83,11 +87,15 @@ export default function SchemaEditTranslation() {
             // reset schema state
             setTranslationResponseText(undefined);
             setTranslationResponseJson(undefined);
-            setTranslationSchema(defaultSchema);
+            setTranslationSchema({
+                fields: translationSchema.fields,
+            });
             setCache(SchemaEditCacheKeys.translation, {
                 responseText: undefined,
                 responseJson: undefined,
-                schema: defaultSchema,
+                schema: {
+                    fields: translationSchema.fields,
+                },
             });
 
             const bodyVariables = fields.body.variablesValues;
@@ -153,7 +161,7 @@ export default function SchemaEditTranslation() {
                 reject(err);
             });
         });
-    }, [defaultSchema, fields, cache, setCache]);
+    }, [fields, translationSchema, cache, setCache]);
 
     const populateSchemaHandler = useCallback((schemaPath: string, dataPath: string) => {
         const schema = jsonUtils.populateJsonByPath(translationSchema, schemaPath, dataPath);
@@ -178,6 +186,11 @@ export default function SchemaEditTranslation() {
                     onDataPathSelect={populateSchemaHandler}
                 />
             )}
+            <Collapsable title="Schema" headerSize="h5" marginTop={5} marginBottom={3}>
+                <pre>
+                    {JSON.stringify(translationSchema, null, 4)}
+                </pre>
+            </Collapsable>
             {translationResponseText && (
                 <Collapsable title="Original response">
                     {translationResponseText}

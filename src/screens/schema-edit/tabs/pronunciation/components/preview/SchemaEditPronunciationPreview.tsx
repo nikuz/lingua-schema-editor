@@ -23,7 +23,7 @@ export default function SchemaEditPronunciationPreview(props: Props) {
     return (
         <Box sx={{ mt: 4 }}>
             <audio
-                src={`${schema.base64Prefix}${value}`}
+                src={`${schema.fields.base64Prefix}${value}`}
                 controls
             />
         </Box>

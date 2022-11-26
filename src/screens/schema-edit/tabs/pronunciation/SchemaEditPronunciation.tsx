@@ -28,35 +28,37 @@ const {
 export default function SchemaEditPronunciation() {
     const [cache, setCache]: [SchemaEditCache, SetSchemaEditCacheCallback] = useOutletContext();
     const defaultSchema = useMemo<PronunciationSchemaType>(() => ({
-        url: REACT_APP_TRANSLATION_URL || '',
-        parameter: REACT_APP_TRANSLATION_BODY_PARAMETER || '',
-        body: REACT_APP_PRONUNCIATION_BODY || '',
-        marker: REACT_APP_PRONUNCIATION_MARKER || '',
-        base64Prefix: 'data:audio/mp3;base64,',
+        fields: {
+            url: REACT_APP_TRANSLATION_URL || '',
+            parameter: REACT_APP_TRANSLATION_BODY_PARAMETER || '',
+            body: REACT_APP_PRONUNCIATION_BODY || '',
+            marker: REACT_APP_PRONUNCIATION_MARKER || '',
+            base64Prefix: 'data:audio/mp3;base64,',
+        }
     }), []);
     const [fields, setFields] = useState<FormFields>({
         url: {
             label: 'Url',
-            value: defaultSchema.url,
+            value: defaultSchema.fields.url,
             fullWidth: true,
         },
         parameter: {
             label: 'Parameter',
-            value: defaultSchema.parameter,
+            value: defaultSchema.fields.parameter,
         },
         body: {
             label: 'Body',
-            value: defaultSchema.body,
+            value: defaultSchema.fields.body,
             variables: ['{marker}', '{word}', '{sourceLanguage}'],
             variablesValues: {
-                '{marker}': defaultSchema.marker,
+                '{marker}': defaultSchema.fields.marker,
             },
             type: 'textarea',
             fullWidth: true,
         },
         base64Prefix: {
             label: 'Base 64 prefix',
-            value: defaultSchema.base64Prefix,
+            value: defaultSchema.fields.base64Prefix,
             fullWidth: true,
         }
     });
@@ -70,13 +72,15 @@ export default function SchemaEditPronunciation() {
     const setFieldsHandler = useCallback((fields: FormFields) => {
         setFields(fields);
         const bodyVariables = fields.body.variablesValues;
-        const schemaClone = {
+        const schemaClone: PronunciationSchemaType = {
             ...pronunciationSchema,
-            url: fields.url.value,
-            parameter: fields.parameter.value,
-            body: fields.body.value,
-            marker: bodyVariables ? bodyVariables['{marker}'] : pronunciationSchema.marker,
-            base64Prefix: fields.base64Prefix.value,
+            fields: {
+                url: fields.url.value,
+                parameter: fields.parameter.value,
+                body: fields.body.value,
+                marker: bodyVariables ? bodyVariables['{marker}'] : pronunciationSchema.fields.marker,
+                base64Prefix: fields.base64Prefix.value,
+            },
         };
         setPronunciationSchema(schemaClone);
         setCache(SchemaEditCacheKeys.pronunciation, {
@@ -90,11 +94,15 @@ export default function SchemaEditPronunciation() {
             // reset schema state
             setPronunciationResponseText(undefined);
             setPronunciationResponseJson(undefined);
-            setPronunciationSchema(defaultSchema);
+            setPronunciationSchema({
+                fields: pronunciationSchema.fields,
+            });
             setCache(SchemaEditCacheKeys.pronunciation, {
                 responseText: undefined,
                 responseJson: undefined,
-                schema: defaultSchema,
+                schema: {
+                    fields: pronunciationSchema.fields,
+                },
             });
 
             const bodyVariables = fields.body.variablesValues;
@@ -160,7 +168,7 @@ export default function SchemaEditPronunciation() {
                 reject(err);
             });
         });
-    }, [defaultSchema, fields, cache, setCache]);
+    }, [fields, pronunciationSchema, cache, setCache]);
 
     const populateSchemaHandler = useCallback((schemaPath: string, dataPath: string) => {
         const schema = jsonUtils.populateJsonByPath(pronunciationSchema, schemaPath, dataPath);
@@ -184,6 +192,11 @@ export default function SchemaEditPronunciation() {
                 onDataPathSelect={populateSchemaHandler}
             />
         )}
+        <Collapsable title="Schema" headerSize="h5" marginTop={5} marginBottom={3}>
+            <pre>
+                {JSON.stringify(pronunciationSchema, null, 4)}
+            </pre>
+        </Collapsable>
         {pronunciationResponseText && (
             <Collapsable title="Original response">
                 <div className="text-ellipsis">

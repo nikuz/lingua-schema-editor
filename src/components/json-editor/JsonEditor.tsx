@@ -47,7 +47,6 @@ export default class JsonEditor extends React.Component<Props> {
             this.editor = new JSONEditor(this.containerEl, {
                 mode,
                 enableSort: false,
-                enableTransform: false,
                 onEvent: this.eventHandler,
             }, data);
         }
