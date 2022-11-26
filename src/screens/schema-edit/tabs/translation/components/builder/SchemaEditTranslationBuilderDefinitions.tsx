@@ -12,7 +12,7 @@ interface Props {
     schema?: TranslationSchemaType,
 }
 
-export default function TranslationSchemaDefinitions(props: Props) {
+export default function SchemaEditTranslationBuilderDefinitions(props: Props) {
     const { data, schema } = props;
 
     return <>

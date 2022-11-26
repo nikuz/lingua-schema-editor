@@ -8,14 +8,3 @@ export interface ResultSchemaType {
     pronunciation?: PronunciationSchemaType,
     images?: ImagesSchemaType,
 }
-
-export enum ResultSchemaKeys {
-    translation = 'translation',
-    pronunciation = 'pronunciation',
-    images = 'images',
-}
-
-export type SetResultSchemaCallback = (
-    key: ResultSchemaKeys,
-    schema: TranslationSchemaType | PronunciationSchemaType | ImagesSchemaType,
-) => void;

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
     Outlet,
     useLocation,
@@ -17,11 +17,11 @@ import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { routerConstants } from 'src/constants';
 import { routerUtils } from 'src/utils';
+import { ResultSchemaType } from '../../types';
 import {
-    ResultSchemaType,
-    ResultSchemaKeys,
-    SetResultSchemaCallback,
-} from '../../types';
+    SchemaEditCache,
+    SetSchemaEditCacheCallback,
+} from './types';
 
 const tabs = [{
     label: 'Translation',
@@ -35,32 +35,38 @@ const tabs = [{
 }];
 
 export default function SchemaEdit() {
-    const [activeTab, setActiveTab] = useState(0);
     const location = useLocation();
     const navigate = useNavigate();
     const params = useParams();
-    const isNew = params.version === 'new';
+    const [activeTab, setActiveTab] = useState(0);
     const [resultSchema, setResultSchema] = useState<ResultSchemaType>({});
-    const isSaveEnabled = useMemo(() => {
-        let schemaIsValid = true;
-        const currentSchemaKeys = Object.keys(resultSchema);
-        const resultSchemaKeys = Object.keys(ResultSchemaKeys);
-        for (let key of resultSchemaKeys) {
-            if (!currentSchemaKeys.includes(key)) {
-                schemaIsValid = false;
-                break;
-            }
-        }
-        return schemaIsValid;
-    }, [resultSchema]);
+    // cache container to keep schemas and API responses states of individual tabs
+    const [cache, setCache] = useState<SchemaEditCache>({
+        translation: {},
+        pronunciation: {},
+        images: {},
+    });
+    const isNew = params.version === 'new';
+    // const isSaveEnabled = useMemo(() => {
+    //     let schemaIsValid = true;
+    //     const currentSchemaKeys = Object.keys(resultSchema);
+    //     const resultSchemaKeys = Object.keys(ResultSchemaKeys);
+    //     for (let key of resultSchemaKeys) {
+    //         if (!currentSchemaKeys.includes(key)) {
+    //             schemaIsValid = false;
+    //             break;
+    //         }
+    //     }
+    //     return schemaIsValid;
+    // }, [resultSchema]);
 
-    const setSchemaHandler: SetResultSchemaCallback = useCallback((key, schema) => {
-        const schemaClone = {
-            ...resultSchema,
-            [key]: schema,
+    const setCacheHandler: SetSchemaEditCacheCallback = useCallback((key, cachePart) => {
+        const cacheClone = {
+            ...cache,
+            [key]: cachePart,
         };
-        setResultSchema(schemaClone);
-    }, [resultSchema]);
+        setCache(cacheClone);
+    }, [cache]);
 
     const tabChangeHandler = useCallback((e: React.SyntheticEvent, index: number) => {
         const url = routerUtils.setParams(tabs[index].url, [':version'], [params.version]);
@@ -100,7 +106,7 @@ export default function SchemaEdit() {
                 variant="outlined"
                 size="small"
                 color="success"
-                disabled={!isSaveEnabled}
+                // disabled={!isSaveEnabled}
                 onClick={saveResultSchema}
             >
                 <SaveIcon sx={{ mr: 1 }} />
@@ -119,7 +125,12 @@ export default function SchemaEdit() {
             </Tabs>
         </Box>
         <Box sx={{ pt: 3 }}>
-            <Outlet context={setSchemaHandler} />
+            <Outlet
+                context={[
+                    cache,
+                    setCacheHandler
+                ]}
+            />
         </Box>
     </>;
 }

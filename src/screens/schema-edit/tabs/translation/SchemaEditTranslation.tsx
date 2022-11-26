@@ -9,10 +9,14 @@ import { jsonUtils } from 'src/utils';
 import {
     FormFields,
     TranslationSchemaType,
-    ResultSchemaKeys,
-    SetResultSchemaCallback,
 } from 'src/types';
-import TranslationSchema from './schema';
+import {
+    SchemaEditCache,
+    SchemaEditCacheKeys,
+    SetSchemaEditCacheCallback,
+} from '../../types';
+import SchemaEditTranslationBuilder from './components/builder';
+import SchemaEditTranslationPreview from './components/preview';
 
 const {
     REACT_APP_TRANSLATION_URL,
@@ -22,7 +26,7 @@ const {
 } = process.env;
 
 export default function SchemaEditTranslation() {
-    const setResultSchema: SetResultSchemaCallback = useOutletContext();
+    const [cache, setCache]: [SchemaEditCache, SetSchemaEditCacheCallback] = useOutletContext();
     const defaultSchema = useMemo<TranslationSchemaType>(() => ({
         url: REACT_APP_TRANSLATION_URL || '',
         parameter: REACT_APP_TRANSLATION_BODY_PARAMETER || '',
@@ -50,9 +54,12 @@ export default function SchemaEditTranslation() {
             fullWidth: true,
         }
     });
-    const [translateResponseText, setTranslateResponseText] = useState<string>();
-    const [translateResponseJson, setTranslateResponseJson] = useState<{}>();
-    const [translationSchema, setTranslationSchema] = useState<TranslationSchemaType>(defaultSchema);
+    const [translationResponseText, setTranslationResponseText] = useState<string | undefined>(cache.translation.responseText);
+    const [translationResponseJson, setTranslationResponseJson] = useState<any>(cache.translation.responseJson);
+    const [translationSchema, setTranslationSchema] = useState<TranslationSchemaType>({
+        ...defaultSchema,
+        ...cache.translation.schema,
+    });
 
     const setFieldsHandler = useCallback((fields: FormFields) => {
         setFields(fields);
@@ -65,16 +72,23 @@ export default function SchemaEditTranslation() {
             marker: bodyVariables ? bodyVariables['{marker}'] : translationSchema.marker,
         };
         setTranslationSchema(schemaClone);
-        setResultSchema(ResultSchemaKeys.translation, schemaClone);
-    }, [translationSchema, setResultSchema]);
+        setCache(SchemaEditCacheKeys.translation, {
+            ...cache.translation,
+            schema: schemaClone,
+        });
+    }, [translationSchema, cache, setCache]);
 
     const requestHandler = useCallback((): Promise<void> => {
         return new Promise((resolve, reject) => {
             // reset schema state
-            setTranslateResponseText(undefined);
-            setTranslateResponseJson(undefined);
+            setTranslationResponseText(undefined);
+            setTranslationResponseJson(undefined);
             setTranslationSchema(defaultSchema);
-            setResultSchema(ResultSchemaKeys.translation, defaultSchema);
+            setCache(SchemaEditCacheKeys.translation, {
+                responseText: undefined,
+                responseJson: undefined,
+                schema: defaultSchema,
+            });
 
             const bodyVariables = fields.body.variablesValues;
             const marker = bodyVariables && bodyVariables['{marker}'];
@@ -107,14 +121,23 @@ export default function SchemaEditTranslation() {
                     }
 
                     if (translationResult !== '') {
-                        setTranslateResponseText(translationResult);
+                        setTranslationResponseText(translationResult);
+                        setCache(SchemaEditCacheKeys.translation, {
+                            ...cache.translation,
+                            responseText: translationResult,
+                        });
                         let data;
                         try {
                             data = JSON.parse(translationResult);
                             const allJsonStrings = jsonUtils.findAllJsonStrings(data);
 
                             if (allJsonStrings.length) {
-                                setTranslateResponseJson(JSON.parse(allJsonStrings[0]));
+                                const responseJson = JSON.parse(allJsonStrings[0]);
+                                setTranslationResponseJson(responseJson);
+                                setCache(SchemaEditCacheKeys.translation, {
+                                    ...cache.translation,
+                                    responseJson,
+                                });
                                 resolve();
                             } else {
                                 reject(new Error('No JSON strings in the response'));
@@ -130,13 +153,16 @@ export default function SchemaEditTranslation() {
                 reject(err);
             });
         });
-    }, [defaultSchema, fields, setResultSchema]);
+    }, [defaultSchema, fields, cache, setCache]);
 
     const populateSchemaHandler = useCallback((schemaPath: string, dataPath: string) => {
         const schema = jsonUtils.populateJsonByPath(translationSchema, schemaPath, dataPath);
         setTranslationSchema(schema);
-        setResultSchema(ResultSchemaKeys.translation, schema);
-    }, [translationSchema, setResultSchema]);
+        setCache(SchemaEditCacheKeys.translation, {
+            ...cache.translation,
+            schema,
+        });
+    }, [translationSchema, cache, setCache]);
 
     return (
         <>
@@ -145,17 +171,23 @@ export default function SchemaEditTranslation() {
                 onChange={setFieldsHandler}
                 onSubmit={requestHandler}
             />
-            {translateResponseJson && (
-                <TranslationSchema
-                    data={translateResponseJson}
+            {translationResponseJson && (
+                <SchemaEditTranslationBuilder
+                    data={translationResponseJson}
                     schema={translationSchema}
                     onDataPathSelect={populateSchemaHandler}
                 />
             )}
-            {translateResponseText && (
+            {translationResponseText && (
                 <Collapsable title="Original response">
-                    {translateResponseText}
+                    {translationResponseText}
                 </Collapsable>
+            )}
+            {translationResponseJson && (
+                <SchemaEditTranslationPreview
+                    schema={translationSchema}
+                    translationResponseJson={translationResponseJson}
+                />
             )}
         </>
     );

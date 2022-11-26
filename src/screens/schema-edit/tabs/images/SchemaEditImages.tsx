@@ -1,14 +1,17 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { Box } from '@mui/material';
 import { Form, Collapsable } from 'src/components';
 import { imagesController } from 'src/controllers';
 import {
     FormFields,
     ImagesSchemaType,
-    ResultSchemaKeys,
-    SetResultSchemaCallback,
 } from 'src/types';
+import {
+    SchemaEditCache,
+    SchemaEditCacheKeys,
+    SetSchemaEditCacheCallback,
+} from '../../types';
+import SchemaEditImagesPreview from './components/preview';
 import './SchemaEditImages.css';
 
 const {
@@ -19,7 +22,7 @@ const {
 } = process.env;
 
 export default function SchemaEditImages() {
-    const setResultSchema: SetResultSchemaCallback = useOutletContext();
+    const [cache, setCache]: [SchemaEditCache, SetSchemaEditCacheCallback] = useOutletContext();
     const defaultSchema = useMemo<ImagesSchemaType>(() => ({
         url: REACT_APP_IMAGE_URL || '',
         userAgent: REACT_APP_IMAGE_USER_AGENT || '',
@@ -47,8 +50,11 @@ export default function SchemaEditImages() {
             value: defaultSchema.minSize,
         },
     });
-    const [images, setImages] = useState<string[]>([]);
-    const [imagesSchema, setImagesSchema] = useState<ImagesSchemaType>(defaultSchema);
+    const [images, setImages] = useState<string[]>(cache.images.images || []);
+    const [imagesSchema, setImagesSchema] = useState<ImagesSchemaType>({
+        ...defaultSchema,
+        ...cache.images.schema,
+    });
 
     const setFieldsHandler = useCallback((fields: FormFields) => {
         setFields(fields);
@@ -60,14 +66,20 @@ export default function SchemaEditImages() {
             minSize: fields.minSize.value,
         };
         setImagesSchema(schemaClone);
-        setResultSchema(ResultSchemaKeys.images, schemaClone);
-    }, [imagesSchema, setResultSchema]);
+        setCache(SchemaEditCacheKeys.images, {
+            ...cache.images,
+            schema: schemaClone,
+        });
+    }, [imagesSchema, cache, setCache]);
 
     const requestHandler = useCallback((): Promise<void> => {
         return new Promise((resolve, reject) => {
-            setImagesSchema(defaultSchema);
-            setResultSchema(ResultSchemaKeys.images, defaultSchema);
             setImages([]);
+            setImagesSchema(defaultSchema);
+            setCache(SchemaEditCacheKeys.images, {
+                images: undefined,
+                schema: defaultSchema,
+            });
 
             let url = fields.url.value;
             const urlVariables = fields.url.variablesValues;
@@ -99,6 +111,10 @@ export default function SchemaEditImages() {
 
                     if (validImages.length) {
                         setImages(validImages);
+                        setCache(SchemaEditCacheKeys.images, {
+                            ...cache.images,
+                            images: validImages,
+                        });
                         resolve();
                     } else {
                         reject(new Error('No large images match MIN size'));
@@ -110,7 +126,7 @@ export default function SchemaEditImages() {
                 reject(err);
             });
         });
-    }, [defaultSchema, fields, setResultSchema]);
+    }, [defaultSchema, fields, cache, setCache]);
 
     return <>
         <Form
@@ -123,18 +139,6 @@ export default function SchemaEditImages() {
                 {JSON.stringify(imagesSchema, null, 4)}
             </pre>
         </Collapsable>
-        <Box sx={{ mt: 4 }}>
-            {images.map((item, key) => {
-                return (
-                    <div className="image" key={key}>
-                        <img
-                            src={`${item}`}
-                            alt=""
-                            loading="lazy"
-                        />
-                    </div>
-                );
-            })}
-        </Box>
+        <SchemaEditImagesPreview images={images} />
     </>;
 }

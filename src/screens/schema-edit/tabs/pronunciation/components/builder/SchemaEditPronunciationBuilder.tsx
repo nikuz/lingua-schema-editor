@@ -13,7 +13,7 @@ interface Props {
     onDataPathSelect: (schemaPath: string, dataPath: string) => void,
 }
 
-export default function PronunciationSchema(props: Props) {
+export default function SchemaEditPronunciationBuilder(props: Props) {
     const {
         data,
         schema,

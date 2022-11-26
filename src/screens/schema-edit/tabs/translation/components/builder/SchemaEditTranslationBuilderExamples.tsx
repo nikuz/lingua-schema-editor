@@ -8,7 +8,7 @@ interface Props {
     schema?: TranslationSchemaType,
 }
 
-export default function TranslationSchemaExamples(props: Props) {
+export default function SchemaEditTranslationBuilderExamples(props: Props) {
     const { data, schema } = props;
 
     return <>

@@ -1,7 +1,5 @@
 import React, { useCallback, useState, useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import jmespath from 'jmespath';
-import { Box } from '@mui/material';
 import {
     Collapsable,
     Form,
@@ -11,10 +9,14 @@ import { jsonUtils } from 'src/utils';
 import {
     FormFields,
     PronunciationSchemaType,
-    ResultSchemaKeys,
-    SetResultSchemaCallback,
 } from 'src/types';
-import PronunciationSchema from './schema';
+import {
+    SchemaEditCache,
+    SchemaEditCacheKeys,
+    SetSchemaEditCacheCallback,
+} from '../../types';
+import SchemaEditPronunciationBuilder from './components/builder';
+import SchemaEditPronunciationPreview from './components/preview';
 
 const {
     REACT_APP_TRANSLATION_URL,
@@ -24,7 +26,7 @@ const {
 } = process.env;
 
 export default function SchemaEditPronunciation() {
-    const setResultSchema: SetResultSchemaCallback = useOutletContext();
+    const [cache, setCache]: [SchemaEditCache, SetSchemaEditCacheCallback] = useOutletContext();
     const defaultSchema = useMemo<PronunciationSchemaType>(() => ({
         url: REACT_APP_TRANSLATION_URL || '',
         parameter: REACT_APP_TRANSLATION_BODY_PARAMETER || '',
@@ -58,9 +60,12 @@ export default function SchemaEditPronunciation() {
             fullWidth: true,
         }
     });
-    const [translateResponseText, setTranslateResponseText] = useState<string>();
-    const [translateResponseJson, setTranslateResponseJson] = useState<{}>();
-    const [pronunciationSchema, setPronunciationSchema] = useState<PronunciationSchemaType>(defaultSchema);
+    const [pronunciationResponseText, setPronunciationResponseText] = useState<string| undefined>(cache.pronunciation.responseText);
+    const [pronunciationResponseJson, setPronunciationResponseJson] = useState<any>(cache.pronunciation.responseJson);
+    const [pronunciationSchema, setPronunciationSchema] = useState<PronunciationSchemaType>({
+        ...defaultSchema,
+        ...cache.pronunciation.schema,
+    });
 
     const setFieldsHandler = useCallback((fields: FormFields) => {
         setFields(fields);
@@ -74,16 +79,23 @@ export default function SchemaEditPronunciation() {
             base64Prefix: fields.base64Prefix.value,
         };
         setPronunciationSchema(schemaClone);
-        setResultSchema(ResultSchemaKeys.pronunciation, schemaClone);
-    }, [pronunciationSchema, setResultSchema]);
+        setCache(SchemaEditCacheKeys.pronunciation, {
+            ...cache.pronunciation,
+            schema: schemaClone,
+        });
+    }, [pronunciationSchema, cache, setCache]);
 
     const requestHandler = useCallback((): Promise<void> => {
         return new Promise((resolve, reject) => {
             // reset schema state
-            setTranslateResponseText(undefined);
-            setTranslateResponseJson(undefined);
+            setPronunciationResponseText(undefined);
+            setPronunciationResponseJson(undefined);
             setPronunciationSchema(defaultSchema);
-            setResultSchema(ResultSchemaKeys.pronunciation, defaultSchema);
+            setCache(SchemaEditCacheKeys.pronunciation, {
+                responseText: undefined,
+                responseJson: undefined,
+                schema: defaultSchema,
+            });
 
             const bodyVariables = fields.body.variablesValues;
             const marker = bodyVariables && bodyVariables['{marker}'];
@@ -116,14 +128,23 @@ export default function SchemaEditPronunciation() {
                     }
 
                     if (translationResult !== '') {
-                        setTranslateResponseText(translationResult);
+                        setCache(SchemaEditCacheKeys.pronunciation, {
+                            ...cache.pronunciation,
+                            responseText: translationResult,
+                        });
+
                         let data;
                         try {
                             data = JSON.parse(translationResult);
                             const allJsonStrings = jsonUtils.findAllJsonStrings(data);
 
                             if (allJsonStrings.length) {
-                                setTranslateResponseJson(JSON.parse(allJsonStrings[0]));
+                                const responseJson = JSON.parse(allJsonStrings[0]);
+                                setPronunciationResponseJson(responseJson);
+                                setCache(SchemaEditCacheKeys.pronunciation, {
+                                    ...cache.pronunciation,
+                                    responseJson,
+                                });
                                 resolve();
                             } else {
                                 reject(new Error('No JSON strings in the response'));
@@ -139,13 +160,16 @@ export default function SchemaEditPronunciation() {
                 reject(err);
             });
         });
-    }, [defaultSchema, fields, setResultSchema]);
+    }, [defaultSchema, fields, cache, setCache]);
 
     const populateSchemaHandler = useCallback((schemaPath: string, dataPath: string) => {
         const schema = jsonUtils.populateJsonByPath(pronunciationSchema, schemaPath, dataPath);
         setPronunciationSchema(schema);
-        setResultSchema(ResultSchemaKeys.pronunciation, schema);
-    }, [pronunciationSchema, setResultSchema]);
+        setCache(SchemaEditCacheKeys.pronunciation, {
+            ...cache.pronunciation,
+            schema,
+        });
+    }, [pronunciationSchema, cache, setCache]);
 
     return <>
         <Form
@@ -153,28 +177,25 @@ export default function SchemaEditPronunciation() {
             onChange={setFieldsHandler}
             onSubmit={requestHandler}
         />
-        {translateResponseJson && (
-            <PronunciationSchema
-                data={translateResponseJson}
+        {pronunciationResponseJson && (
+            <SchemaEditPronunciationBuilder
+                data={pronunciationResponseJson}
                 schema={pronunciationSchema}
                 onDataPathSelect={populateSchemaHandler}
             />
         )}
-        {translateResponseText && (
+        {pronunciationResponseText && (
             <Collapsable title="Original response">
                 <div className="text-ellipsis">
-                    {translateResponseText}
+                    {pronunciationResponseText}
                 </div>
             </Collapsable>
         )}
-        {pronunciationSchema.data && pronunciationSchema.data.value !== '' && (
-            <Box sx={{ mt: 4 }}>
-                <audio
-                    src={`${pronunciationSchema.base64Prefix}${jmespath.search(translateResponseJson, pronunciationSchema.data.value)}`}
-                    controls
-                    autoPlay
-                />
-            </Box>
+        {pronunciationResponseJson && (
+            <SchemaEditPronunciationPreview
+                schema={pronunciationSchema}
+                translateResponseJson={pronunciationResponseJson}
+            />
         )}
     </>;
 }

@@ -3,11 +3,11 @@ import { Typography } from '@mui/material';
 import { Collapsable } from 'src/components';
 import { TranslationSchemaContext } from 'src/helpers';
 import { TranslationSchemaType } from 'src/types';
-import TranslationSchemaTranslation from './TranslationSchemaTranslation';
-import TranslationSchemaAlternativeTranslations from './TranslationSchemaAlternativeTranslations';
-import TranslationSchemaDefinitions from './TranslationSchemaDefinitions';
-import TranslationSchemaExamples from './TranslationSchemaExamples';
-import './TranslationSchema.css';
+import SchemaEditTranslationBuilderTranslation from './SchemaEditTranslationBuilderTranslation';
+import SchemaEditTranslationBuilderAlternativeTranslations from './SchemaEditTranslationBuilderAlternativeTranslations';
+import SchemaEditTranslationBuilderDefinitions from './SchemaEditTranslationBuilderDefinitions';
+import SchemaEditTranslationBuilderExamples from './SchemaEditTranslationBuilderExamples';
+import './SchemaEditTranslationBuilder.css';
 
 interface Props {
     data: any,
@@ -15,7 +15,7 @@ interface Props {
     onDataPathSelect: (schemaPath: string, dataPath: string) => void,
 }
 
-export default function TranslationSchema(props: Props) {
+export default function SchemaEditTranslationBuilder(props: Props) {
     const {
         data,
         schema,
@@ -32,19 +32,19 @@ export default function TranslationSchema(props: Props) {
                 >
                     Translation Schema
                 </Typography>
-                <TranslationSchemaTranslation
+                <SchemaEditTranslationBuilderTranslation
                     data={data}
                     schema={schema}
                 />
-                <TranslationSchemaAlternativeTranslations
+                <SchemaEditTranslationBuilderAlternativeTranslations
                     data={data}
                     schema={schema}
                 />
-                <TranslationSchemaDefinitions
+                <SchemaEditTranslationBuilderDefinitions
                     data={data}
                     schema={schema}
                 />
-                <TranslationSchemaExamples
+                <SchemaEditTranslationBuilderExamples
                     data={data}
                     schema={schema}
                 />

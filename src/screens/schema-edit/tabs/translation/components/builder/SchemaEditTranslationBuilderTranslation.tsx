@@ -14,7 +14,7 @@ interface Props {
 /// * auto spelling fix
 /// * translation
 /// * transcription
-export default function TranslationSchemaTranslation(props: Props) {
+export default function SchemaEditTranslationBuilderTranslation(props: Props) {
     const { data, schema } = props;
 
     return (
