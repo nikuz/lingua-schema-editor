@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import cl from 'classnames';
 import {
     Table,
     TableBody,
@@ -31,11 +32,13 @@ import {
     setFirestoreDoc,
     firestoreQuery,
     firestoreWhere,
+    firestoreGetDoc,
     firestoreGetDocs,
     firestoreDeleteDoc,
 } from 'src/providers/firebase';
 import { routerConstants } from 'src/constants';
 import { routerUtils } from 'src/utils';
+import './Dashboard.css';
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -73,6 +76,15 @@ export default function Dashboard() {
             )
                 .then(() => {
                     setChangeCurrentPromptLoading(false);
+                    firestoreGetDoc(docReference).then(response => {
+                        setFirestoreDoc(
+                            firestoreDoc(firestoreInstance, 'schemas', 'current'),
+                            {
+                                ...response.data(),
+                                id: 'current',
+                            }
+                        )
+                    });
                 })
                 .catch(err => {
                     setChangeCurrentPromptLoading(false);
@@ -117,6 +129,9 @@ export default function Dashboard() {
                 </TableHead>
                 <TableBody>
                     {values?.map((item, key) => {
+                        if (item.id === 'current') {
+                            return null;
+                        }
                         const createdAt = item.createdAt && new Date(item.createdAt.seconds * 1000);
                         const updatedAt = item.updatedAt && new Date(item.updatedAt.seconds * 1000);
 
@@ -130,17 +145,22 @@ export default function Dashboard() {
                                 </TableCell>
                                 <TableCell>{createdAt && `${createdAt.toLocaleDateString()} ${createdAt.toLocaleTimeString()}`}</TableCell>
                                 <TableCell>{updatedAt && `${updatedAt.toLocaleDateString()} ${updatedAt.toLocaleTimeString()}`}</TableCell>
-                                <TableCell sx={{ width: 170 }}>
-                                    <IconButton onClick={() => navigate(getSchemaEditUrl(item.version))}>
+                                <TableCell sx={{ width: 190 }}>
+                                    <IconButton
+                                        className="dashboard-action-btn"
+                                        onClick={() => navigate(getSchemaEditUrl(item.version))}
+                                    >
                                         <CreateIcon color="primary" />
                                     </IconButton>
                                     <IconButton
+                                        className={cl('dashboard-action-btn', { disabled: item.current })}
                                         disabled={item.current}
                                         onClick={() => setChangeCurrentPrompt(item.version)}
                                     >
                                         <StarHalfIcon color={item.current ? 'inherit' : 'primary'} />
                                     </IconButton>
                                     <IconButton
+                                        className={cl('dashboard-action-btn', { disabled: item.current })}
                                         disabled={item.current}
                                         onClick={() => setRemovePrompt(item.version)}
                                     >

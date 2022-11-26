@@ -6,6 +6,7 @@ import {
     setDoc,
     query,
     where,
+    getDoc,
     getDocs,
     deleteDoc,
 } from 'firebase/firestore';
@@ -30,6 +31,7 @@ export {
     setDoc as setFirestoreDoc,
     where as firestoreWhere,
     query as firestoreQuery,
+    getDoc as firestoreGetDoc,
     getDocs as firestoreGetDocs,
     deleteDoc as firestoreDeleteDoc,
 };
