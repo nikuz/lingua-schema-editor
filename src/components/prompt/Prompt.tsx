@@ -42,9 +42,7 @@ export default function Prompt(props: Props) {
             )}
             <DialogActions>
                 <Button onClick={onCancel} autoFocus>Cancel</Button>
-                <Button onClick={onConfirm}>
-                    Agree
-                </Button>
+                <Button onClick={onConfirm}>Ok</Button>
             </DialogActions>
         </Dialog>
     );

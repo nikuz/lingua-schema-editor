@@ -7,6 +7,7 @@ import {
     query,
     where,
     getDocs,
+    deleteDoc,
 } from 'firebase/firestore';
 import {
     getAuth,
@@ -30,4 +31,5 @@ export {
     where as firestoreWhere,
     query as firestoreQuery,
     getDocs as firestoreGetDocs,
+    deleteDoc as firestoreDeleteDoc,
 };

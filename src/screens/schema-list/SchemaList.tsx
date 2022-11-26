@@ -29,6 +29,7 @@ import {
     firestoreQuery,
     firestoreWhere,
     firestoreGetDocs,
+    firestoreDeleteDoc,
 } from 'src/providers/firebase';
 
 export default function SchemaList() {
@@ -38,8 +39,11 @@ export default function SchemaList() {
     const [changeCurrentPrompt, setChangeCurrentPrompt] = useState<string>();
     const [changeCurrentPromptLoading, setChangeCurrentPromptLoading] = useState(false);
     const [changeCurrentPromptError, setChangeCurrentPromptError] = useState<Error>();
-    const loading = listRetrievalLoading || changeCurrentPromptLoading;
-    const error = listRetrievalError || changeCurrentPromptError;
+    const [removePrompt, setRemovePrompt] = useState<string>();
+    const [removePromptLoading, setRemovePromptLoading] = useState(false);
+    const [removePromptError, setRemovePromptErrorError] = useState<Error>();
+    const loading = listRetrievalLoading || changeCurrentPromptLoading || removePromptLoading;
+    const error = listRetrievalError || changeCurrentPromptError || removePromptError;
 
     const changeCurrentHandler = useCallback(async () => {
         if (changeCurrentPrompt) {
@@ -72,6 +76,23 @@ export default function SchemaList() {
         setChangeCurrentPrompt(undefined);
     }, [changeCurrentPrompt]);
 
+    const removeSchemaHandler = useCallback(async () => {
+        if (removePrompt) {
+            setRemovePromptLoading(true);
+            setRemovePromptErrorError(undefined);
+            const docReference = firestoreDoc(firestoreInstance, 'schemas', removePrompt);
+            if (docReference) {
+                firestoreDeleteDoc(docReference).then(() => {
+                    setRemovePromptLoading(false);
+                }).catch(err => {
+                    setRemovePromptLoading(false);
+                    setRemovePromptErrorError(err);
+                });
+            }
+        }
+        setRemovePrompt(undefined);
+    }, [removePrompt]);
+
     return <>
         <TableContainer component={Paper}>
             <Table aria-label="simple table">
@@ -91,7 +112,7 @@ export default function SchemaList() {
 
                         return (
                             <TableRow key={key}>
-                                <TableCell>
+                                <TableCell sx={{ pl: 3 }}>
                                     {item.current && <StarIcon color="warning" />}
                                 </TableCell>
                                 <TableCell>
@@ -106,7 +127,7 @@ export default function SchemaList() {
                                     <IconButton onClick={() => setChangeCurrentPrompt(item.version)}>
                                         <StarHalfIcon color="primary" />
                                     </IconButton>
-                                    <IconButton>
+                                    <IconButton onClick={() => setRemovePrompt(item.version)}>
                                         <DeleteIcon color="error" />
                                     </IconButton>
                                 </TableCell>
@@ -132,6 +153,16 @@ export default function SchemaList() {
                     setChangeCurrentPrompt(undefined);
                 }}
                 onConfirm={changeCurrentHandler}
+            />
+        )}
+        {removePrompt && (
+            <Prompt
+                isOpen
+                title={`Remove schema "${removePrompt}"?`}
+                onCancel={() => {
+                    setRemovePrompt(undefined);
+                }}
+                onConfirm={removeSchemaHandler}
             />
         )}
         {loading && <Loading blocker />}
