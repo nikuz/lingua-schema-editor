@@ -9,7 +9,6 @@ import { routerConstants } from 'src/constants';
 import App from './App';
 import Login from './login';
 import NotFound from './not-found';
-import Dashboard from './dashboard';
 import SchemaEdit from './schema-edit';
 import SchemaEditTranslation from './schema-edit/tabs/translation';
 import SchemaEditPronunciation from './schema-edit/tabs/pronunciation';
@@ -21,10 +20,6 @@ export default function AppRoutes() {
         <BrowserRouter>
             <Routes>
                 <Route path={routerConstants.HOME} element={<App />}>
-                    <Route
-                        path={routerConstants.HOME}
-                        element={<Dashboard />}
-                    />
                     <Route
                         path={routerConstants.LOGIN}
                         element={<Login />}

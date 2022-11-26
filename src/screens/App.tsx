@@ -13,7 +13,6 @@ import {
     Box,
     CssBaseline,
 } from '@mui/material';
-import DashboardIcon from '@mui/icons-material/Dashboard';
 import SchemaIcon from '@mui/icons-material/Schema';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Loading } from 'src/components';
@@ -28,9 +27,6 @@ import './App.css';
 const DRAWER_WIDTH = 64;
 
 const menuItems = [{
-    url: routerConstants.HOME,
-    icon: <DashboardIcon />
-}, {
     url: routerConstants.SCHEMA_LIST,
     icon: <SchemaIcon />
 }, {
