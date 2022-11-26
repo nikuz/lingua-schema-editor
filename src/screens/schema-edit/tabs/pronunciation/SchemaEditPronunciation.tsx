@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useMemo } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import jmespath from 'jmespath';
 import { Box } from '@mui/material';
 import {
@@ -10,6 +11,8 @@ import { jsonUtils } from 'src/utils';
 import {
     FormFields,
     PronunciationSchemaType,
+    ResultSchemaKeys,
+    SetResultSchemaCallback,
 } from 'src/types';
 import PronunciationSchema from './schema';
 
@@ -21,6 +24,7 @@ const {
 } = process.env;
 
 export default function SchemaEditPronunciation() {
+    const setResultSchema: SetResultSchemaCallback = useOutletContext();
     const defaultSchema = useMemo<PronunciationSchemaType>(() => ({
         url: REACT_APP_TRANSLATION_URL || '',
         parameter: REACT_APP_TRANSLATION_BODY_PARAMETER || '',
@@ -56,27 +60,30 @@ export default function SchemaEditPronunciation() {
     });
     const [translateResponseText, setTranslateResponseText] = useState<string>();
     const [translateResponseJson, setTranslateResponseJson] = useState<{}>();
-    const [resultSchema, setResultSchema] = useState<PronunciationSchemaType>(defaultSchema);
+    const [pronunciationSchema, setPronunciationSchema] = useState<PronunciationSchemaType>(defaultSchema);
 
     const setFieldsHandler = useCallback((fields: FormFields) => {
         setFields(fields);
         const bodyVariables = fields.body.variablesValues;
-        setResultSchema({
-            ...resultSchema,
+        const schemaClone = {
+            ...pronunciationSchema,
             url: fields.url.value,
             parameter: fields.parameter.value,
             body: fields.body.value,
-            marker: bodyVariables ? bodyVariables['{marker}'] : resultSchema.marker,
+            marker: bodyVariables ? bodyVariables['{marker}'] : pronunciationSchema.marker,
             base64Prefix: fields.base64Prefix.value,
-        });
-    }, [resultSchema]);
+        };
+        setPronunciationSchema(schemaClone);
+        setResultSchema(ResultSchemaKeys.pronunciation, schemaClone);
+    }, [pronunciationSchema, setResultSchema]);
 
     const requestHandler = useCallback((): Promise<void> => {
         return new Promise((resolve, reject) => {
             // reset schema state
             setTranslateResponseText(undefined);
             setTranslateResponseJson(undefined);
-            setResultSchema(defaultSchema);
+            setPronunciationSchema(defaultSchema);
+            setResultSchema(ResultSchemaKeys.pronunciation, defaultSchema);
 
             const bodyVariables = fields.body.variablesValues;
             const marker = bodyVariables && bodyVariables['{marker}'];
@@ -132,11 +139,13 @@ export default function SchemaEditPronunciation() {
                 reject(err);
             });
         });
-    }, [defaultSchema, fields]);
+    }, [defaultSchema, fields, setResultSchema]);
 
     const populateSchemaHandler = useCallback((schemaPath: string, dataPath: string) => {
-        setResultSchema(jsonUtils.populateJsonByPath(resultSchema, schemaPath, dataPath));
-    }, [resultSchema]);
+        const schema = jsonUtils.populateJsonByPath(pronunciationSchema, schemaPath, dataPath);
+        setPronunciationSchema(schema);
+        setResultSchema(ResultSchemaKeys.pronunciation, schema);
+    }, [pronunciationSchema, setResultSchema]);
 
     return <>
         <Form
@@ -147,7 +156,7 @@ export default function SchemaEditPronunciation() {
         {translateResponseJson && (
             <PronunciationSchema
                 data={translateResponseJson}
-                schema={resultSchema}
+                schema={pronunciationSchema}
                 onDataPathSelect={populateSchemaHandler}
             />
         )}
@@ -158,10 +167,10 @@ export default function SchemaEditPronunciation() {
                 </div>
             </Collapsable>
         )}
-        {resultSchema.data && resultSchema.data.value !== '' && (
+        {pronunciationSchema.data && pronunciationSchema.data.value !== '' && (
             <Box sx={{ mt: 4 }}>
                 <audio
-                    src={`${resultSchema.base64Prefix}${jmespath.search(translateResponseJson, resultSchema.data.value)}`}
+                    src={`${pronunciationSchema.base64Prefix}${jmespath.search(translateResponseJson, pronunciationSchema.data.value)}`}
                     controls
                     autoPlay
                 />

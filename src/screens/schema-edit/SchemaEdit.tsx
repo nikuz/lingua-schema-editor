@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
     Outlet,
     useLocation,
@@ -11,10 +11,17 @@ import {
     Tab,
     Typography,
     IconButton,
+    Button,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import SaveIcon from '@mui/icons-material/Save';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { routerConstants } from 'src/constants';
 import { routerUtils } from 'src/utils';
+import {
+    ResultSchemaType,
+    ResultSchemaKeys,
+    SetResultSchemaCallback,
+} from '../../types';
 
 const tabs = [{
     label: 'Translation',
@@ -32,11 +39,39 @@ export default function SchemaEdit() {
     const location = useLocation();
     const navigate = useNavigate();
     const params = useParams();
+    const isNew = params.version === 'new';
+    const [resultSchema, setResultSchema] = useState<ResultSchemaType>({});
+    const isSaveEnabled = useMemo(() => {
+        let schemaIsValid = true;
+        const currentSchemaKeys = Object.keys(resultSchema);
+        const resultSchemaKeys = Object.keys(ResultSchemaKeys);
+        for (let key of resultSchemaKeys) {
+            if (!currentSchemaKeys.includes(key)) {
+                schemaIsValid = false;
+                break;
+            }
+        }
+        return schemaIsValid;
+    }, [resultSchema]);
+
+    const setSchemaHandler: SetResultSchemaCallback = useCallback((key, schema) => {
+        const schemaClone = {
+            ...resultSchema,
+            [key]: schema,
+        };
+        setResultSchema(schemaClone);
+    }, [resultSchema]);
 
     const tabChangeHandler = useCallback((e: React.SyntheticEvent, index: number) => {
         const url = routerUtils.setParams(tabs[index].url, [':version'], [params.version]);
         navigate(url);
     }, [navigate, params]);
+
+    const saveResultSchema = useCallback(() => {
+        if (Object.values(resultSchema).length > 0) {
+
+        }
+    }, [resultSchema]);
 
     useEffect(() => {
         const activeTabIndex = tabs.findIndex(item => {
@@ -49,13 +84,28 @@ export default function SchemaEdit() {
     }, [activeTab, location, params]);
 
     return <>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="h6">
-                Schema "{params.version}"
-            </Typography>
-            <IconButton onClick={() => navigate(routerConstants.HOME)}>
-                <CloseIcon color="error" />
-            </IconButton>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <IconButton
+                    onClick={() => navigate(routerConstants.HOME)}
+                    sx={{ mr: 1 }}
+                >
+                    <ArrowBackIcon />
+                </IconButton>
+                <Typography variant="h6">
+                    {isNew ? 'New schema' : `Schema "${params.version}"`}
+                </Typography>
+            </Box>
+            <Button
+                variant="outlined"
+                size="small"
+                color="success"
+                disabled={!isSaveEnabled}
+                onClick={saveResultSchema}
+            >
+                <SaveIcon sx={{ mr: 1 }} />
+                Save
+            </Button>
         </Box>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs
@@ -69,7 +119,7 @@ export default function SchemaEdit() {
             </Tabs>
         </Box>
         <Box sx={{ pt: 3 }}>
-            <Outlet />
+            <Outlet context={setSchemaHandler} />
         </Box>
     </>;
 }

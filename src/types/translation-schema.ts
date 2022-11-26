@@ -1,4 +1,4 @@
-import { SchemaItemType } from './schema';
+import { SchemaItemType } from './schema-item';
 
 export interface TranslationSchemaType {
     url: string,

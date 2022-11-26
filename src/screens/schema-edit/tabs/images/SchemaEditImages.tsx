@@ -1,8 +1,14 @@
 import React, { useState, useCallback, useMemo } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { Form, Collapsable } from 'src/components';
 import { imagesController } from 'src/controllers';
-import { FormFields, ImagesSchemaType } from 'src/types';
+import {
+    FormFields,
+    ImagesSchemaType,
+    ResultSchemaKeys,
+    SetResultSchemaCallback,
+} from 'src/types';
 import './SchemaEditImages.css';
 
 const {
@@ -13,6 +19,7 @@ const {
 } = process.env;
 
 export default function SchemaEditImages() {
+    const setResultSchema: SetResultSchemaCallback = useOutletContext();
     const defaultSchema = useMemo<ImagesSchemaType>(() => ({
         url: REACT_APP_IMAGE_URL || '',
         userAgent: REACT_APP_IMAGE_USER_AGENT || '',
@@ -41,22 +48,25 @@ export default function SchemaEditImages() {
         },
     });
     const [images, setImages] = useState<string[]>([]);
-    const [resultSchema, setResultSchema] = useState<ImagesSchemaType>(defaultSchema);
+    const [imagesSchema, setImagesSchema] = useState<ImagesSchemaType>(defaultSchema);
 
     const setFieldsHandler = useCallback((fields: FormFields) => {
         setFields(fields);
-        setResultSchema({
-            ...resultSchema,
+        const schemaClone = {
+            ...imagesSchema,
             url: fields.url.value,
             userAgent: fields.userAgent.value,
             regExp: fields.regExp.value,
             minSize: fields.minSize.value,
-        });
-    }, [resultSchema]);
+        };
+        setImagesSchema(schemaClone);
+        setResultSchema(ResultSchemaKeys.images, schemaClone);
+    }, [imagesSchema, setResultSchema]);
 
     const requestHandler = useCallback((): Promise<void> => {
         return new Promise((resolve, reject) => {
-            setResultSchema(defaultSchema);
+            setImagesSchema(defaultSchema);
+            setResultSchema(ResultSchemaKeys.images, defaultSchema);
             setImages([]);
 
             let url = fields.url.value;
@@ -100,7 +110,7 @@ export default function SchemaEditImages() {
                 reject(err);
             });
         });
-    }, [defaultSchema, fields]);
+    }, [defaultSchema, fields, setResultSchema]);
 
     return <>
         <Form
@@ -110,7 +120,7 @@ export default function SchemaEditImages() {
         />
         <Collapsable title="Schema" headerSize="h5" marginTop={5}>
             <pre>
-                {JSON.stringify(resultSchema, null, 4)}
+                {JSON.stringify(imagesSchema, null, 4)}
             </pre>
         </Collapsable>
         <Box sx={{ mt: 4 }}>

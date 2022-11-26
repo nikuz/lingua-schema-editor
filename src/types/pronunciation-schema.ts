@@ -1,4 +1,4 @@
-import { SchemaItemType } from './schema';
+import { SchemaItemType } from './schema-item';
 
 export type PronunciationSchemaType = {
     url: string,
