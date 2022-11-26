@@ -18,13 +18,24 @@ import './Login.css';
 
 export default function Login() {
     const navigate = useNavigate();
-    const [user, loading, error] = useAuthState(authInstance);
+    const [user, authLoading, authError] = useAuthState(authInstance);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loginLoading, setLoginLoading] = useState(false);
+    const [loginError, setLoginError] = useState<Error>();
+    const loading = authLoading || loginLoading;
+    const error = authError || loginError;
 
     const loginHandler = useCallback((event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        signInWithEmailAndPassword(authInstance, email, password);
+        setLoginLoading(true);
+        setLoginError(undefined);
+        signInWithEmailAndPassword(authInstance, email, password).then(() => {
+            setLoginLoading(false);
+        }).catch(err => {
+            setLoginLoading(false);
+            setLoginError(err);
+        });
     }, [email, password]);
 
     useEffect(() => {
@@ -72,7 +83,7 @@ export default function Login() {
                     />
                 </Box>
                 {error && (
-                    <Alert severity="error">{error.message}</Alert>
+                    <Alert severity="error" sx={{ mb: 3 }}>{error.message}</Alert>
                 )}
                 <Button
                     variant="contained"

@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Table,
     TableBody,
@@ -7,6 +8,7 @@ import {
     TableHead,
     TableRow,
     Paper,
+    Button,
     IconButton,
     Alert,
     Typography,
@@ -16,6 +18,7 @@ import StarIcon from '@mui/icons-material/Star';
 import StarHalfIcon from '@mui/icons-material/StarHalf';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 import {
     Loading,
     Prompt,
@@ -31,8 +34,11 @@ import {
     firestoreGetDocs,
     firestoreDeleteDoc,
 } from 'src/providers/firebase';
+import { routerConstants } from 'src/constants';
+import { routerUtils } from 'src/utils';
 
-export default function SchemaList() {
+export default function Dashboard() {
+    const navigate = useNavigate();
     const [values, listRetrievalLoading, listRetrievalError] = useFirestoreCollectionData(
         firestoreCollection(firestoreInstance, 'schemas')
     );
@@ -93,6 +99,10 @@ export default function SchemaList() {
         setRemovePrompt(undefined);
     }, [removePrompt]);
 
+    const getSchemaEditUrl = useCallback((value: string) => {
+        return routerUtils.setParams(routerConstants.SCHEMA_EDIT, [':version'], [value]);
+    }, []);
+
     return <>
         <TableContainer component={Paper}>
             <Table aria-label="simple table">
@@ -121,14 +131,20 @@ export default function SchemaList() {
                                 <TableCell>{createdAt && `${createdAt.toLocaleDateString()} ${createdAt.toLocaleTimeString()}`}</TableCell>
                                 <TableCell>{updatedAt && `${updatedAt.toLocaleDateString()} ${updatedAt.toLocaleTimeString()}`}</TableCell>
                                 <TableCell sx={{ width: 170 }}>
-                                    <IconButton>
+                                    <IconButton onClick={() => navigate(getSchemaEditUrl(item.version))}>
                                         <CreateIcon color="primary" />
                                     </IconButton>
-                                    <IconButton onClick={() => setChangeCurrentPrompt(item.version)}>
-                                        <StarHalfIcon color="primary" />
+                                    <IconButton
+                                        disabled={item.current}
+                                        onClick={() => setChangeCurrentPrompt(item.version)}
+                                    >
+                                        <StarHalfIcon color={item.current ? 'inherit' : 'primary'} />
                                     </IconButton>
-                                    <IconButton onClick={() => setRemovePrompt(item.version)}>
-                                        <DeleteIcon color="error" />
+                                    <IconButton
+                                        disabled={item.current}
+                                        onClick={() => setRemovePrompt(item.version)}
+                                    >
+                                        <DeleteIcon color={item.current ? 'inherit' : 'error'} />
                                     </IconButton>
                                 </TableCell>
                             </TableRow>
@@ -137,6 +153,15 @@ export default function SchemaList() {
                 </TableBody>
             </Table>
         </TableContainer>
+        <Button
+            variant="contained"
+            color="success"
+            sx={{ mt: 3 }}
+            onClick={() => navigate(getSchemaEditUrl('new'))}
+        >
+            <AddIcon />
+            Add
+        </Button>
         {values?.length === 0 && (
             <Box sx={{ mt: 3, textAlign: 'center' }}>
                 <Typography variant="body2">No schemas found</Typography>

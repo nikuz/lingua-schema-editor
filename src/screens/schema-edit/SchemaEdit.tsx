@@ -3,13 +3,18 @@ import {
     Outlet,
     useLocation,
     useNavigate,
+    useParams,
 } from 'react-router-dom';
 import {
     Box,
     Tabs,
     Tab,
+    Typography,
+    IconButton,
 } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import { routerConstants } from 'src/constants';
+import { routerUtils } from 'src/utils';
 
 const tabs = [{
     label: 'Translation',
@@ -26,19 +31,32 @@ export default function SchemaEdit() {
     const [activeTab, setActiveTab] = useState(0);
     const location = useLocation();
     const navigate = useNavigate();
+    const params = useParams();
 
     const tabChangeHandler = useCallback((e: React.SyntheticEvent, index: number) => {
-        navigate(tabs[index].url);
-    }, [navigate]);
+        const url = routerUtils.setParams(tabs[index].url, [':version'], [params.version]);
+        navigate(url);
+    }, [navigate, params]);
 
     useEffect(() => {
-        const activeTabIndex = tabs.findIndex(item => item.url === location.pathname);
+        const activeTabIndex = tabs.findIndex(item => {
+            const url = routerUtils.setParams(item.url, [':version'], [params.version]);
+            return url === location.pathname;
+        });
         if (activeTabIndex !== -1 && activeTabIndex !== activeTab) {
             setActiveTab(activeTabIndex);
         }
-    }, [activeTab, location]);
+    }, [activeTab, location, params]);
 
     return <>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h6">
+                Schema "{params.version}"
+            </Typography>
+            <IconButton onClick={() => navigate(routerConstants.HOME)}>
+                <CloseIcon color="error" />
+            </IconButton>
+        </Box>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs
                 value={activeTab}

@@ -7,19 +7,23 @@ import {
 import { routerConstants } from 'src/constants';
 
 import App from './App';
+import Dashboard from './dashboard';
 import Login from './login';
 import NotFound from './not-found';
 import SchemaEdit from './schema-edit';
 import SchemaEditTranslation from './schema-edit/tabs/translation';
 import SchemaEditPronunciation from './schema-edit/tabs/pronunciation';
 import SchemaEditImages from './schema-edit/tabs/images';
-import SchemaList from './schema-list';
 
 export default function AppRoutes() {
     return (
         <BrowserRouter>
             <Routes>
                 <Route path={routerConstants.HOME} element={<App />}>
+                    <Route
+                        path={routerConstants.HOME}
+                        element={<Dashboard />}
+                    />
                     <Route
                         path={routerConstants.LOGIN}
                         element={<Login />}
@@ -41,10 +45,6 @@ export default function AppRoutes() {
                             element={<SchemaEditImages />}
                         />
                     </Route>
-                    <Route
-                        path={routerConstants.SCHEMA_LIST}
-                        element={<SchemaList />}
-                    />
                     <Route path='*' element={<NotFound />}/>
                 </Route>
             </Routes>

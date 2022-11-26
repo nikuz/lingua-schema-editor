@@ -27,7 +27,7 @@ import './App.css';
 const DRAWER_WIDTH = 64;
 
 const menuItems = [{
-    url: routerConstants.SCHEMA_LIST,
+    url: routerConstants.HOME,
     icon: <SchemaIcon />
 }, {
     url: 'logout',
@@ -66,7 +66,7 @@ export default function App() {
                 >
                     <List>
                         {menuItems.map((item, key) => {
-                            const isSelected = location.pathname === item.url;
+                            const isSelected = location.pathname.startsWith(item.url);
                             return (
                                 <ListItem key={key} disablePadding sx={{ mb: 1 }}>
                                     <ListItemButton
