@@ -12,12 +12,21 @@ import {
     Typography,
     IconButton,
     Button,
+    TextField,
+    Alert,
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Loading, Prompt, SaveHotkey } from '../../components';
 import { routerConstants } from 'src/constants';
 import { routerUtils } from 'src/utils';
-import { ResultSchemaType } from '../../types';
+import {
+    firestoreInstance,
+    firestoreDoc,
+    firestoreGetDoc,
+    firestoreSetDoc,
+} from 'src/providers/firebase/controller';
+import { ResultSchemaType } from 'src/types';
 import { validateSchemaIntegrity } from './utils/schema-validator';
 import {
     SchemaEditCache,
@@ -34,20 +43,25 @@ const tabs = [{
     label: 'Images',
     url: routerConstants.SCHEMA_EDIT_IMAGES,
 }];
+const newSchemaNameMaxLength = 20;
 
 export default function SchemaEdit() {
     const location = useLocation();
     const navigate = useNavigate();
     const params = useParams();
     const [activeTab, setActiveTab] = useState(0);
-    const [resultSchema, setResultSchema] = useState<ResultSchemaType>({});
+    const [savingPrompt, setSavingPrompt] = useState(false);
+    const [newSchemaVersionName, setNewSchemaVersionName] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error>();
+    const [schemaFromCloud, setSchemaFromCloud] = useState<ResultSchemaType>();
+    const isNew = useMemo(() => params.version === 'new', [params]);
     // cache container to keep schemas and API responses states of individual tabs
     const [cache, setCache] = useState<SchemaEditCache>({
-        translation: {},
-        pronunciation: {},
-        images: {},
+        translation: { initiated: isNew },
+        pronunciation: { initiated: isNew },
+        images: { initiated: isNew },
     });
-    const isNew = params.version === 'new';
     const isSaveEnabled = useMemo(() => {
         return validateSchemaIntegrity({
             translation: cache.translation.schema,
@@ -55,6 +69,9 @@ export default function SchemaEdit() {
             images: cache.images.schema,
         });
     }, [cache]);
+    const newVersionNameError = useMemo(() => (
+        newSchemaVersionName.trim().toLocaleLowerCase() === 'new'
+    ), [newSchemaVersionName]);
 
     const setCacheHandler: SetSchemaEditCacheCallback = useCallback((key, cachePart) => {
         const cacheClone = {
@@ -70,10 +87,105 @@ export default function SchemaEdit() {
     }, [navigate, params]);
 
     const saveResultSchema = useCallback(() => {
-        if (Object.values(resultSchema).length > 0) {
+        setLoading(true);
+        setError(undefined);
+        const schema = JSON.stringify({
+            translation: cache.translation.schema,
+            pronunciation: cache.pronunciation.schema,
+            images: cache.images.schema,
+        });
 
+        if (isNew) {
+            const newSchemaReference = firestoreDoc(firestoreInstance, 'schemas', newSchemaVersionName);
+            firestoreGetDoc(newSchemaReference).then(result => {
+                if (result.exists()) {
+                    setLoading(false);
+                    setError(new Error('Schema with this version name already exists. Please make unique name'));
+                } else {
+                    firestoreSetDoc(
+                        firestoreDoc(firestoreInstance, 'schemas', newSchemaVersionName),
+                        {
+                            version: newSchemaVersionName,
+                            schema,
+                            current: false,
+                            createdAt: Date.now(),
+                        }
+                    ).then(() => {
+                        navigate(routerConstants.HOME);
+                    }).catch(err => {
+                        setLoading(false);
+                        setError(err);
+                    });
+                }
+            }).catch(err => {
+                setLoading(false);
+                setError(err);
+            });
+        } else if (params.version) {
+            firestoreSetDoc(
+                firestoreDoc(firestoreInstance, 'schemas', params.version),
+                {
+                    schema,
+                    updatedAt: Date.now(),
+                },
+                { merge: true }
+            ).then(() => {
+                navigate(routerConstants.HOME);
+            }).catch(err => {
+                setLoading(false);
+                setError(err);
+            });
         }
-    }, [resultSchema]);
+    }, [cache, newSchemaVersionName, isNew, params, navigate]);
+
+    const saveButtonClickHandler = useCallback(() => {
+        if (isNew) {
+            setSavingPrompt(true);
+        } else {
+            saveResultSchema();
+        }
+    }, [isNew, saveResultSchema]);
+
+    useEffect(() => {
+        if (!isNew && params.version && !schemaFromCloud && !loading && !error) {
+            setLoading(true);
+            const schemaReference = firestoreDoc(firestoreInstance, 'schemas', params.version);
+            firestoreGetDoc(schemaReference).then(result => {
+                setLoading(false);
+                const docData = result.data();
+                if (docData) {
+                    let schema: ResultSchemaType | undefined;
+                    try {
+                        schema = JSON.parse(docData.schema);
+                    } catch (e) {
+                        setError(new Error('Can\'t parse schema from cloud'));
+                    }
+                    if (schema) {
+                        setSchemaFromCloud(schema);
+                        setCache({
+                            translation: {
+                                initiated: false,
+                                schema: schema.translation,
+                            },
+                            pronunciation: {
+                                initiated: false,
+                                schema: schema.pronunciation,
+                            },
+                            images: {
+                                initiated: false,
+                                schema: schema.images,
+                            },
+                        });
+                    }
+                } else {
+                    setError(new Error('Can\'t find document in cloud'));
+                }
+            }).catch(err => {
+                setLoading(false);
+                setError(err);
+            });
+        }
+    }, [params, isNew, loading, error, schemaFromCloud]);
 
     useEffect(() => {
         const activeTabIndex = tabs.findIndex(item => {
@@ -102,8 +214,8 @@ export default function SchemaEdit() {
                 variant="outlined"
                 size="small"
                 color="success"
-                disabled={!isSaveEnabled}
-                onClick={saveResultSchema}
+                disabled={!isSaveEnabled || !!error}
+                onClick={saveButtonClickHandler}
             >
                 <SaveIcon sx={{ mr: 1 }} />
                 Save
@@ -128,5 +240,41 @@ export default function SchemaEdit() {
                 ]}
             />
         </Box>
+        {savingPrompt && (
+            <Prompt
+                isOpen
+                title={`Make a version name for new schema`}
+                onCancel={() => {
+                    setSavingPrompt(false);
+                }}
+                disabled={newSchemaVersionName.trim() === '' || newVersionNameError}
+                onConfirm={() => {
+                    setSavingPrompt(false);
+                    saveResultSchema();
+                }}
+            >
+                <TextField
+                    variant="outlined"
+                    label="Name"
+                    size="small"
+                    value={newSchemaVersionName}
+                    sx={{ mt: 1 }}
+                    fullWidth
+                    error={newVersionNameError}
+                    helperText={`Has to be unique. Cannot be "new". 20 characters max.`}
+                    autoFocus
+                    onChange={(event) => {
+                        setNewSchemaVersionName(event.target.value.substring(0, newSchemaNameMaxLength));
+                    }}
+                />
+            </Prompt>
+        )}
+        <SaveHotkey
+            onSave={saveButtonClickHandler}
+        />
+        {loading && <Loading blocker />}
+        {error && (
+            <Alert severity="error">{error.message}</Alert>
+        )}
     </>;
 }

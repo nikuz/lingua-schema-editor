@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import {
     Collapsable,
@@ -9,6 +9,7 @@ import { jsonUtils } from 'src/utils';
 import {
     FormFields,
     PronunciationSchemaType,
+    PronunciationSchemaTypeFieldsName,
 } from 'src/types';
 import {
     SchemaEditCache,
@@ -27,83 +28,63 @@ const {
 
 export default function SchemaEditPronunciation() {
     const [cache, setCache]: [SchemaEditCache, SetSchemaEditCacheCallback] = useOutletContext();
-    const defaultSchema = useMemo<PronunciationSchemaType>(() => ({
-        fields: {
-            url: REACT_APP_TRANSLATION_URL || '',
-            parameter: REACT_APP_TRANSLATION_BODY_PARAMETER || '',
-            body: REACT_APP_PRONUNCIATION_BODY || '',
-            marker: REACT_APP_PRONUNCIATION_MARKER || '',
-            base64Prefix: 'data:audio/mp3;base64,',
-        }
-    }), []);
     const [fields, setFields] = useState<FormFields>({
         url: {
             label: 'Url',
-            value: defaultSchema.fields.url,
+            value: cache.pronunciation.schema?.fields.url || REACT_APP_TRANSLATION_URL || '',
             fullWidth: true,
         },
         parameter: {
             label: 'Parameter',
-            value: defaultSchema.fields.parameter,
+            value: cache.pronunciation.schema?.fields.parameter || REACT_APP_TRANSLATION_BODY_PARAMETER || '',
         },
         body: {
             label: 'Body',
-            value: defaultSchema.fields.body,
+            value: cache.pronunciation.schema?.fields.body || REACT_APP_PRONUNCIATION_BODY || '',
             variables: ['{marker}', '{word}', '{sourceLanguage}'],
             variablesValues: {
-                '{marker}': defaultSchema.fields.marker,
+                '{marker}': cache.pronunciation.schema?.fields.marker || REACT_APP_PRONUNCIATION_MARKER || '',
             },
             type: 'textarea',
             fullWidth: true,
         },
         base64Prefix: {
             label: 'Base 64 prefix',
-            value: defaultSchema.fields.base64Prefix,
+            value: cache.pronunciation.schema?.fields.base64Prefix || 'data:audio/mp3;base64,',
             fullWidth: true,
         }
-    });
-    const [pronunciationResponseText, setPronunciationResponseText] = useState<string| undefined>(cache.pronunciation.responseText);
-    const [pronunciationResponseJson, setPronunciationResponseJson] = useState<any>(cache.pronunciation.responseJson);
-    const [pronunciationSchema, setPronunciationSchema] = useState<PronunciationSchemaType>({
-        ...defaultSchema,
-        ...cache.pronunciation.schema,
     });
 
     const setFieldsHandler = useCallback((fields: FormFields) => {
         setFields(fields);
         const bodyVariables = fields.body.variablesValues;
-        const schemaClone: PronunciationSchemaType = {
-            ...pronunciationSchema,
-            fields: {
-                url: fields.url.value,
-                parameter: fields.parameter.value,
-                body: fields.body.value,
-                marker: bodyVariables ? bodyVariables['{marker}'] : pronunciationSchema.fields.marker,
-                base64Prefix: fields.base64Prefix.value,
-            },
-        };
-        setPronunciationSchema(schemaClone);
         setCache(SchemaEditCacheKeys.pronunciation, {
             ...cache.pronunciation,
-            schema: schemaClone,
+            schema: {
+                ...cache.pronunciation.schema,
+                fields: {
+                    url: fields.url.value,
+                    parameter: fields.parameter.value,
+                    body: fields.body.value,
+                    marker: bodyVariables
+                        ? bodyVariables['{marker}']
+                        : cache.pronunciation.schema?.fields.marker || '',
+                    base64Prefix: fields.base64Prefix.value,
+                },
+            },
         });
-    }, [pronunciationSchema, cache, setCache]);
+    }, [cache, setCache]);
 
     const requestHandler = useCallback((): Promise<void> => {
         return new Promise((resolve, reject) => {
-            // reset schema state
-            setPronunciationResponseText(undefined);
-            setPronunciationResponseJson(undefined);
-            setPronunciationSchema({
-                fields: pronunciationSchema.fields,
-            });
-            setCache(SchemaEditCacheKeys.pronunciation, {
-                responseText: undefined,
-                responseJson: undefined,
-                schema: {
-                    fields: pronunciationSchema.fields,
-                },
-            });
+            // clear response text and json states
+            if (cache.pronunciation.responseText && cache.pronunciation.responseJson) {
+                setCache(SchemaEditCacheKeys.pronunciation, {
+                    ...cache.pronunciation,
+                    responseText: undefined,
+                    responseJson: undefined,
+                });
+            }
 
             const bodyVariables = fields.body.variablesValues;
             const marker = bodyVariables && bodyVariables['{marker}'];
@@ -136,12 +117,6 @@ export default function SchemaEditPronunciation() {
                     }
 
                     if (translationResult !== '') {
-                        setPronunciationResponseText(translationResult);
-                        setCache(SchemaEditCacheKeys.pronunciation, {
-                            ...cache.pronunciation,
-                            responseText: translationResult,
-                        });
-
                         let data;
                         try {
                             data = JSON.parse(translationResult);
@@ -149,18 +124,23 @@ export default function SchemaEditPronunciation() {
 
                             if (allJsonStrings.length) {
                                 const responseJson = JSON.parse(allJsonStrings[0]);
-                                setPronunciationResponseJson(responseJson);
                                 setCache(SchemaEditCacheKeys.pronunciation, {
                                     ...cache.pronunciation,
                                     responseJson,
+                                    responseText: translationResult,
                                 });
-                                resolve();
+                                return resolve();
                             } else {
                                 reject(new Error('No JSON strings in the response'));
                             }
                         } catch (e) {
                             reject(new Error('Can\'t parse response JSON'));
                         }
+                        // set only responseText if previous conditions have failed
+                        setCache(SchemaEditCacheKeys.pronunciation, {
+                            ...cache.pronunciation,
+                            responseText: translationResult,
+                        });
                     }
                 } else {
                     reject(new Error('No Marker set'));
@@ -169,16 +149,40 @@ export default function SchemaEditPronunciation() {
                 reject(err);
             });
         });
-    }, [fields, pronunciationSchema, cache, setCache]);
+    }, [fields, cache, setCache]);
 
     const populateSchemaHandler = useCallback((schemaPath: string, dataPath: string) => {
-        const schema = jsonUtils.populateJsonByPath(pronunciationSchema, schemaPath, dataPath);
-        setPronunciationSchema(schema);
+        const schema = jsonUtils.populateJsonByPath(cache.pronunciation.schema || {}, schemaPath, dataPath);
         setCache(SchemaEditCacheKeys.pronunciation, {
             ...cache.pronunciation,
             schema,
         });
-    }, [pronunciationSchema, cache, setCache]);
+    }, [cache, setCache]);
+
+    // set fields values from cloud
+    useEffect(() => {
+        const schemaFields = cache.pronunciation.schema?.fields;
+        if (!cache.pronunciation.initiated && schemaFields) {
+            const fieldsClone = { ...fields };
+            Object.keys(schemaFields).forEach(item => {
+                const key = item as PronunciationSchemaTypeFieldsName;
+                if (fieldsClone[key]) {
+                    fieldsClone[key].value = schemaFields[key];
+                }
+                if (key === 'marker' && fieldsClone.body) {
+                    fieldsClone.body.variablesValues = {
+                        ...fieldsClone.body.variablesValues,
+                        '{marker}': schemaFields[key],
+                    }
+                }
+            });
+            setFields(fieldsClone);
+            setCache(SchemaEditCacheKeys.pronunciation, {
+                ...cache.pronunciation,
+                initiated: true,
+            });
+        }
+    }, [fields, cache, setCache]);
 
     return <>
         <Form
@@ -186,29 +190,29 @@ export default function SchemaEditPronunciation() {
             onChange={setFieldsHandler}
             onSubmit={requestHandler}
         />
-        {pronunciationResponseJson && (
+        {cache.pronunciation.responseJson && (
             <SchemaEditPronunciationBuilder
-                data={pronunciationResponseJson}
-                schema={pronunciationSchema}
+                data={cache.pronunciation.responseJson}
+                schema={cache.pronunciation.schema || {} as PronunciationSchemaType}
                 onDataPathSelect={populateSchemaHandler}
             />
         )}
         <Collapsable title="Schema" headerSize="h5" marginTop={5} marginBottom={3}>
             <pre>
-                {JSON.stringify(pronunciationSchema, null, 4)}
+                {JSON.stringify(cache.pronunciation.schema || {}, null, 4)}
             </pre>
         </Collapsable>
-        {pronunciationResponseText && (
+        {cache.pronunciation.responseText && (
             <Collapsable title="Original response">
                 <div className="text-ellipsis">
-                    {pronunciationResponseText}
+                    {cache.pronunciation.responseText}
                 </div>
             </Collapsable>
         )}
-        {pronunciationResponseJson && (
+        {cache.pronunciation.responseJson && (
             <SchemaEditPronunciationPreview
-                schema={pronunciationSchema}
-                translateResponseJson={pronunciationResponseJson}
+                schema={cache.pronunciation.schema || {} as PronunciationSchemaType}
+                translateResponseJson={cache.pronunciation.responseJson}
             />
         )}
     </>;

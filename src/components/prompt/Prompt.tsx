@@ -12,6 +12,8 @@ interface Props {
     isOpen: boolean,
     title: string,
     text?: string,
+    disabled?: boolean,
+    children?: React.ReactNode,
     onCancel: () => void,
     onConfirm: () => void,
 }
@@ -21,6 +23,8 @@ export default function Prompt(props: Props) {
         isOpen,
         title,
         text,
+        disabled,
+        children,
         onCancel,
         onConfirm,
     } = props;
@@ -33,16 +37,17 @@ export default function Prompt(props: Props) {
             <DialogTitle>
                 {title}
             </DialogTitle>
-            {text && (
+            {(text || children) && (
                 <DialogContent>
                     <DialogContentText>
                         {text}
                     </DialogContentText>
+                    {children}
                 </DialogContent>
             )}
             <DialogActions>
                 <Button onClick={onCancel} autoFocus>Cancel</Button>
-                <Button onClick={onConfirm}>Ok</Button>
+                <Button onClick={onConfirm} disabled={disabled}>Ok</Button>
             </DialogActions>
         </Dialog>
     );

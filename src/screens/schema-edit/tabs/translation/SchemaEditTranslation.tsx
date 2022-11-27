@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import {
     Collapsable,
@@ -9,6 +9,7 @@ import { jsonUtils } from 'src/utils';
 import {
     FormFields,
     TranslationSchemaType,
+    TranslationSchemaTypeFieldsName,
 } from 'src/types';
 import {
     SchemaEditCache,
@@ -27,76 +28,57 @@ const {
 
 export default function SchemaEditTranslation() {
     const [cache, setCache]: [SchemaEditCache, SetSchemaEditCacheCallback] = useOutletContext();
-    const defaultSchema = useMemo<TranslationSchemaType>(() => ({
-        fields: {
-            url: REACT_APP_TRANSLATION_URL || '',
-            parameter: REACT_APP_TRANSLATION_BODY_PARAMETER || '',
-            body: REACT_APP_TRANSLATION_BODY || '',
-            marker: REACT_APP_TRANSLATION_MARKER || '',
-        },
-    }), []);
     const [fields, setFields] = useState<FormFields>({
         url: {
             label: 'Url',
-            value: defaultSchema.fields.url,
+            value: cache.translation.schema?.fields.url || REACT_APP_TRANSLATION_URL || '',
             fullWidth: true,
         },
         parameter: {
             label: 'Parameter',
-            value: defaultSchema.fields.parameter,
+            value: cache.translation.schema?.fields.parameter || REACT_APP_TRANSLATION_BODY_PARAMETER || '',
         },
         body: {
             label: 'Body',
-            value: defaultSchema.fields.body,
+            value: cache.translation.schema?.fields.body || REACT_APP_TRANSLATION_BODY || '',
             variables: ['{marker}', '{word}', '{sourceLanguage}', '{targetLanguage}'],
             variablesValues: {
-                '{marker}': defaultSchema.fields.marker,
+                '{marker}': cache.translation.schema?.fields.marker || REACT_APP_TRANSLATION_MARKER || '',
             },
             type: 'textarea',
             fullWidth: true,
         }
     });
-    const [translationResponseText, setTranslationResponseText] = useState<string | undefined>(cache.translation.responseText);
-    const [translationResponseJson, setTranslationResponseJson] = useState<any>(cache.translation.responseJson);
-    const [translationSchema, setTranslationSchema] = useState<TranslationSchemaType>({
-        ...defaultSchema,
-        ...cache.translation.schema,
-    });
 
     const setFieldsHandler = useCallback((fields: FormFields) => {
         setFields(fields);
         const bodyVariables = fields.body.variablesValues;
-        const schemaClone: TranslationSchemaType = {
-            ...translationSchema,
-            fields: {
-                url: fields.url.value,
-                parameter: fields.parameter.value,
-                body: fields.body.value,
-                marker: bodyVariables ? bodyVariables['{marker}'] : translationSchema.fields.marker,
-            },
-        };
-        setTranslationSchema(schemaClone);
         setCache(SchemaEditCacheKeys.translation, {
             ...cache.translation,
-            schema: schemaClone,
+            schema: {
+                ...cache.translation.schema,
+                fields: {
+                    url: fields.url.value,
+                    parameter: fields.parameter.value,
+                    body: fields.body.value,
+                    marker: bodyVariables
+                        ? bodyVariables['{marker}']
+                        : cache.translation.schema?.fields.marker || '',
+                },
+            },
         });
-    }, [translationSchema, cache, setCache]);
+    }, [cache, setCache]);
 
     const requestHandler = useCallback((): Promise<void> => {
         return new Promise((resolve, reject) => {
-            // reset schema state
-            setTranslationResponseText(undefined);
-            setTranslationResponseJson(undefined);
-            setTranslationSchema({
-                fields: translationSchema.fields,
-            });
-            setCache(SchemaEditCacheKeys.translation, {
-                responseText: undefined,
-                responseJson: undefined,
-                schema: {
-                    fields: translationSchema.fields,
-                },
-            });
+            // clear response text and json states
+            if (cache.translation.responseText && cache.translation.responseJson) {
+                setCache(SchemaEditCacheKeys.translation, {
+                    ...cache.translation,
+                    responseText: undefined,
+                    responseJson: undefined,
+                });
+            }
 
             const bodyVariables = fields.body.variablesValues;
             const marker = bodyVariables && bodyVariables['{marker}'];
@@ -129,11 +111,6 @@ export default function SchemaEditTranslation() {
                     }
 
                     if (translationResult !== '') {
-                        setTranslationResponseText(translationResult);
-                        setCache(SchemaEditCacheKeys.translation, {
-                            ...cache.translation,
-                            responseText: translationResult,
-                        });
                         let data;
                         try {
                             data = JSON.parse(translationResult);
@@ -141,18 +118,23 @@ export default function SchemaEditTranslation() {
 
                             if (allJsonStrings.length) {
                                 const responseJson = JSON.parse(allJsonStrings[0]);
-                                setTranslationResponseJson(responseJson);
                                 setCache(SchemaEditCacheKeys.translation, {
                                     ...cache.translation,
                                     responseJson,
+                                    responseText: translationResult,
                                 });
-                                resolve();
+                                return resolve();
                             } else {
                                 reject(new Error('No JSON strings in the response'));
                             }
                         } catch (e) {
                             reject(new Error('Can\'t parse response JSON'));
                         }
+                        // set only responseText if previous conditions have failed
+                        setCache(SchemaEditCacheKeys.translation, {
+                            ...cache.translation,
+                            responseText: translationResult,
+                        });
                     }
                 } else {
                     reject(new Error('No Marker set'));
@@ -161,16 +143,40 @@ export default function SchemaEditTranslation() {
                 reject(err);
             });
         });
-    }, [fields, translationSchema, cache, setCache]);
+    }, [fields, cache, setCache]);
 
     const populateSchemaHandler = useCallback((schemaPath: string, dataPath: string) => {
-        const schema = jsonUtils.populateJsonByPath(translationSchema, schemaPath, dataPath);
-        setTranslationSchema(schema);
+        const schema = jsonUtils.populateJsonByPath(cache.translation.schema || {}, schemaPath, dataPath);
         setCache(SchemaEditCacheKeys.translation, {
             ...cache.translation,
             schema,
         });
-    }, [translationSchema, cache, setCache]);
+    }, [cache, setCache]);
+
+    // set fields values from cloud
+    useEffect(() => {
+        const schemaFields = cache.translation.schema?.fields;
+        if (!cache.translation.initiated && schemaFields) {
+            const fieldsClone = { ...fields };
+            Object.keys(schemaFields).forEach(item => {
+                const key = item as TranslationSchemaTypeFieldsName;
+                if (fieldsClone[key]) {
+                    fieldsClone[key].value = schemaFields[key];
+                }
+                if (key === 'marker' && fieldsClone.body) {
+                    fieldsClone.body.variablesValues = {
+                        ...fieldsClone.body.variablesValues,
+                        '{marker}': schemaFields[key],
+                    }
+                }
+            });
+            setFields(fieldsClone);
+            setCache(SchemaEditCacheKeys.translation, {
+                ...cache.translation,
+                initiated: true,
+            });
+        }
+    }, [fields, cache, setCache]);
 
     return (
         <>
@@ -179,27 +185,27 @@ export default function SchemaEditTranslation() {
                 onChange={setFieldsHandler}
                 onSubmit={requestHandler}
             />
-            {translationResponseJson && (
+            {cache.translation.responseJson && (
                 <SchemaEditTranslationBuilder
-                    data={translationResponseJson}
-                    schema={translationSchema}
+                    data={cache.translation.responseJson}
+                    schema={cache.translation.schema || {} as TranslationSchemaType}
                     onDataPathSelect={populateSchemaHandler}
                 />
             )}
             <Collapsable title="Schema" headerSize="h5" marginTop={5} marginBottom={3}>
                 <pre>
-                    {JSON.stringify(translationSchema, null, 4)}
+                    {JSON.stringify(cache.translation.schema || {}, null, 4)}
                 </pre>
             </Collapsable>
-            {translationResponseText && (
+            {cache.translation.responseText && (
                 <Collapsable title="Original response">
-                    {translationResponseText}
+                    {cache.translation.responseText}
                 </Collapsable>
             )}
-            {translationResponseJson && (
+            {cache.translation.responseJson && (
                 <SchemaEditTranslationPreview
-                    schema={translationSchema}
-                    translationResponseJson={translationResponseJson}
+                    schema={cache.translation.schema || {} as TranslationSchemaType}
+                    translationResponseJson={cache.translation.responseJson}
                 />
             )}
         </>

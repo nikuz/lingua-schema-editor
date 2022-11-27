@@ -11,18 +11,21 @@ export interface SchemaEditCache {
 }
 
 export interface SchemaEditCacheTranslation {
+    initiated: boolean,
     responseText?: string,
     responseJson?: any,
     schema?: TranslationSchemaType,
 }
 
 export interface SchemaEditCachePronunciation {
+    initiated: boolean,
     responseText?: string,
     responseJson?: any,
     schema?: PronunciationSchemaType,
 }
 
 export interface SchemaEditCacheImages {
+    initiated: boolean,
     images?: string[],
     schema?: ImagesSchemaType,
 }

@@ -29,7 +29,7 @@ import {
     firestoreCollection,
     useFirestoreCollectionData,
     firestoreDoc,
-    setFirestoreDoc,
+    firestoreSetDoc,
     firestoreQuery,
     firestoreWhere,
     firestoreGetDoc,
@@ -64,12 +64,12 @@ export default function Dashboard() {
             if (activeCurrentDocRef) {
                 const activeCurrentDocs = await firestoreGetDocs(activeCurrentDocRef);
                 activeCurrentDocs.forEach(item => {
-                    setFirestoreDoc(item.ref, { current: false }, { merge: true });
+                    firestoreSetDoc(item.ref, { current: false }, { merge: true });
                 });
             }
 
             const docReference = firestoreDoc(firestoreInstance, 'schemas', changeCurrentPrompt);
-            setFirestoreDoc(
+            firestoreSetDoc(
                 docReference,
                 { current: true },
                 { merge: true }
@@ -77,13 +77,13 @@ export default function Dashboard() {
                 .then(() => {
                     setChangeCurrentPromptLoading(false);
                     firestoreGetDoc(docReference).then(response => {
-                        setFirestoreDoc(
+                        firestoreSetDoc(
                             firestoreDoc(firestoreInstance, 'schemas', 'current'),
                             {
                                 ...response.data(),
                                 id: 'current',
                             }
-                        )
+                        );
                     });
                 })
                 .catch(err => {
@@ -132,8 +132,8 @@ export default function Dashboard() {
                         if (item.id === 'current') {
                             return null;
                         }
-                        const createdAt = item.createdAt && new Date(item.createdAt.seconds * 1000);
-                        const updatedAt = item.updatedAt && new Date(item.updatedAt.seconds * 1000);
+                        const createdAt = item.createdAt && new Date(item.createdAt);
+                        const updatedAt = item.updatedAt && new Date(item.updatedAt);
 
                         return (
                             <TableRow key={key}>
@@ -187,9 +187,6 @@ export default function Dashboard() {
                 <Typography variant="body2">No schemas found</Typography>
             </Box>
         )}
-        {error && (
-            <Alert severity="error">{error.message}</Alert>
-        )}
         {changeCurrentPrompt && (
             <Prompt
                 isOpen
@@ -211,5 +208,8 @@ export default function Dashboard() {
             />
         )}
         {loading && <Loading blocker />}
+        {error && (
+            <Alert severity="error">{error.message}</Alert>
+        )}
     </>
 }

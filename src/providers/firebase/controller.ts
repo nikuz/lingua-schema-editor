@@ -28,7 +28,7 @@ export {
     collection as firestoreCollection,
     useCollectionData as useFirestoreCollectionData,
     doc as firestoreDoc,
-    setDoc as setFirestoreDoc,
+    setDoc as firestoreSetDoc,
     where as firestoreWhere,
     query as firestoreQuery,
     getDoc as firestoreGetDoc,

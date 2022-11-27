@@ -1,12 +1,7 @@
 import { SchemaItemType } from './schema-item';
 
 export interface TranslationSchemaType {
-    fields: {
-        url: string,
-        parameter: string,
-        body: string,
-        marker: string,
-    },
+    fields: TranslationSchemaTypeFields,
     word?: SchemaItemType,
     auto_spelling_fix?: SchemaItemType,
     translation?: SchemaItemType,
@@ -15,6 +10,15 @@ export interface TranslationSchemaType {
     definitions?: TranslationSchemaTypeDefinitions,
     examples?: TranslationSchemaTypeExamples,
 }
+
+export interface TranslationSchemaTypeFields {
+    url: string,
+    parameter: string,
+    body: string,
+    marker: string,
+}
+
+export type TranslationSchemaTypeFieldsName = keyof TranslationSchemaTypeFields;
 
 export type TranslationSchemaTypeAlternativeTranslations = SchemaItemType & {
     speech_part?: SchemaItemType,
