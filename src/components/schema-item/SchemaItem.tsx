@@ -128,7 +128,7 @@ export default function SchemaItem({
                 <div className="json-editor-modal-container flex flex-center relative">
                     <div className="blocker" onClick={closePathModalHandler} />
                     <div className="json-editor-modal-wrapper">
-                        <Box className="json-editor-modal-title">
+                        <div className="json-editor-modal-title">
                             <Typography variant="body1" sx={{ mr: 5 }}>
                                 {schemaPath}
                             </Typography>
@@ -147,14 +147,14 @@ export default function SchemaItem({
                             >
                                 Save manual
                             </Button>
-                        </Box>
-                        <Box sx={{ flex: 1 }}>
+                        </div>
+                        <div className="json-editor-modal-body">
                             <JsonEditor
                                 mode="tree"
                                 data={data}
                                 onSelect={selectHandler}
                             />
-                        </Box>
+                        </div>
                     </div>
                 </div>
             </Modal>

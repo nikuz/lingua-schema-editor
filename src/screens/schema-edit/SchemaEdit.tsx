@@ -32,6 +32,7 @@ import {
     SchemaEditCache,
     SetSchemaEditCacheCallback,
 } from './types';
+// import data from 'src/data/bitch.json';
 
 const tabs = [{
     label: 'Translation',
@@ -139,12 +140,15 @@ export default function SchemaEdit() {
     }, [cache, newSchemaVersionName, isNew, params, navigate]);
 
     const saveButtonClickHandler = useCallback(() => {
+        if (!isSaveEnabled || error) {
+            return;
+        }
         if (isNew) {
             setSavingPrompt(true);
         } else {
             saveResultSchema();
         }
-    }, [isNew, saveResultSchema]);
+    }, [isNew, isSaveEnabled, error, saveResultSchema]);
 
     useEffect(() => {
         if (!isNew && params.version && !schemaFromCloud && !loading && !error) {
@@ -166,6 +170,7 @@ export default function SchemaEdit() {
                             translation: {
                                 initiated: false,
                                 schema: schema.translation,
+                                // responseJson: data,
                             },
                             pronunciation: {
                                 initiated: false,

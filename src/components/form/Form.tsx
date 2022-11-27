@@ -12,7 +12,6 @@ import { FormFields } from 'src/types';
 import Loading from '../loading';
 import supportedLanguages from 'src/data/supported-languages.json';
 import './Form.css';
-// import data from '../../data/man.json';
 
 interface Props {
     fields: FormFields,
@@ -84,13 +83,7 @@ export default function Form(props: Props) {
         };
         onChange(fieldsClone);
     }, [fields, onChange]);
-
-    // TODO: remove in production
-    // useEffect(() => {
-    //     onDataReceive(JSON.stringify(data), data);
-    // }, [onDataReceive]);
-    //
-
+    
     return <>
         {Object.keys(fields).map(fieldKey => {
             const field = fields[fieldKey];

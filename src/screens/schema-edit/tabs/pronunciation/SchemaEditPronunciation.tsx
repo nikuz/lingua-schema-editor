@@ -24,6 +24,7 @@ const {
     REACT_APP_PRONUNCIATION_MARKER,
     REACT_APP_TRANSLATION_BODY_PARAMETER,
     REACT_APP_PRONUNCIATION_BODY,
+    REACT_APP_PRONUNCIATION_BASE64_PREFIX,
 } = process.env;
 
 export default function SchemaEditPronunciation() {
@@ -50,7 +51,7 @@ export default function SchemaEditPronunciation() {
         },
         base64Prefix: {
             label: 'Base 64 prefix',
-            value: cache.pronunciation.schema?.fields.base64Prefix || 'data:audio/mp3;base64,',
+            value: cache.pronunciation.schema?.fields.base64Prefix || REACT_APP_PRONUNCIATION_BASE64_PREFIX || '',
             fullWidth: true,
         }
     });

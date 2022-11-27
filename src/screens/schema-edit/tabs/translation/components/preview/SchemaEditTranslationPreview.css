@@ -1,0 +1,59 @@
+.translation-speech-part {
+    color: rgb(26,115,232);
+}
+
+.translation-grey {
+    color: rgb(95, 99, 104)!important;
+}
+
+.alternative-translation-row {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+}
+
+.alternative-translation-frequency {
+    display: flex;
+}
+
+.alternative-translation-frequency div {
+    width: 10px;
+    height: 6px;
+    margin: 1px;
+    border-radius: 1px;
+    background-color: rgb(218, 220, 224);
+}
+
+.alternative-translation-frequency.f1 div {
+    background-color: rgb(26, 115, 232);
+}
+
+.alternative-translation-frequency.f2 div:nth-child(1),
+.alternative-translation-frequency.f2 div:nth-child(2) {
+    background-color: rgb(26, 115, 232);
+}
+
+.alternative-translation-frequency.f3 div:nth-child(1) {
+    background-color: rgb(26, 115, 232);
+}
+
+.translation-definition-counter {
+    position: absolute;
+    top: 3px;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    border: 1px solid rgb(218, 220, 224);
+    border-radius: 50%;
+    color: rgb(95,99,104);
+    font-size: 14px;
+    line-height: 18px;
+    text-align: center;
+}
+
+.translation-example-quote {
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: rgb(95, 99, 104);
+}
