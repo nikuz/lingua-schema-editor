@@ -123,8 +123,9 @@ export default function SchemaEdit() {
                 setError(err);
             });
         } else if (params.version) {
+            const existingSchemaReference = firestoreDoc(firestoreInstance, 'schemas', params.version);
             firestoreSetDoc(
-                firestoreDoc(firestoreInstance, 'schemas', params.version),
+                existingSchemaReference,
                 {
                     schema,
                     updatedAt: Date.now(),
@@ -132,6 +133,20 @@ export default function SchemaEdit() {
                 { merge: true }
             ).then(() => {
                 navigate(routerConstants.HOME);
+                // update current schema also
+                firestoreGetDoc(existingSchemaReference).then(result => {
+                    const docData = result.data();
+                    if (docData && docData.current === true) {
+                        firestoreSetDoc(
+                            firestoreDoc(firestoreInstance, 'schemas', 'current'),
+                            {
+                                schema,
+                                updatedAt: Date.now(),
+                            },
+                            { merge: true }
+                        );
+                    }
+                });
             }).catch(err => {
                 setLoading(false);
                 setError(err);
