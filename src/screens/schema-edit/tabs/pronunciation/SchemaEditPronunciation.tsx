@@ -10,6 +10,7 @@ import {
     FormFields,
     PronunciationSchemaType,
     PronunciationSchemaTypeFieldsName,
+    Language,
 } from 'src/types';
 import {
     SchemaEditCache,
@@ -28,7 +29,7 @@ const {
 } = process.env;
 
 export default function SchemaEditPronunciation() {
-    const [cache, setCache]: [SchemaEditCache, SetSchemaEditCacheCallback] = useOutletContext();
+    const [cache, setCache, languages]: [SchemaEditCache, SetSchemaEditCacheCallback, Language[]] = useOutletContext();
     const [fields, setFields] = useState<FormFields>({
         url: {
             label: 'Url',
@@ -188,6 +189,7 @@ export default function SchemaEditPronunciation() {
     return <>
         <Form
             fields={fields}
+            languages={languages}
             onChange={setFieldsHandler}
             onSubmit={requestHandler}
         />

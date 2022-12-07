@@ -96,7 +96,7 @@ export default function Login() {
                 >
                     Login
                 </Button>
-                {loading && <Loading blocker />}
+                {loading && <Loading blocker fixed />}
             </form>
         </div>
     );

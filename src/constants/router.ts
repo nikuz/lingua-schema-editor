@@ -1,4 +1,5 @@
 export const HOME = '/';
+export const LANGUAGES = '/languages';
 export const LOGIN = '/login';
 export const SCHEMA_EDIT = '/schema-edit/:version';
 export const SCHEMA_EDIT_PRONUNCIATION = '/schema-edit/:version/pronunciation';

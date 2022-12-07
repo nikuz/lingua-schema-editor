@@ -20,6 +20,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Loading, Prompt, SaveHotkey } from '../../components';
 import { routerConstants } from 'src/constants';
 import { routerUtils } from 'src/utils';
+import { useStoredLanguages } from 'src/hooks';
 import {
     firestoreInstance,
     firestoreDoc,
@@ -53,8 +54,8 @@ export default function SchemaEdit() {
     const [activeTab, setActiveTab] = useState(0);
     const [savingPrompt, setSavingPrompt] = useState(false);
     const [newSchemaVersionName, setNewSchemaVersionName] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<Error>();
+    const [pageLoading, setPageLoading] = useState(false);
+    const [pageError, setPageError] = useState<Error>();
     const [schemaFromCloud, setSchemaFromCloud] = useState<ResultSchemaType>();
     const isNew = useMemo(() => params.version === 'new', [params]);
     // cache container to keep schemas and API responses states of individual tabs
@@ -63,6 +64,7 @@ export default function SchemaEdit() {
         pronunciation: { initiated: isNew },
         images: { initiated: isNew },
     });
+    const [storedLanguages, storedLanguagesLoading, storedLanguagesError] = useStoredLanguages();
     const isSaveEnabled = useMemo(() => {
         return validateSchemaIntegrity({
             translation: cache.translation.schema,
@@ -73,6 +75,8 @@ export default function SchemaEdit() {
     const newVersionNameError = useMemo(() => (
         newSchemaVersionName.trim().toLocaleLowerCase() === 'new'
     ), [newSchemaVersionName]);
+    const loading = pageLoading || storedLanguagesLoading;
+    const error = pageError || storedLanguagesError;
 
     const setCacheHandler: SetSchemaEditCacheCallback = useCallback((key, cachePart) => {
         const cacheClone = {
@@ -88,8 +92,8 @@ export default function SchemaEdit() {
     }, [navigate, params]);
 
     const saveResultSchema = useCallback(() => {
-        setLoading(true);
-        setError(undefined);
+        setPageLoading(true);
+        setPageError(undefined);
         const schema = JSON.stringify({
             translation: cache.translation.schema,
             pronunciation: cache.pronunciation.schema,
@@ -100,8 +104,8 @@ export default function SchemaEdit() {
             const newSchemaReference = firestoreDoc(firestoreInstance, 'schemas', newSchemaVersionName);
             firestoreGetDoc(newSchemaReference).then(result => {
                 if (result.exists()) {
-                    setLoading(false);
-                    setError(new Error('Schema with this version name already exists. Please make unique name'));
+                    setPageLoading(false);
+                    setPageError(new Error('Schema with this version name already exists. Please make unique name'));
                 } else {
                     firestoreSetDoc(
                         firestoreDoc(firestoreInstance, 'schemas', newSchemaVersionName),
@@ -114,13 +118,13 @@ export default function SchemaEdit() {
                     ).then(() => {
                         navigate(routerConstants.HOME);
                     }).catch(err => {
-                        setLoading(false);
-                        setError(err);
+                        setPageLoading(false);
+                        setPageError(err);
                     });
                 }
             }).catch(err => {
-                setLoading(false);
-                setError(err);
+                setPageLoading(false);
+                setPageError(err);
             });
         } else if (params.version) {
             const existingSchemaReference = firestoreDoc(firestoreInstance, 'schemas', params.version);
@@ -148,8 +152,8 @@ export default function SchemaEdit() {
                     }
                 });
             }).catch(err => {
-                setLoading(false);
-                setError(err);
+                setPageLoading(false);
+                setPageError(err);
             });
         }
     }, [cache, newSchemaVersionName, isNew, params, navigate]);
@@ -167,17 +171,17 @@ export default function SchemaEdit() {
 
     useEffect(() => {
         if (!isNew && params.version && !schemaFromCloud && !loading && !error) {
-            setLoading(true);
+            setPageLoading(true);
             const schemaReference = firestoreDoc(firestoreInstance, 'schemas', params.version);
             firestoreGetDoc(schemaReference).then(result => {
-                setLoading(false);
+                setPageLoading(false);
                 const docData = result.data();
                 if (docData) {
                     let schema: ResultSchemaType | undefined;
                     try {
                         schema = JSON.parse(docData.schema);
                     } catch (e) {
-                        setError(new Error('Can\'t parse schema from cloud'));
+                        setPageError(new Error('Can\'t parse schema from cloud'));
                     }
                     if (schema) {
                         setSchemaFromCloud(schema);
@@ -198,11 +202,11 @@ export default function SchemaEdit() {
                         });
                     }
                 } else {
-                    setError(new Error('Can\'t find document in cloud'));
+                    setPageError(new Error('Can\'t find document in cloud'));
                 }
             }).catch(err => {
-                setLoading(false);
-                setError(err);
+                setPageLoading(false);
+                setPageError(err);
             });
         }
     }, [params, isNew, loading, error, schemaFromCloud]);
@@ -256,7 +260,8 @@ export default function SchemaEdit() {
             <Outlet
                 context={[
                     cache,
-                    setCacheHandler
+                    setCacheHandler,
+                    storedLanguages,
                 ]}
             />
         </Box>
@@ -292,7 +297,7 @@ export default function SchemaEdit() {
         <SaveHotkey
             onSave={saveButtonClickHandler}
         />
-        {loading && <Loading blocker />}
+        {loading && <Loading blocker fixed />}
         {error && (
             <Alert severity="error">{error.message}</Alert>
         )}

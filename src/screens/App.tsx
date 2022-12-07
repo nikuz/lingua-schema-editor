@@ -13,9 +13,11 @@ import {
     Box,
     CssBaseline,
 } from '@mui/material';
-import SchemaIcon from '@mui/icons-material/Schema';
+import GTranslateIcon from '@mui/icons-material/GTranslate';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Loading } from 'src/components';
+import { routerUtils } from 'src/utils';
 import { routerConstants } from 'src/constants';
 import {
     useAuthState,
@@ -28,9 +30,24 @@ const DRAWER_WIDTH = 64;
 
 const menuItems = [{
     url: routerConstants.HOME,
-    icon: <SchemaIcon />
+    label: 'Schemas',
+    isSelected: (pathName: string) => (
+        pathName === routerConstants.HOME
+        || pathName.startsWith(routerUtils.setParams(routerConstants.SCHEMA_EDIT, [':version'], ['']))
+    ),
+    icon: <AccountTreeIcon />
+}, {
+    url: routerConstants.LANGUAGES,
+    label: 'Languages',
+    isSelected: (pathName: string) => (
+        pathName === routerConstants.LANGUAGES
+    ),
+    icon: <GTranslateIcon />
 }, {
     url: 'logout',
+    label: 'Logout',
+    subpages: [],
+    isSelected: () => false,
     icon: <LogoutIcon />
 }];
 
@@ -66,10 +83,11 @@ export default function App() {
                 >
                     <List>
                         {menuItems.map((item, key) => {
-                            const isSelected = location.pathname.startsWith(item.url);
+                            const isSelected = item.isSelected(location.pathname);
                             return (
                                 <ListItem key={key} disablePadding sx={{ mb: 1 }}>
                                     <ListItemButton
+                                        title={item.label}
                                         sx={{
                                             minHeight: 48,
                                             px: 2.5,

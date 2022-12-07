@@ -3,7 +3,7 @@ const path = require('node:path');
 
 const dataFilePath = path.resolve(__dirname, 'google-translate-response.html');
 const resultFilePath = path.resolve(__dirname, 'supported-languages.json');
-const languageCodesRegExp = /data: (\[\[\["auto", "Detect language"[^\n]+]]]),/;
+const languageCodesRegExp = /data:\s?(\[\[\["auto",\s?"Detect language"[^\n]+]]]),/;
 
 if (!fs.existsSync(dataFilePath)) {
     throw new Error('No "google-translate-response.html" file exists in the script directory');

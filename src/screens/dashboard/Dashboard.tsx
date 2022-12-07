@@ -207,7 +207,7 @@ export default function Dashboard() {
                 onConfirm={removeSchemaHandler}
             />
         )}
-        {loading && <Loading blocker />}
+        {loading && <Loading blocker fixed />}
         {error && (
             <Alert severity="error">{error.message}</Alert>
         )}

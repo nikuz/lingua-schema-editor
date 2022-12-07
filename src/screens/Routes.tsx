@@ -3,7 +3,7 @@ import {
     BrowserRouter,
     Routes,
     Route,
-} from 'react-router-dom';
+    } from 'react-router-dom';
 import { routerConstants } from 'src/constants';
 
 import App from './App';
@@ -14,6 +14,7 @@ import SchemaEdit from './schema-edit';
 import SchemaEditTranslation from './schema-edit/tabs/translation';
 import SchemaEditPronunciation from './schema-edit/tabs/pronunciation';
 import SchemaEditImages from './schema-edit/tabs/images';
+import Languages from './languages';
 
 export default function AppRoutes() {
     return (
@@ -45,6 +46,10 @@ export default function AppRoutes() {
                             element={<SchemaEditImages />}
                         />
                     </Route>
+                    <Route
+                        path={routerConstants.LANGUAGES}
+                        element={<Languages />}
+                    />
                     <Route path='*' element={<NotFound />}/>
                 </Route>
             </Routes>
