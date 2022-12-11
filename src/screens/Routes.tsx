@@ -11,9 +11,9 @@ import Dashboard from './dashboard';
 import Login from './login';
 import NotFound from './not-found';
 import SchemaEdit from './schema-edit';
-import SchemaEditTranslation from './schema-edit/tabs/translation';
-import SchemaEditPronunciation from './schema-edit/tabs/pronunciation';
-import SchemaEditImages from './schema-edit/tabs/images';
+import SchemaEditTranslation from './schema-edit/translation';
+import SchemaEditPronunciation from './schema-edit/pronunciation';
+import SchemaEditImages from './schema-edit/images';
 import Languages from './languages';
 
 export default function AppRoutes() {

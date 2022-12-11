@@ -10,7 +10,7 @@ import {
     SchemaEditCache,
     SchemaEditCacheKeys,
     SetSchemaEditCacheCallback,
-} from '../../types';
+} from '../types';
 import SchemaEditImagesPreview from './components/preview';
 import './SchemaEditImages.css';
 

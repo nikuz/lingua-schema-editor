@@ -19,7 +19,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Loading, Prompt, SaveHotkey } from '../../components';
 import { routerConstants } from 'src/constants';
-import { routerUtils } from 'src/utils';
+import { routerUtils, schemaUtils } from 'src/utils';
 import { useStoredLanguages } from 'src/hooks';
 import {
     firestoreInstance,
@@ -28,12 +28,11 @@ import {
     firestoreSetDoc,
 } from 'src/providers/firebase/controller';
 import { ResultSchemaType } from 'src/types';
-import { validateSchemaIntegrity } from './utils/schema-validator';
 import {
     SchemaEditCache,
     SetSchemaEditCacheCallback,
 } from './types';
-// import data from 'src/data/bitch.json';
+// import data from 'src/data/man.json';
 
 const tabs = [{
     label: 'Translation',
@@ -45,7 +44,6 @@ const tabs = [{
     label: 'Images',
     url: routerConstants.SCHEMA_EDIT_IMAGES,
 }];
-const newSchemaNameMaxLength = 20;
 
 export default function SchemaEdit() {
     const location = useLocation();
@@ -66,14 +64,14 @@ export default function SchemaEdit() {
     });
     const [storedLanguages, storedLanguagesLoading, storedLanguagesError] = useStoredLanguages();
     const isSaveEnabled = useMemo(() => {
-        return validateSchemaIntegrity({
+        return schemaUtils.validateIntegrity({
             translation: cache.translation.schema,
             pronunciation: cache.pronunciation.schema,
             images: cache.images.schema,
         });
     }, [cache]);
-    const newVersionNameError = useMemo(() => (
-        newSchemaVersionName.trim().toLocaleLowerCase() === 'new'
+    const newVersionNameError = useMemo<boolean>(() => (
+        newSchemaVersionName.trim() === '' || isNaN(Number(newSchemaVersionName))
     ), [newSchemaVersionName]);
     const loading = pageLoading || storedLanguagesLoading;
     const error = pageError || storedLanguagesError;
@@ -148,7 +146,10 @@ export default function SchemaEdit() {
                                 updatedAt: Date.now(),
                             },
                             { merge: true }
-                        );
+                        ).catch(err => {
+                            setPageLoading(false);
+                            setPageError(err);
+                        })
                     }
                 });
             }).catch(err => {
@@ -272,7 +273,7 @@ export default function SchemaEdit() {
                 onCancel={() => {
                     setSavingPrompt(false);
                 }}
-                disabled={newSchemaVersionName.trim() === '' || newVersionNameError}
+                disabled={newVersionNameError}
                 onConfirm={() => {
                     setSavingPrompt(false);
                     saveResultSchema();
@@ -286,10 +287,10 @@ export default function SchemaEdit() {
                     sx={{ mt: 1 }}
                     fullWidth
                     error={newVersionNameError}
-                    helperText={`Has to be unique. Cannot be "new". 20 characters max.`}
+                    helperText="Has to be unique number"
                     autoFocus
                     onChange={(event) => {
-                        setNewSchemaVersionName(event.target.value.substring(0, newSchemaNameMaxLength));
+                        setNewSchemaVersionName(event.target.value);
                     }}
                 />
             </Prompt>

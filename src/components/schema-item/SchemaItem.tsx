@@ -47,7 +47,7 @@ export default function SchemaItem({
     const value = useMemo(() => (
         dataPath && typeof dataPath === 'string' ? jmespath.search(data, dataPath) : undefined
     ), [data, dataPath]);
-    const [manualEnterValue, setManualEnterValue] = useState(value);
+    const [manualEnterValue, setManualEnterValue] = useState(dataPath || '');
     let content;
     
     const openPathModalHandler = useCallback((e: React.MouseEvent) => {
@@ -63,11 +63,18 @@ export default function SchemaItem({
         if (context.onDataPathSelect) {
             context.onDataPathSelect(schemaPath, dataPath);
         }
+        setManualEnterValue(dataPath);
         closePathModalHandler();
     }, [context, schemaPath, closePathModalHandler]);
 
     if (value !== undefined) {
-        if (isListExpected && Array.isArray(value)) {
+        if (isListExpected) {
+            // if the data for current field is not present in the translation response
+            // then just show schema fields for manual filling
+            let data = value;
+            if (!Array.isArray(value)) {
+                data = [];
+            }
             content = <>
                 <Typography variant="subtitle1">
                     <Link href="#" onClick={openPathModalHandler}>
@@ -76,21 +83,21 @@ export default function SchemaItem({
                 </Typography>
                 {/*show only first item to prevent UI pollution*/}
                 <List>
-                    {itemRender ? itemRender(value[0]) : null}
+                    {itemRender ? itemRender(data[0]) : null}
                 </List>
 
                 {/*render the rest items under a folded Accordion*/}
-                {value.length > 1 && (
+                {data.length > 1 && (
                     <Collapsable title={`Other ${title}`} marginTop={2}>
                         <List>
-                            {value.map((item: any, key) => {
+                            {data.map((item: any, key: number) => {
                                 if (key === 0) {
                                     return null;
                                 }
                                 return (
                                     <React.Fragment key={key}>
                                         {itemRender ? itemRender(item) : null}
-                                        {key !== value.length - 1 && <Divider />}
+                                        {key !== data.length - 1 && <Divider />}
                                     </React.Fragment>
                                 );
                             })}

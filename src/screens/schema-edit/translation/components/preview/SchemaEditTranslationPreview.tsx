@@ -41,7 +41,30 @@ export default function SchemaEditTranslationPreview(props: Props) {
                         {word}
                         {autoSpellingFix && ` [${autoSpellingFix}?]`}
                         &nbsp;=&nbsp;
-                        {translation}
+                        {Array.isArray(translation) && translation.map((genderItem, key) => {
+                            const gender = retrieveData(genderItem, schema.translation?.gender?.value);
+                            const word = retrieveData(genderItem, schema.translation?.word?.value);
+                            const sentences = retrieveData(genderItem, schema.translation?.sentence?.value);
+
+                            return (
+                                <Box component="span" key={key}>
+                                    {word}
+                                    {gender && <>
+                                        {gender}
+                                        {key < translation.length - 1 && ", "}
+                                    </>}
+                                    {Array.isArray(sentences) && sentences.map((sentence, key) => {
+                                        const word = retrieveData(sentence, schema.translation?.sentence?.word?.value);
+                                        return (
+                                            <Box component="span" key={key}>
+                                                {word}
+                                                {key < sentences.length - 1 && " "}
+                                            </Box>
+                                        )
+                                    })}
+                                </Box>
+                            );
+                        })}
                     </Typography>
                 )}
                 subheader={(

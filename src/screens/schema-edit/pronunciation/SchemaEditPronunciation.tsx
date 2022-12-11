@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import {
     Collapsable,
@@ -8,45 +8,51 @@ import { translationController } from 'src/controllers';
 import { jsonUtils } from 'src/utils';
 import {
     FormFields,
-    TranslationSchemaType,
-    TranslationSchemaTypeFieldsName,
+    PronunciationSchemaType,
+    PronunciationSchemaTypeFieldsName,
     Language,
 } from 'src/types';
 import {
     SchemaEditCache,
     SchemaEditCacheKeys,
     SetSchemaEditCacheCallback,
-} from '../../types';
-import SchemaEditTranslationBuilder from './components/schema-builder';
-import SchemaEditTranslationPreview from './components/preview';
+} from '../types';
+import SchemaEditPronunciationBuilder from './components/schema-builder';
+import SchemaEditPronunciationPreview from './components/preview';
 
 const {
     REACT_APP_TRANSLATION_URL,
-    REACT_APP_TRANSLATION_MARKER,
+    REACT_APP_PRONUNCIATION_MARKER,
     REACT_APP_TRANSLATION_BODY_PARAMETER,
-    REACT_APP_TRANSLATION_BODY,
+    REACT_APP_PRONUNCIATION_BODY,
+    REACT_APP_PRONUNCIATION_BASE64_PREFIX,
 } = process.env;
 
-export default function SchemaEditTranslation() {
+export default function SchemaEditPronunciation() {
     const [cache, setCache, languages]: [SchemaEditCache, SetSchemaEditCacheCallback, Language[]] = useOutletContext();
     const [fields, setFields] = useState<FormFields>({
         url: {
             label: 'Url',
-            value: cache.translation.schema?.fields.url || REACT_APP_TRANSLATION_URL || '',
+            value: cache.pronunciation.schema?.fields.url || REACT_APP_TRANSLATION_URL || '',
             fullWidth: true,
         },
         parameter: {
             label: 'Parameter',
-            value: cache.translation.schema?.fields.parameter || REACT_APP_TRANSLATION_BODY_PARAMETER || '',
+            value: cache.pronunciation.schema?.fields.parameter || REACT_APP_TRANSLATION_BODY_PARAMETER || '',
         },
         body: {
             label: 'Body',
-            value: cache.translation.schema?.fields.body || REACT_APP_TRANSLATION_BODY || '',
-            variables: ['{marker}', '{word}', '{sourceLanguage}', '{targetLanguage}'],
+            value: cache.pronunciation.schema?.fields.body || REACT_APP_PRONUNCIATION_BODY || '',
+            variables: ['{marker}', '{word}', '{sourceLanguage}'],
             variablesValues: {
-                '{marker}': cache.translation.schema?.fields.marker || REACT_APP_TRANSLATION_MARKER || '',
+                '{marker}': cache.pronunciation.schema?.fields.marker || REACT_APP_PRONUNCIATION_MARKER || '',
             },
             type: 'textarea',
+            fullWidth: true,
+        },
+        base64Prefix: {
+            label: 'Base 64 prefix',
+            value: cache.pronunciation.schema?.fields.base64Prefix || REACT_APP_PRONUNCIATION_BASE64_PREFIX || '',
             fullWidth: true,
         }
     });
@@ -54,17 +60,18 @@ export default function SchemaEditTranslation() {
     const setFieldsHandler = useCallback((fields: FormFields) => {
         setFields(fields);
         const bodyVariables = fields.body.variablesValues;
-        setCache(SchemaEditCacheKeys.translation, {
-            ...cache.translation,
+        setCache(SchemaEditCacheKeys.pronunciation, {
+            ...cache.pronunciation,
             schema: {
-                ...cache.translation.schema,
+                ...cache.pronunciation.schema,
                 fields: {
                     url: fields.url.value,
                     parameter: fields.parameter.value,
                     body: fields.body.value,
                     marker: bodyVariables
                         ? bodyVariables['{marker}']
-                        : cache.translation.schema?.fields.marker || '',
+                        : cache.pronunciation.schema?.fields.marker || '',
+                    base64Prefix: fields.base64Prefix.value,
                 },
             },
         });
@@ -73,9 +80,9 @@ export default function SchemaEditTranslation() {
     const requestHandler = useCallback((): Promise<void> => {
         return new Promise((resolve, reject) => {
             // clear response text and json states
-            if (cache.translation.responseText && cache.translation.responseJson) {
-                setCache(SchemaEditCacheKeys.translation, {
-                    ...cache.translation,
+            if (cache.pronunciation.responseText && cache.pronunciation.responseJson) {
+                setCache(SchemaEditCacheKeys.pronunciation, {
+                    ...cache.pronunciation,
                     responseText: undefined,
                     responseJson: undefined,
                 });
@@ -119,8 +126,8 @@ export default function SchemaEditTranslation() {
 
                             if (allJsonStrings.length) {
                                 const responseJson = JSON.parse(allJsonStrings[0]);
-                                setCache(SchemaEditCacheKeys.translation, {
-                                    ...cache.translation,
+                                setCache(SchemaEditCacheKeys.pronunciation, {
+                                    ...cache.pronunciation,
                                     responseJson,
                                     responseText: translationResult,
                                 });
@@ -132,8 +139,8 @@ export default function SchemaEditTranslation() {
                             reject(new Error('Can\'t parse response JSON'));
                         }
                         // set only responseText if previous conditions have failed
-                        setCache(SchemaEditCacheKeys.translation, {
-                            ...cache.translation,
+                        setCache(SchemaEditCacheKeys.pronunciation, {
+                            ...cache.pronunciation,
                             responseText: translationResult,
                         });
                     }
@@ -147,20 +154,20 @@ export default function SchemaEditTranslation() {
     }, [fields, cache, setCache]);
 
     const populateSchemaHandler = useCallback((schemaPath: string, dataPath: string) => {
-        const schema = jsonUtils.populateJsonByPath(cache.translation.schema || {}, schemaPath, dataPath);
-        setCache(SchemaEditCacheKeys.translation, {
-            ...cache.translation,
+        const schema = jsonUtils.populateJsonByPath(cache.pronunciation.schema || {}, schemaPath, dataPath);
+        setCache(SchemaEditCacheKeys.pronunciation, {
+            ...cache.pronunciation,
             schema,
         });
     }, [cache, setCache]);
 
     // set fields values from cloud
     useEffect(() => {
-        const schemaFields = cache.translation.schema?.fields;
-        if (!cache.translation.initiated && schemaFields) {
+        const schemaFields = cache.pronunciation.schema?.fields;
+        if (!cache.pronunciation.initiated && schemaFields) {
             const fieldsClone = { ...fields };
             Object.keys(schemaFields).forEach(item => {
-                const key = item as TranslationSchemaTypeFieldsName;
+                const key = item as PronunciationSchemaTypeFieldsName;
                 if (fieldsClone[key]) {
                     fieldsClone[key].value = schemaFields[key];
                 }
@@ -172,44 +179,44 @@ export default function SchemaEditTranslation() {
                 }
             });
             setFields(fieldsClone);
-            setCache(SchemaEditCacheKeys.translation, {
-                ...cache.translation,
+            setCache(SchemaEditCacheKeys.pronunciation, {
+                ...cache.pronunciation,
                 initiated: true,
             });
         }
     }, [fields, cache, setCache]);
 
-    return (
-        <>
-            <Form
-                fields={fields}
-                languages={languages}
-                onChange={setFieldsHandler}
-                onSubmit={requestHandler}
+    return <>
+        <Form
+            fields={fields}
+            languages={languages}
+            onChange={setFieldsHandler}
+            onSubmit={requestHandler}
+        />
+        {cache.pronunciation.responseJson && (
+            <SchemaEditPronunciationBuilder
+                data={cache.pronunciation.responseJson}
+                schema={cache.pronunciation.schema || {} as PronunciationSchemaType}
+                onDataPathSelect={populateSchemaHandler}
             />
-            {cache.translation.responseJson && (
-                <SchemaEditTranslationBuilder
-                    data={cache.translation.responseJson}
-                    schema={cache.translation.schema || {} as TranslationSchemaType}
-                    onDataPathSelect={populateSchemaHandler}
-                />
-            )}
-            <Collapsable title="Schema" headerSize="h5" marginTop={5} marginBottom={3}>
-                <pre>
-                    {JSON.stringify(cache.translation.schema || {}, null, 4)}
-                </pre>
+        )}
+        <Collapsable title="Schema" headerSize="h5" marginTop={5} marginBottom={3}>
+            <pre>
+                {JSON.stringify(cache.pronunciation.schema || {}, null, 4)}
+            </pre>
+        </Collapsable>
+        {cache.pronunciation.responseText && (
+            <Collapsable title="Original response">
+                <div className="text-ellipsis">
+                    {cache.pronunciation.responseText}
+                </div>
             </Collapsable>
-            {cache.translation.responseText && (
-                <Collapsable title="Original response">
-                    {cache.translation.responseText}
-                </Collapsable>
-            )}
-            {cache.translation.responseJson && (
-                <SchemaEditTranslationPreview
-                    schema={cache.translation.schema || {} as TranslationSchemaType}
-                    translationResponseJson={cache.translation.responseJson}
-                />
-            )}
-        </>
-    );
+        )}
+        {cache.pronunciation.responseJson && (
+            <SchemaEditPronunciationPreview
+                schema={cache.pronunciation.schema || {} as PronunciationSchemaType}
+                translateResponseJson={cache.pronunciation.responseJson}
+            />
+        )}
+    </>;
 }

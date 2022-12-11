@@ -1,6 +1,6 @@
 import { ResultSchemaType } from 'src/types';
 
-export function validateSchemaIntegrity(schema: ResultSchemaType): boolean {
+export function validateIntegrity(schema: ResultSchemaType): boolean {
     return !(
         !schema.translation
         || !schema.translation.fields
@@ -12,11 +12,21 @@ export function validateSchemaIntegrity(schema: ResultSchemaType): boolean {
         || !schema.translation.word.value
         || !schema.translation.auto_spelling_fix
         || !schema.translation.auto_spelling_fix.value
+        // translation
         || !schema.translation.translation
         || !schema.translation.translation.value
+        || !schema.translation.translation.gender
+        || !schema.translation.translation.gender.value
+        || !schema.translation.translation.word
+        || !schema.translation.translation.word.value
+        || !schema.translation.translation.sentence
+        || !schema.translation.translation.sentence.value
+        || !schema.translation.translation.sentence.word
+        || !schema.translation.translation.sentence.word.value
+        // transcription
         || !schema.translation.transcription
         || !schema.translation.transcription.value
-        // translation alternative translations
+        // alternative translations
         || !schema.translation.alternative_translations
         || !schema.translation.alternative_translations.value
         || !schema.translation.alternative_translations.speech_part
@@ -29,7 +39,7 @@ export function validateSchemaIntegrity(schema: ResultSchemaType): boolean {
         || !schema.translation.alternative_translations.items.frequency.value
         || !schema.translation.alternative_translations.items.words
         || !schema.translation.alternative_translations.items.words.value
-        // translation definitions
+        // definitions
         || !schema.translation.definitions
         || !schema.translation.definitions.value
         || !schema.translation.definitions.speech_part
@@ -52,7 +62,7 @@ export function validateSchemaIntegrity(schema: ResultSchemaType): boolean {
         || !schema.translation.definitions.items.synonyms.items.value
         || !schema.translation.definitions.items.synonyms.items.text
         || !schema.translation.definitions.items.synonyms.items.text.value
-        // translation examples
+        // examples
         || !schema.translation.examples
         || !schema.translation.examples.value
         || !schema.translation.examples.text

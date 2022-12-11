@@ -4,7 +4,7 @@ export interface TranslationSchemaType {
     fields: TranslationSchemaTypeFields,
     word?: SchemaItemType,
     auto_spelling_fix?: SchemaItemType,
-    translation?: SchemaItemType,
+    translation?: TranslationSchemaTypeTranslation,
     transcription?: SchemaItemType,
     alternative_translations?: TranslationSchemaTypeAlternativeTranslations,
     definitions?: TranslationSchemaTypeDefinitions,
@@ -19,6 +19,14 @@ export interface TranslationSchemaTypeFields {
 }
 
 export type TranslationSchemaTypeFieldsName = keyof TranslationSchemaTypeFields;
+
+export type TranslationSchemaTypeTranslation = SchemaItemType & {
+    word: SchemaItemType,
+    gender: SchemaItemType,
+    sentence?: SchemaItemType & {
+        word?: SchemaItemType,
+    }
+}
 
 export type TranslationSchemaTypeAlternativeTranslations = SchemaItemType & {
     speech_part?: SchemaItemType,
