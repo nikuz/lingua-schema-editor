@@ -27,7 +27,7 @@ export default function SchemaEditTranslationPreview(props: Props) {
     const word = retrieveData(source, schema.word?.value);
     const autoSpellingFix = retrieveData(source, schema.auto_spelling_fix?.value);
     const correctedWord = autoSpellingFix || word;
-    const translation = retrieveData(source, schema.translation?.value);
+    const translation = retrieveData(source, schema.translations?.value);
     const transcription = retrieveData(source, schema.transcription?.value);
     const alternativeTranslations = retrieveData(source, schema.alternative_translations?.value);
     const definitions = retrieveData(source, schema.definitions?.value);
@@ -42,9 +42,9 @@ export default function SchemaEditTranslationPreview(props: Props) {
                         {autoSpellingFix && ` [${autoSpellingFix}?]`}
                         &nbsp;=&nbsp;
                         {Array.isArray(translation) && translation.map((genderItem, key) => {
-                            const gender = retrieveData(genderItem, schema.translation?.gender?.value);
-                            const word = retrieveData(genderItem, schema.translation?.word?.value);
-                            const sentences = retrieveData(genderItem, schema.translation?.sentence?.value);
+                            const gender = retrieveData(genderItem, schema.translations?.gender?.value);
+                            const word = retrieveData(genderItem, schema.translations?.word?.value);
+                            const sentences = retrieveData(genderItem, schema.translations?.sentences?.value);
 
                             return (
                                 <Box component="span" key={key}>
@@ -54,7 +54,7 @@ export default function SchemaEditTranslationPreview(props: Props) {
                                         {key < translation.length - 1 && ", "}
                                     </>}
                                     {Array.isArray(sentences) && sentences.map((sentence, key) => {
-                                        const word = retrieveData(sentence, schema.translation?.sentence?.word?.value);
+                                        const word = retrieveData(sentence, schema.translations?.sentences?.word?.value);
                                         return (
                                             <Box component="span" key={key}>
                                                 {word}
@@ -86,11 +86,18 @@ export default function SchemaEditTranslationPreview(props: Props) {
                         <Box key={speechPartName} sx={{ mt: 1, mb: 3 }}>
                             <i className="translation-speech-part">{speechPartName}</i>
                             {Array.isArray(items) && items.map((item, key) => {
+                                const genre = retrieveData(item, schema.alternative_translations?.items?.genre?.value);
                                 const translation = retrieveData(item, schema.alternative_translations?.items?.translation?.value);
                                 const words = retrieveData(item, schema.alternative_translations?.items?.words?.value);
                                 const frequency = retrieveData(item, schema.alternative_translations?.items?.frequency?.value);
                                 return (
                                     <div key={key} className="alternative-translation-row">
+                                        {genre && (
+                                            <Typography variant="body2" className="translation-grey">
+                                                {genre}
+                                                &nbsp;
+                                            </Typography>
+                                        )}
                                         <Typography variant="body1" sx={{ width: '30%' }}>
                                             {translation}
                                         </Typography>

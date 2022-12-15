@@ -3,7 +3,7 @@ import { Typography } from '@mui/material';
 import { TranslationSchemaContext } from 'src/helpers';
 import { TranslationSchemaType } from 'src/types';
 import { SchemaItem } from 'src/components';
-import SchemaEditTranslationBuilderTranslation from './SchemaEditTranslationBuilderTranslation';
+import SchemaEditTranslationBuilderTranslations from './SchemaEditTranslationBuilderTranslations';
 import SchemaEditTranslationBuilderAlternativeTranslations from './SchemaEditTranslationBuilderAlternativeTranslations';
 import SchemaEditTranslationBuilderDefinitions from './SchemaEditTranslationBuilderDefinitions';
 import SchemaEditTranslationBuilderExamples from './SchemaEditTranslationBuilderExamples';
@@ -48,7 +48,7 @@ export default function SchemaEditTranslationBuilder(props: Props) {
                 schema={schema}
                 schemaPath="transcription.value"
             />
-            <SchemaEditTranslationBuilderTranslation
+            <SchemaEditTranslationBuilderTranslations
                 data={data}
                 schema={schema}
             />

@@ -12,20 +12,20 @@ export function validateIntegrity(schema: ResultSchemaType): boolean {
         || !schema.translation.word.value
         || !schema.translation.auto_spelling_fix
         || !schema.translation.auto_spelling_fix.value
-        // translation
-        || !schema.translation.translation
-        || !schema.translation.translation.value
-        || !schema.translation.translation.gender
-        || !schema.translation.translation.gender.value
-        || !schema.translation.translation.word
-        || !schema.translation.translation.word.value
-        || !schema.translation.translation.sentence
-        || !schema.translation.translation.sentence.value
-        || !schema.translation.translation.sentence.word
-        || !schema.translation.translation.sentence.word.value
         // transcription
         || !schema.translation.transcription
         || !schema.translation.transcription.value
+        // translation
+        || !schema.translation.translations
+        || !schema.translation.translations.value
+        || !schema.translation.translations.gender
+        || !schema.translation.translations.gender.value
+        || !schema.translation.translations.word
+        || !schema.translation.translations.word.value
+        || !schema.translation.translations.sentences
+        || !schema.translation.translations.sentences.value
+        || !schema.translation.translations.sentences.word
+        || !schema.translation.translations.sentences.word.value
         // alternative translations
         || !schema.translation.alternative_translations
         || !schema.translation.alternative_translations.value
@@ -33,6 +33,8 @@ export function validateIntegrity(schema: ResultSchemaType): boolean {
         || !schema.translation.alternative_translations.speech_part.value
         || !schema.translation.alternative_translations.items
         || !schema.translation.alternative_translations.items.value
+        || !schema.translation.alternative_translations.items.genre
+        || !schema.translation.alternative_translations.items.genre.value
         || !schema.translation.alternative_translations.items.translation
         || !schema.translation.alternative_translations.items.translation.value
         || !schema.translation.alternative_translations.items.frequency

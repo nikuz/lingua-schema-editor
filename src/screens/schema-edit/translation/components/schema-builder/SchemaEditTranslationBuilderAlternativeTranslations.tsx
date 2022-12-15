@@ -70,6 +70,12 @@ function TranslationSchemaAlternativeTranslationsItem(props: Props) {
         <ListItem sx={{ pl: 3 }}>
             <Stack spacing={1}>
                 <SchemaItem
+                    title="Genre"
+                    data={data}
+                    schema={schema}
+                    schemaPath="alternative_translations.items.genre.value"
+                />
+                <SchemaItem
                     title="Translation"
                     data={data}
                     schema={schema}

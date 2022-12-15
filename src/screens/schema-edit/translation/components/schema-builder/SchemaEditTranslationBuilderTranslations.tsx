@@ -12,7 +12,7 @@ interface Props {
     schema?: TranslationSchemaType,
 }
 
-export default function SchemaEditTranslationBuilderTranslation(props: Props) {
+export default function SchemaEditTranslationBuilderTranslations(props: Props) {
     const { data, schema } = props;
 
     return (
@@ -23,7 +23,7 @@ export default function SchemaEditTranslationBuilderTranslation(props: Props) {
                 renderType={SchemaItemRenderType.list}
                 data={data}
                 schema={schema}
-                schemaPath="translation.value"
+                schemaPath="translations.value"
                 itemRender={(item) => (
                     <TranslationSchemaTranslationGender
                         data={item}
@@ -45,20 +45,20 @@ function TranslationSchemaTranslationGender(props: Props) {
                     title="Gender"
                     data={data}
                     schema={schema}
-                    schemaPath="translation.gender.value"
+                    schemaPath="translations.gender.value"
                 />
                 <SchemaItem
                     title="Word"
                     data={data}
                     schema={schema}
-                    schemaPath="translation.word.value"
+                    schemaPath="translations.word.value"
                 />
                 <SchemaItem
                     title="Sentences"
                     renderType={SchemaItemRenderType.list}
                     data={data}
                     schema={schema}
-                    schemaPath="translation.sentence.value"
+                    schemaPath="translations.sentences.value"
                     itemRender={(item) => (
                         <TranslationSchemaTranslationGenderSentences
                             data={item}
@@ -81,7 +81,7 @@ function TranslationSchemaTranslationGenderSentences(props: Props) {
                     title="Word"
                     data={data}
                     schema={schema}
-                    schemaPath="translation.sentence.word.value"
+                    schemaPath="translations.sentences.word.value"
                 />
             </Stack>
         </ListItem>
