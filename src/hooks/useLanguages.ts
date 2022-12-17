@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Language } from 'src/types';
+import { LanguagesType } from 'src/types';
 import {
     firestoreDoc,
     firestoreGetDoc,
@@ -7,13 +7,13 @@ import {
 } from 'src/providers/firebase/controller';
 
 type ResponseTuple = [
-    Language[] | undefined,
+    LanguagesType | undefined,
     boolean,
     Error | undefined,
 ];
 
 export function useStoredLanguages(): ResponseTuple {
-    const [languages, setLanguages] = useState<Language[]>();
+    const [languages, setLanguages] = useState<LanguagesType>();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | undefined>();
 

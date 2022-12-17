@@ -20,7 +20,7 @@ import {
     firestoreSetDoc,
 } from 'src/providers/firebase';
 import { useStoredLanguages } from 'src/hooks';
-import { FormFields, Language } from 'src/types';
+import { FormFields, LanguagesType } from 'src/types';
 import './Languages.css';
 
 const { REACT_APP_LANGUAGES_URL } = process.env;
@@ -33,7 +33,7 @@ export default function Languages() {
             fullWidth: true,
         }
     });
-    const [languages, setLanguages] = useState<Language[]>();
+    const [languages, setLanguages] = useState<LanguagesType>();
     const [storedLanguages, storedLanguagesLoading, storedLanguagesError] = useStoredLanguages();
     const [snackbarIsOpen, setSnackbarIsOpen] = useState(false);
     const [saveLoading, setSaveLoading] = useState(false);
@@ -44,7 +44,6 @@ export default function Languages() {
     const requestHandler = useCallback((): Promise<void> => {
         return new Promise((resolve, reject) => {
             languagesController.retrieve(fields.url.value).then(response => {
-                console.log(response);
                 setLanguages(response)
                 resolve();
             }).catch((err) => {
@@ -81,10 +80,10 @@ export default function Languages() {
             <Card sx={{ mb: 3 }}>
                 <CardHeader title={`New retrieved Languages (${languages.length})`} />
                 <CardContent>
-                    {languages.map(item => (
+                    {Object.entries(languages).map(item => (
                         <Chip
-                            key={item.id}
-                            label={item.value}
+                            key={item[0]}
+                            label={item[1]}
                             className="language-chip"
                         />
                     ))}
@@ -95,10 +94,10 @@ export default function Languages() {
             <Card sx={{ mb: 3 }}>
                 <CardHeader title={`Stored Languages (${storedLanguages.length})`} />
                 <CardContent>
-                    {storedLanguages.map(item => (
+                    {Object.entries(storedLanguages).map(item => (
                         <Chip
-                            key={item.id}
-                            label={item.value}
+                            key={item[0]}
+                            label={item[1]}
                             className="language-chip"
                         />
                     ))}
@@ -108,7 +107,7 @@ export default function Languages() {
 
         <Button
             variant="contained"
-            disabled={!languages?.length}
+            disabled={!languages || !Object.values(languages).length}
             onClick={saveHandler}
         >
             Save

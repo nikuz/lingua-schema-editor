@@ -10,7 +10,7 @@ import {
     FormFields,
     TranslationSchemaType,
     TranslationSchemaTypeFieldsName,
-    Language,
+    LanguagesType,
 } from 'src/types';
 import {
     SchemaEditCache,
@@ -28,7 +28,7 @@ const {
 } = process.env;
 
 export default function SchemaEditTranslation() {
-    const [cache, setCache, languages]: [SchemaEditCache, SetSchemaEditCacheCallback, Language[]] = useOutletContext();
+    const [cache, setCache, languages]: [SchemaEditCache, SetSchemaEditCacheCallback, LanguagesType] = useOutletContext();
     const [fields, setFields] = useState<FormFields>({
         url: {
             label: 'Url',

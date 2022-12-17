@@ -8,13 +8,13 @@ import {
     TextField,
     Box,
 } from '@mui/material';
-import { FormFields, Language } from 'src/types';
+import { FormFields, LanguagesType } from 'src/types';
 import Loading from '../loading';
 import './Form.css';
 
 interface Props {
     fields: FormFields,
-    languages?: Language[],
+    languages?: LanguagesType,
     onChange: React.Dispatch<React.SetStateAction<any>>,
     onSubmit: () => Promise<void>,
 }
@@ -136,12 +136,12 @@ export default function Form(props: Props) {
                                             );
                                         }}
                                     >
-                                        {languages?.map(language => (
+                                        {languages && Object.entries(languages).map(language => (
                                             <MenuItem
-                                                key={language.id}
-                                                value={language.id}
+                                                key={language[0]}
+                                                value={language[0]}
                                             >
-                                                {language.value}
+                                                {language[1]}
                                             </MenuItem>
                                         ))}
                                     </Select>

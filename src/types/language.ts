@@ -1,4 +1,3 @@
-export interface Language {
-    id: string,
-    value: string,
-}
+export type LanguagesType = {
+    [id: string]: string,
+};

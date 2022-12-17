@@ -1,8 +1,8 @@
-import { Language } from 'src/types';
+import { LanguagesType } from 'src/types';
 
 const languageCodesRegExp = /data:\s?(\[\[\["auto",\s?"Detect language"[^\n]+]]]),/;
 
-export function retrieve(url: string) {
+export function retrieve(url: string): Promise<LanguagesType> {
     return fetch(url).then(async (response) => {
         const text = await response.text();
         if (response.status === 200) {
@@ -19,24 +19,15 @@ export function retrieve(url: string) {
                 throw new Error('Can\'t parse retrieved languages as JSON array');
             }
 
-            const supportedLanguagesMap = new Map();
+            const supportedLanguages = new Map();
 
             for (const item of languageCodes[0]) {
                 if (item[0] !== 'auto') {
-                    supportedLanguagesMap.set(item[0], item[1]);
+                    supportedLanguages.set(item[0], item[1]);
                 }
             }
 
-            const supportedLanguagesList: Language[] = [];
-
-            for (const item of Array.from(supportedLanguagesMap)) {
-                supportedLanguagesList.push({
-                    id: item[0],
-                    value: item[1],
-                });
-            }
-
-            return supportedLanguagesList;
+            return Object.fromEntries(supportedLanguages);
         }
         throw new Error(text || response.status.toString());
     });
