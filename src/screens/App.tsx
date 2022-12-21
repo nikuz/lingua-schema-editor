@@ -58,12 +58,15 @@ export default function App() {
     const onLoginPage = useMemo(() => (
         location.pathname === routerConstants.LOGIN
     ), [location]);
+    const onPrivacyPolicyPage = useMemo(() => (
+        location.pathname === routerConstants.PRIVACY_POLICY
+    ), [location]);
 
     useEffect(() => {
-        if (!onLoginPage && !loading && !user) {
+        if (!onLoginPage && !onPrivacyPolicyPage && !loading && !user) {
             navigate(routerConstants.LOGIN)
         }
-    }, [loading, user, onLoginPage, navigate]);
+    }, [loading, user, onLoginPage, onPrivacyPolicyPage, navigate]);
 
     return (
         <Box sx={{ display: 'flex' }}>
@@ -111,7 +114,7 @@ export default function App() {
                     </List>
                 </Drawer>
             )}
-            {(user || onLoginPage) && (
+            {(user || onLoginPage || onPrivacyPolicyPage) && (
                 <Box
                     component="main"
                     sx={{
