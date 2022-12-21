@@ -81,8 +81,11 @@ export default function SchemaEditImages() {
                 url,
                 userAgent: fields.userAgent.value,
             }).then(response => {
+                console.log(response);
+                console.log(fields.regExp.value);
                 const regExp = new RegExp(fields.regExp.value, 'g');
                 const imagesMatch = response.match(regExp);
+                console.log(imagesMatch?.length);
                 if (imagesMatch) {
                     const validImages: string[] = [];
                     const minSize = Number(fields.minSize.value);
@@ -126,8 +129,8 @@ export default function SchemaEditImages() {
                 }
             });
             setFields(fieldsClone);
-            setCache(SchemaEditCacheKeys.translation, {
-                ...cache.translation,
+            setCache(SchemaEditCacheKeys.images, {
+                ...cache.images,
                 initiated: true,
             });
         }
