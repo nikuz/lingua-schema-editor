@@ -43,6 +43,12 @@ export default function SchemaEditTranslationBuilder(props: Props) {
                 schemaPath="auto_spelling_fix.value"
             />
             <SchemaItem
+                title="Auto language code"
+                data={data}
+                schema={schema}
+                schemaPath="auto_language_code.value"
+            />
+            <SchemaItem
                 title="Transcription"
                 data={data}
                 schema={schema}

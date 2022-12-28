@@ -4,6 +4,7 @@ export interface TranslationSchemaType {
     fields: TranslationSchemaTypeFields,
     word?: SchemaItemType,
     auto_spelling_fix?: SchemaItemType,
+    auto_language_code?: SchemaItemType,
     translations?: TranslationSchemaTypeTranslations,
     transcription?: SchemaItemType,
     alternative_translations?: TranslationSchemaTypeAlternativeTranslations,

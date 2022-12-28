@@ -12,6 +12,8 @@ export function validateIntegrity(schema: ResultSchemaType): boolean {
         || !schema.translation.word.value
         || !schema.translation.auto_spelling_fix
         || !schema.translation.auto_spelling_fix.value
+        || !schema.translation.auto_language_code
+        || !schema.translation.auto_language_code.value
         // transcription
         || !schema.translation.transcription
         || !schema.translation.transcription.value
