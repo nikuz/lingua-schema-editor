@@ -113,7 +113,7 @@ const termsString = `
     </ul>
     <div style="line-height: 1.5;"><span style="font-size: 15px;"><span style="color: rgb(127, 127, 127);"><span
         data-custom-class="body_text"><strong>Questions or concerns? </strong>Reading this privacy notice will help you understand your privacy rights and choices. If you do not agree with our policies and practices, please do not use our Services. If you still have any questions or concerns, please contact us at <bdt
-        class="question">TranslateShow@gmail.com</bdt>.</span></span></span></div>
+        class="question">translateshow.app@gmail.com</bdt>.</span></span></span></div>
     <div style="line-height: 1.5;"><br></div>
     <div style="line-height: 1.5;"><br></div>
     <div style="line-height: 1.5;"><strong><span style="font-size: 15px;"><span data-custom-class="heading_1">SUMMARY OF KEY POINTS</span></span></strong>
@@ -841,7 +841,7 @@ const termsString = `
     <div style="line-height: 1.5;"><span style="font-size: 15px; color: rgb(89, 89, 89);"><span
         style="font-size: 15px; color: rgb(89, 89, 89);"><span data-custom-class="body_text">We do not knowingly solicit data from or market to children under 18 years of age. By using the Services, you represent that you are at least 18 or that you are the parent or guardian of such a minor and consent to such minor dependent’s use of the Services. If we learn that personal information from users less than 18 years of age has been collected, we will deactivate the account and take reasonable measures to promptly delete such data from our records. If you become aware of any data we may have collected from children under age 18, please contact us at <span
         style="color: rgb(89, 89, 89); font-size: 15px;"><span data-custom-class="body_text"><bdt
-        class="block-component"></bdt><bdt class="question">TranslateShow@gmail.com</bdt><bdt
+        class="block-component"></bdt><bdt class="question">translateshow.app@gmail.com</bdt><bdt
         class="else-block"></bdt></span></span>.</span></span></span><span style="font-size: 15px; color: rgb(89, 89, 89);"><span
         style="font-size: 15px; color: rgb(89, 89, 89);"><span data-custom-class="body_text"><bdt class="else-block"></bdt></span></span></span>
     </span>
@@ -923,7 +923,7 @@ const termsString = `
     </div>
     <div style="line-height: 1.5;"><br></div>
     <div style="line-height: 1.5;"><span data-custom-class="body_text"><span style="font-size: 15px;">If you have questions or comments about your privacy rights, you may email us at <bdt
-        class="question">TranslateShow@gmail.com</bdt>.</span></span>
+        class="question">translateshow.app@gmail.com</bdt>.</span></span>
         <bdt class="statement-end-if-in-editor"><span style="font-size: 15px;"><span
             data-custom-class="body_text"></span></span></bdt>
     </div>
@@ -988,7 +988,7 @@ const termsString = `
     <div style="line-height: 1.5;"><span style="font-size: 15px; color: rgb(89, 89, 89);"><span
         style="font-size: 15px; color: rgb(89, 89, 89);"><span data-custom-class="body_text">If you have questions or comments about this notice, you may <span
         style="color: rgb(89, 89, 89); font-size: 15px;"><span data-custom-class="body_text"><bdt
-        class="block-component"></bdt>email us at <bdt class="question">TranslateShow@gmail.com</bdt><bdt
+        class="block-component"></bdt>email us at <bdt class="question">translateshow.app@gmail.com</bdt><bdt
         class="statement-end-if-in-editor"></bdt></span></span><span style="font-size: 15px; color: rgb(89, 89, 89);"><span
         style="font-size: 15px; color: rgb(89, 89, 89);"></span></span></span></span></span></div>
     <div style="line-height: 1.5;"><span style="font-size: 15px;"><span data-custom-class="body_text"><span
