@@ -19,13 +19,15 @@ const {
     REACT_APP_IMAGE_USER_AGENT,
     REACT_APP_IMAGE_REG_EXP,
     REACT_APP_IMAGE_MIN_SIZE,
+    REACT_APP_IMAGE_SAFE_SEARCH_URL,
+    REACT_APP_IMAGE_SAFE_SEARCH_SIGNATURE_REG_EXP,
 } = process.env;
 
 export default function SchemaEditImages() {
     const [cache, setCache]: [SchemaEditCache, SetSchemaEditCacheCallback] = useOutletContext();
     const [fields, setFields] = useState<FormFields>({
         url: {
-            label: 'Url',
+            label: 'URL',
             value: cache.images.schema?.fields.url || REACT_APP_IMAGE_URL || '',
             fullWidth: true,
             variables: ['{word}'],
@@ -43,6 +45,15 @@ export default function SchemaEditImages() {
             label: 'Min base64 image size',
             value: cache.images.schema?.fields.minSize || REACT_APP_IMAGE_MIN_SIZE || '',
         },
+        safeSearchUrl: {
+            label: 'Safe search URL',
+            value: cache.images.schema?.fields.safeSearchUrl || REACT_APP_IMAGE_SAFE_SEARCH_URL || '',
+            fullWidth: true,
+        },
+        safeSearchSignatureRegExp: {
+            label: 'Safe search signature RegExp',
+            value: cache.images.schema?.fields.safeSearchSignatureRegExp || REACT_APP_IMAGE_SAFE_SEARCH_SIGNATURE_REG_EXP || '',
+        },
     });
 
     const setFieldsHandler = useCallback((fields: FormFields) => {
@@ -56,6 +67,8 @@ export default function SchemaEditImages() {
                     userAgent: fields.userAgent.value,
                     regExp: fields.regExp.value,
                     minSize: fields.minSize.value,
+                    safeSearchUrl: fields.safeSearchUrl.value,
+                    safeSearchSignatureRegExp: fields.safeSearchSignatureRegExp.value,
                 },
             },
         });

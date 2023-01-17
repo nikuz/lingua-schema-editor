@@ -90,5 +90,7 @@ export function validateIntegrity(schema: ResultSchemaType): boolean {
         || !schema.images.fields.userAgent
         || !schema.images.fields.regExp
         || !schema.images.fields.minSize
+        || !schema.images.fields.safeSearchUrl
+        || !schema.images.fields.safeSearchSignatureRegExp
     );
 }
