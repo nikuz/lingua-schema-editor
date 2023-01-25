@@ -1,0 +1,1 @@
+export type ObjectData = { [name: string]: any };

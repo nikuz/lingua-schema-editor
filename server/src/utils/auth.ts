@@ -7,7 +7,7 @@ export async function isAuthorized(req: Request, res: Response) {
 
     if (authToken) {
         try {
-            isAuthorized = await firebaseController.isTokenValid(authToken);
+            isAuthorized = await firebaseController.isAdmin(authToken);
         } catch (err) {
             //
         }

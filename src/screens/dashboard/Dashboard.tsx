@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import cl from 'classnames';
 import {
@@ -27,7 +27,6 @@ import {
 import {
     firestoreInstance,
     firestoreCollection,
-    useFirestoreCollectionData,
     firestoreDoc,
     firestoreSetDoc,
     firestoreQuery,
@@ -35,24 +34,29 @@ import {
     firestoreGetDoc,
     firestoreGetDocs,
     firestoreDeleteDoc,
+    useAuthTokenId,
 } from 'src/providers/firebase';
+import { useGetSchemaList } from 'src/providers/schema';
 import { routerConstants } from 'src/constants';
 import { routerUtils } from 'src/utils';
 import './Dashboard.css';
 
 export default function Dashboard() {
+    const [userTokenId, userTokenLoading, userTokenIdError] = useAuthTokenId();
     const navigate = useNavigate();
-    const [values, listRetrievalLoading, listRetrievalError] = useFirestoreCollectionData(
-        firestoreCollection(firestoreInstance, 'schemas')
-    );
+    const [getSchemasList, {
+        loading: getSchemasListLoading,
+        error: getSchemasListError,
+        data: schemasList,
+    }] = useGetSchemaList();
     const [changeCurrentPrompt, setChangeCurrentPrompt] = useState<string>();
     const [changeCurrentPromptLoading, setChangeCurrentPromptLoading] = useState(false);
     const [changeCurrentPromptError, setChangeCurrentPromptError] = useState<Error>();
     const [removePrompt, setRemovePrompt] = useState<string>();
     const [removePromptLoading, setRemovePromptLoading] = useState(false);
     const [removePromptError, setRemovePromptErrorError] = useState<Error>();
-    const loading = listRetrievalLoading || changeCurrentPromptLoading || removePromptLoading;
-    const error = listRetrievalError || changeCurrentPromptError || removePromptError;
+    const loading = userTokenLoading || getSchemasListLoading || changeCurrentPromptLoading || removePromptLoading;
+    const error = userTokenIdError || getSchemasListError || changeCurrentPromptError || removePromptError;
 
     const changeCurrentHandler = useCallback(async () => {
         if (changeCurrentPrompt) {
@@ -115,6 +119,14 @@ export default function Dashboard() {
         return routerUtils.setParams(routerConstants.SCHEMA_EDIT, [':version'], [value]);
     }, []);
 
+    useEffect(() => {
+        if (userTokenId && !schemasList && !getSchemasListLoading && !getSchemasListError) {
+            getSchemasList({
+                token: userTokenId,
+            });
+        }
+    }, [userTokenId, getSchemasListLoading, getSchemasListError, schemasList, getSchemasList]);
+
     return <>
         <TableContainer component={Paper}>
             <Table aria-label="simple table">
@@ -128,7 +140,7 @@ export default function Dashboard() {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {values?.map((item, key) => {
+                    {schemasList?.map((item, key) => {
                         if (item.id === 'current') {
                             return null;
                         }
@@ -173,6 +185,9 @@ export default function Dashboard() {
                 </TableBody>
             </Table>
         </TableContainer>
+        {error && (
+            <Alert sx={{ mt: 3 }} severity="error">{error.message}</Alert>
+        )}
         <Button
             variant="contained"
             color="success"
@@ -182,7 +197,7 @@ export default function Dashboard() {
             <AddIcon />
             Add
         </Button>
-        {values?.length === 0 && (
+        {schemasList && schemasList.length === 0 && (
             <Box sx={{ mt: 3, textAlign: 'center' }}>
                 <Typography variant="body2">No schemas found</Typography>
             </Box>
@@ -208,8 +223,5 @@ export default function Dashboard() {
             />
         )}
         {loading && <Loading blocker fixed />}
-        {error && (
-            <Alert severity="error">{error.message}</Alert>
-        )}
     </>
 }

@@ -9,10 +9,10 @@ const firebaseApp = firebaseAdmin.initializeApp({
     }),
 });
 
-export async function isTokenValid(token: string) {
+export async function isAdmin(token: string) {
     return new Promise<boolean>((resolve, reject) => {
         firebaseApp.auth().verifyIdToken(token).then((decodedToken) => {
-            if (decodedToken && decodedToken.uid) {
+            if (decodedToken.uid === process.env.ADMIN_USER_ID) {
                 resolve(true);
             } else {
                 resolve(false);

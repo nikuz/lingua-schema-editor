@@ -25,3 +25,7 @@ yarn-error.log*
 
 scripts/retrieve-supported-languages/*.json
 scripts/retrieve-supported-languages/*.html
+*firebase.json
+schemas/*
+languages/*
+.env.secret

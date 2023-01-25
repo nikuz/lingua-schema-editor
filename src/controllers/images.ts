@@ -1,10 +1,12 @@
+import { apiUtils } from 'src/utils';
+
 interface Props {
     url: string,
     userAgent: string,
 }
 
 export function get(props: Props) {
-    return fetch(props.url, {
+    return fetch(`${apiUtils.getApiUrl()}/proxy?url=${encodeURIComponent(props.url)}`, {
         headers: {
             'user-agent': props.userAgent,
         }

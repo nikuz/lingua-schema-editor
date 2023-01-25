@@ -5,6 +5,7 @@ import cors from 'cors';
 import compression from 'compression';
 
 dotenv.config({ path: path.join(__dirname, '../../.env') });
+dotenv.config({ path: path.join(__dirname, '../../.env.secret') });
 
 const routes = require('./routes');
 
