@@ -5,7 +5,10 @@ import cors from 'cors';
 import compression from 'compression';
 
 dotenv.config({ path: path.join(__dirname, '../../.env') });
-dotenv.config({ path: path.join(__dirname, '../../.env.secret') });
+dotenv.config({
+    path: path.join(__dirname, '../../.env.secret'),
+    override: true,
+});
 
 const routes = require('./routes');
 
