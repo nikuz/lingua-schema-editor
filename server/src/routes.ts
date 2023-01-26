@@ -20,14 +20,6 @@ exports = module.exports = (app: Express) => {
         }
     ));
 
-    app.get('/', (req, res) => {
-        res.sendFile(path.resolve(__dirname, '../../build/index.html'));
-    });
-    app.use('*/static', (req, res) => {
-        console.log(req.url);
-        res.sendFile(path.resolve(__dirname, `../../build/static/${req.url}`));
-    });
-
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -43,6 +35,19 @@ exports = module.exports = (app: Express) => {
     //language
     app.get('/languages', languageController.getLanguages);
     app.post('/languages', languageController.storeLanguages);
+
+    app.use('/static', (req, res) => {
+        res.sendFile(path.resolve(__dirname, `../../build/static/${req.url}`));
+    });
+    app.use('/favicon.ico', (req, res) => {
+        res.sendFile(path.resolve(__dirname, `../../build/favicon.ico`));
+    });
+    app.use('/robots.txt', (req, res) => {
+        res.sendFile(path.resolve(__dirname, `../../build/robots.txt`));
+    });
+    app.all('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, '../../build/index.html'));
+    });
 };
 
 function getProxyUrl(req: Request) {
