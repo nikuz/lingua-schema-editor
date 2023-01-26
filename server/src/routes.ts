@@ -40,10 +40,10 @@ exports = module.exports = (app: Express) => {
         res.sendFile(path.resolve(__dirname, `../../build/static/${req.url}`));
     });
     app.use('/favicon.ico', (req, res) => {
-        res.sendFile(path.resolve(__dirname, `../../build/favicon.ico`));
+        res.sendFile(path.resolve(__dirname, '../../build/favicon.ico'));
     });
     app.use('/robots.txt', (req, res) => {
-        res.sendFile(path.resolve(__dirname, `../../build/robots.txt`));
+        res.sendFile(path.resolve(__dirname, '../../build/robots.txt'));
     });
     app.all('*', (req, res) => {
         res.sendFile(path.resolve(__dirname, '../../build/index.html'));
