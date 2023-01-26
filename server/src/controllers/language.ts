@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { Request, Response } from 'express';
-import { authUtils } from 'utils';
+import { authUtils } from '../utils';
 
 const languagesFilePath = path.resolve(__dirname, '../../../languages/languages.json');
 

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { Request, Response } from 'express';
-import { authUtils } from 'utils';
+import { authUtils } from '../utils';
 
 let currentSchemaCache: string;
 const schemasDirectoryPath = path.resolve(__dirname, '../../../schemas');

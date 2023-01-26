@@ -30,3 +30,4 @@ schemas/*
 languages/*
 .env.secret
 server-build
+server/keys

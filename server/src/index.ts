@@ -1,4 +1,6 @@
 import path from 'path';
+import https from 'https';
+import fs from 'fs';
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
@@ -14,15 +16,27 @@ const routes = require('./routes');
 
 const app = express();
 const port = process.env.REACT_APP_SERVER_PORT;
+const env = process.env.NODE_ENV;
 
 app.use(cors());
 app.use(compression());
 
 routes(app);
 
-app.listen(port, () => {
-    console.log('Node client started on port:', port);
-});
+if (env === 'production') {
+    const keysPath = process.env.KEYS_PATH;
+    const certificateProps = {
+        key: fs.readFileSync(`${keysPath}/privkey.pem`),
+        cert: fs.readFileSync(`${keysPath}/cert.pem`),
+    };
+    https.createServer(certificateProps, app).listen(port, () => {
+        console.log('Node client started on port:', port);
+    });
+} else {
+    app.listen(port, () => {
+        console.log('Node client started on port:', port);
+    });
+}
 
 process.on('SIGINT', () => {
     process.exit(0);
