@@ -1,5 +1,5 @@
 import * as firebaseAdmin from 'firebase-admin';
-import serviceAccount from '../../wisual-firebase.json';
+import serviceAccount from 'wisual-firebase.json';
 
 const firebaseApp = firebaseAdmin.initializeApp({
     credential: firebaseAdmin.credential.cert({

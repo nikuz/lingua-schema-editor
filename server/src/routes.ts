@@ -2,8 +2,8 @@ import path from 'path';
 import { Express, Request } from 'express';
 import proxy from 'express-http-proxy';
 import bodyParser from 'body-parser';
-import { schemaController, languageController } from 'src/controllers';
-import { authUtils } from 'src/utils';
+import { schemaController, languageController } from './controllers';
+import { authUtils } from './utils';
 
 exports = module.exports = (app: Express) => {
     app.use('/proxy', proxy(

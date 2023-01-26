@@ -5,9 +5,9 @@
   "main": "src/index.js",
   "scripts": {
     "start": "NODE_ENV=development NODE_PATH=./ ts-node-dev --transpile-only --no-notify --exit-child src/index.ts",
-    "build": "npm run lint && tcs",
+    "build": "npm run eslint && tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "eslint": "eslint ./src --ext .ts -f table"
+    "eslint": "eslint ./src --ext .ts"
   },
   "author": "Nikolai Kuznetcov",
   "license": "ISC",

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { Request, Response } from 'express';
-import { authUtils } from 'src/utils';
+import { authUtils } from 'utils';
 
 let currentSchemaCache: string;
 const schemasDirectoryPath = path.resolve(__dirname, '../../../schemas');
@@ -18,7 +18,7 @@ export async function getList(req: Request, res: Response) {
     const schemas = [];
     const schemasFiles = fs.readdirSync(schemasDirectoryPath);
 
-    for (let file of schemasFiles) {
+    for (const file of schemasFiles) {
         const filePath = `${schemasDirectoryPath}/${file}`;
         const fileStats = fs.lstatSync(filePath);
         if (file.endsWith('.json') && !file.startsWith('current') && fileStats.isFile()) {
@@ -135,7 +135,7 @@ export async function setCurrent(req: Request, res: Response) {
     const schemasFiles = fs.readdirSync(schemasDirectoryPath);
     let currentSchema;
 
-    for (let file of schemasFiles) {
+    for (const file of schemasFiles) {
         const filePath = `${schemasDirectoryPath}/${file}`;
         const fileStats = fs.lstatSync(filePath);
         if (file.endsWith('.json') && !file.startsWith('current') && fileStats.isFile()) {

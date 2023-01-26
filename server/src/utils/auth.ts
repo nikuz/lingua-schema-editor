@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { firebaseController } from 'src/controllers';
+import { firebaseController } from 'controllers';
 
 export async function isAuthorized(req: Request, res: Response) {
     const authToken = req.headers['authorization']?.toString();
