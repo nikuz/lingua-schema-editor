@@ -13,7 +13,7 @@ export function translate(props: Props) {
         token,
     } = props;
 
-    return fetch(`${apiUtils.getApiUrl()}/proxy?url=${encodeURIComponent(url)}`, {
+    return fetch(`${apiUtils.getApiUrl()}/api/proxy?url=${encodeURIComponent(url)}`, {
         method: 'POST',
         headers: {
             'authorization': token,

@@ -12,7 +12,7 @@ export function getList(props: GetListProps): Promise<CloudSchemaType[]> {
         signal,
     } = props;
 
-    return fetch(`${apiUtils.getApiUrl()}/schemas`, {
+    return fetch(`${apiUtils.getApiUrl()}/api/schemas`, {
         signal,
         headers: {
             'content-type': 'application/json',
@@ -40,7 +40,7 @@ export function get(props: GetProps): Promise<CloudSchemaType> {
         signal,
     } = props;
 
-    return fetch(`${apiUtils.getApiUrl()}/schema/${id}`, {
+    return fetch(`${apiUtils.getApiUrl()}/api/schema/${id}`, {
         signal,
         headers: {
             'content-type': 'application/json',
@@ -68,7 +68,7 @@ export function setCurrent(props: SetCurrentProps): Promise<CloudSchemaType> {
         signal,
     } = props;
 
-    return fetch(`${apiUtils.getApiUrl()}/schema/${id}`, {
+    return fetch(`${apiUtils.getApiUrl()}/api/schema/${id}`, {
         method: 'PUT',
         signal,
         headers: {
@@ -97,7 +97,7 @@ export function add(props: AddProps): Promise<CloudSchemaType> {
         signal,
     } = props;
 
-    return fetch(`${apiUtils.getApiUrl()}/schemas`, {
+    return fetch(`${apiUtils.getApiUrl()}/api/schemas`, {
         method: 'POST',
         signal,
         headers: {
@@ -129,7 +129,7 @@ export function update(props: UpdateProps): Promise<CloudSchemaType> {
         signal,
     } = props;
 
-    return fetch(`${apiUtils.getApiUrl()}/schema/${id}`, {
+    return fetch(`${apiUtils.getApiUrl()}/api/schema/${id}`, {
         method: 'POST',
         signal,
         headers: {
@@ -159,7 +159,7 @@ export function remove(props: RemoveProps): Promise<number> {
         signal,
     } = props;
 
-    return fetch(`${apiUtils.getApiUrl()}/schema/${id}`, {
+    return fetch(`${apiUtils.getApiUrl()}/api/schema/${id}`, {
         method: 'DELETE',
         signal,
         headers: {

@@ -12,7 +12,7 @@ export function getLanguages(props: GetLanguagesProps): Promise<LanguagesType> {
         signal,
     } = props;
 
-    return fetch(`${apiUtils.getApiUrl()}/languages`, {
+    return fetch(`${apiUtils.getApiUrl()}/api/languages`, {
         signal,
         headers: {
             'content-type': 'application/json',
@@ -40,7 +40,7 @@ export function storeLanguages(props: StoreLanguagesProps): Promise<LanguagesTyp
         signal,
     } = props;
 
-    return fetch(`${apiUtils.getApiUrl()}/languages`, {
+    return fetch(`${apiUtils.getApiUrl()}/api/languages`, {
         method: 'POST',
         signal,
         headers: {
