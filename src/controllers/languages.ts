@@ -3,8 +3,12 @@ import { LanguagesType } from 'src/types';
 
 const languageCodesRegExp = /data:\s?(\[\[\["auto",\s?"Detect language"[^\n]+]]]),/;
 
-export function retrieve(url: string): Promise<LanguagesType> {
-    return fetch(`${apiUtils.getApiUrl()}/proxy?url=${encodeURIComponent(url)}`).then(async (response) => {
+export function retrieve(url: string, token: string): Promise<LanguagesType> {
+    return fetch(`${apiUtils.getApiUrl()}/proxy?url=${encodeURIComponent(url)}`, {
+        headers: {
+            'authorization': token,
+        },
+    }).then(async (response) => {
         const text = await response.text();
         if (response.status === 200) {
             const languageCodesStrings = text.match(languageCodesRegExp);

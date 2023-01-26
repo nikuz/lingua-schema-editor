@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
     Alert,
     Chip,
@@ -14,18 +14,15 @@ import {
     Loading,
 } from 'src/components';
 import { languagesController } from 'src/controllers';
-import {
-    firestoreInstance,
-    firestoreDoc,
-    firestoreSetDoc,
-} from 'src/providers/firebase';
-import { useStoredLanguages } from 'src/hooks';
+import { useGetLanguages, useStoreLanguages } from 'src/providers/language';
+import { useAuthTokenId } from 'src/providers/firebase';
 import { FormFields, LanguagesType } from 'src/types';
 import './Languages.css';
 
 const { REACT_APP_LANGUAGES_URL } = process.env;
 
 export default function Languages() {
+    const [userTokenId, userTokenLoading, userTokenIdError] = useAuthTokenId();
     const [fields, setFields] = useState<FormFields>({
         url: {
             label: 'Url',
@@ -33,39 +30,54 @@ export default function Languages() {
             fullWidth: true,
         }
     });
+    const [getLanguages, {
+        loading: getLanguagesLoading,
+        error: getLanguagesError,
+        data: storedLanguages,
+    }] = useGetLanguages();
+    const [storeLanguages, {
+        loading: storeLanguagesLoading,
+        error: storeLanguagesError,
+    }] = useStoreLanguages();
     const [languages, setLanguages] = useState<LanguagesType>();
-    const [storedLanguages, storedLanguagesLoading, storedLanguagesError] = useStoredLanguages();
     const [snackbarIsOpen, setSnackbarIsOpen] = useState(false);
-    const [saveLoading, setSaveLoading] = useState(false);
-    const [saveError, setSaveError] = useState<Error | undefined>();
-    const loading = storedLanguagesLoading || saveLoading;
-    const error = storedLanguagesError || saveError;
+    const loading = userTokenLoading || getLanguagesLoading || storeLanguagesLoading;
+    const error = userTokenIdError || getLanguagesError || storeLanguagesError;
 
     const requestHandler = useCallback((): Promise<void> => {
+        if (!userTokenId) {
+            return Promise.resolve();
+        }
         return new Promise((resolve, reject) => {
-            languagesController.retrieve(fields.url.value).then(response => {
+            languagesController.retrieve(fields.url.value, userTokenId).then(response => {
                 setLanguages(response)
                 resolve();
             }).catch((err) => {
                 reject(err);
             });
         });
-    }, [fields]);
+    }, [userTokenId, fields]);
 
     const saveHandler = useCallback(async () => {
-        setSaveLoading(true);
-        const docReference = firestoreDoc(firestoreInstance, 'languages', 'languages');
-        firestoreSetDoc(docReference, { raw: JSON.stringify(languages) }).then(() => {
-            setSaveLoading(false);
-            setSnackbarIsOpen(true);
-        }).catch(err => {
-            setSaveError(err);
-        });
-    }, [languages]);
+        if (userTokenId && languages) {
+            storeLanguages({
+                token: userTokenId,
+                languages,
+            }).then(() => {
+                setSnackbarIsOpen(true);
+            });
+        }
+    }, [languages, userTokenId, storeLanguages]);
 
     const closeSnackbarHandler = useCallback(async () => {
         setSnackbarIsOpen(false);
     }, []);
+
+    useEffect(() => {
+        if (userTokenId && !storedLanguages && !getLanguagesLoading && !getLanguagesError) {
+            getLanguages({ token: userTokenId });
+        }
+    }, [userTokenId, storedLanguages, getLanguagesLoading, getLanguagesError, getLanguages]);
 
     return <>
         <Typography variant="h4" sx={{ mb: 3 }}>
@@ -78,7 +90,7 @@ export default function Languages() {
         />
         {languages && (
             <Card sx={{ mb: 3 }}>
-                <CardHeader title={`New retrieved Languages (${languages.length})`} />
+                <CardHeader title={`New retrieved Languages (${Object.entries(languages).length})`} />
                 <CardContent>
                     {Object.entries(languages).map(item => (
                         <Chip
@@ -92,7 +104,7 @@ export default function Languages() {
         )}
         {storedLanguages && (
             <Card sx={{ mb: 3 }}>
-                <CardHeader title={`Stored Languages (${storedLanguages.length})`} />
+                <CardHeader title={`Stored Languages (${Object.entries(storedLanguages).length})`} />
                 <CardContent>
                     {Object.entries(storedLanguages).map(item => (
                         <Chip

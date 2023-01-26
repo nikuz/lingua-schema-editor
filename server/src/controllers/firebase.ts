@@ -12,7 +12,8 @@ const firebaseApp = firebaseAdmin.initializeApp({
 export async function isAdmin(token: string) {
     return new Promise<boolean>((resolve, reject) => {
         firebaseApp.auth().verifyIdToken(token).then((decodedToken) => {
-            if (decodedToken.uid === process.env.ADMIN_USER_ID) {
+            const expirationTime = new Date(decodedToken.exp * 1000);
+            if (decodedToken.uid === process.env.ADMIN_USER_ID && new Date() < expirationTime) {
                 resolve(true);
             } else {
                 resolve(false);

@@ -15,12 +15,7 @@ import {
     signInWithEmailAndPassword,
     signOut,
 } from 'firebase/auth';
-import {
-    useCollectionData,
-    useDocumentData,
-    useDocumentDataOnce,
-} from 'react-firebase-hooks/firestore';
-import config from 'src/firebase-config.json';
+import config from 'src/wisual-web-firebase.json';
 
 export const firebaseApp = initializeApp(config);
 export const authInstance = getAuth(firebaseApp);
@@ -30,9 +25,6 @@ export {
     signInWithEmailAndPassword,
     signOut,
     collection as firestoreCollection,
-    useCollectionData as useFirestoreCollectionData,
-    useDocumentData as useFirestoreDocumentData,
-    useDocumentDataOnce as useFirestoreDocumentDataOnce,
     doc as firestoreDoc,
     setDoc as firestoreSetDoc,
     where as firestoreWhere,

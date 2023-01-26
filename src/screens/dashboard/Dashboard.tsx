@@ -24,19 +24,12 @@ import {
     Loading,
     Prompt,
 } from 'src/components';
+import { useAuthTokenId } from 'src/providers/firebase';
 import {
-    firestoreInstance,
-    firestoreCollection,
-    firestoreDoc,
-    firestoreSetDoc,
-    firestoreQuery,
-    firestoreWhere,
-    firestoreGetDoc,
-    firestoreGetDocs,
-    firestoreDeleteDoc,
-    useAuthTokenId,
-} from 'src/providers/firebase';
-import { useGetSchemaList } from 'src/providers/schema';
+    useGetSchemaList,
+    useSetCurrentSchema,
+    useRemoveSchema,
+} from 'src/providers/schema';
 import { routerConstants } from 'src/constants';
 import { routerUtils } from 'src/utils';
 import './Dashboard.css';
@@ -49,71 +42,50 @@ export default function Dashboard() {
         error: getSchemasListError,
         data: schemasList,
     }] = useGetSchemaList();
+    const [setCurrentSchema, {
+        loading: setCurrentSchemaLoading,
+        error: setCurrentSchemaError,
+    }] = useSetCurrentSchema();
+    const [removeSchema, {
+        loading: removeSchemaLoading,
+        error: removeSchemaError,
+    }] = useRemoveSchema();
     const [changeCurrentPrompt, setChangeCurrentPrompt] = useState<string>();
-    const [changeCurrentPromptLoading, setChangeCurrentPromptLoading] = useState(false);
-    const [changeCurrentPromptError, setChangeCurrentPromptError] = useState<Error>();
     const [removePrompt, setRemovePrompt] = useState<string>();
-    const [removePromptLoading, setRemovePromptLoading] = useState(false);
-    const [removePromptError, setRemovePromptErrorError] = useState<Error>();
-    const loading = userTokenLoading || getSchemasListLoading || changeCurrentPromptLoading || removePromptLoading;
-    const error = userTokenIdError || getSchemasListError || changeCurrentPromptError || removePromptError;
+    const loading = userTokenLoading || getSchemasListLoading || setCurrentSchemaLoading || removeSchemaLoading;
+    const error = userTokenIdError || getSchemasListError || setCurrentSchemaError || removeSchemaError;
 
     const changeCurrentHandler = useCallback(async () => {
-        if (changeCurrentPrompt) {
-            setChangeCurrentPromptLoading(true);
-            setChangeCurrentPromptError(undefined);
-
-            const schemas = firestoreCollection(firestoreInstance, 'schemas');
-            const activeCurrentDocRef = firestoreQuery(schemas, firestoreWhere('current', '==', true));
-            if (activeCurrentDocRef) {
-                const activeCurrentDocs = await firestoreGetDocs(activeCurrentDocRef);
-                activeCurrentDocs.forEach(item => {
-                    firestoreSetDoc(item.ref, { current: false }, { merge: true });
-                });
-            }
-
-            const docReference = firestoreDoc(firestoreInstance, 'schemas', changeCurrentPrompt);
-            firestoreSetDoc(
-                docReference,
-                { current: true },
-                { merge: true }
-            )
-                .then(() => {
-                    setChangeCurrentPromptLoading(false);
-                    firestoreGetDoc(docReference).then(response => {
-                        firestoreSetDoc(
-                            firestoreDoc(firestoreInstance, 'schemas', 'current'),
-                            {
-                                ...response.data(),
-                                id: 'current',
-                            }
-                        );
-                    });
-                })
-                .catch(err => {
-                    setChangeCurrentPromptLoading(false);
-                    setChangeCurrentPromptError(err);
-                });
+        if (!changeCurrentPrompt || !userTokenId) {
+            return;
         }
         setChangeCurrentPrompt(undefined);
-    }, [changeCurrentPrompt]);
+
+        setCurrentSchema({
+            id: changeCurrentPrompt,
+            token: userTokenId,
+        }).then(() => {
+            getSchemasList({
+                token: userTokenId,
+            });
+        });
+    }, [userTokenId, changeCurrentPrompt, getSchemasList, setCurrentSchema]);
 
     const removeSchemaHandler = useCallback(async () => {
-        if (removePrompt) {
-            setRemovePromptLoading(true);
-            setRemovePromptErrorError(undefined);
-            const docReference = firestoreDoc(firestoreInstance, 'schemas', removePrompt);
-            if (docReference) {
-                firestoreDeleteDoc(docReference).then(() => {
-                    setRemovePromptLoading(false);
-                }).catch(err => {
-                    setRemovePromptLoading(false);
-                    setRemovePromptErrorError(err);
-                });
-            }
+        if (!removePrompt || !userTokenId) {
+            return;
         }
         setRemovePrompt(undefined);
-    }, [removePrompt]);
+
+        removeSchema({
+            id: removePrompt,
+            token: userTokenId,
+        }).then(() => {
+            getSchemasList({
+                token: userTokenId,
+            });
+        });
+    }, [userTokenId, removePrompt, getSchemasList, removeSchema]);
 
     const getSchemaEditUrl = useCallback((value: string) => {
         return routerUtils.setParams(routerConstants.SCHEMA_EDIT, [':version'], [value]);
@@ -141,9 +113,6 @@ export default function Dashboard() {
                 </TableHead>
                 <TableBody>
                     {schemasList?.map((item, key) => {
-                        if (item.id === 'current') {
-                            return null;
-                        }
                         const createdAt = item.createdAt && new Date(item.createdAt);
                         const updatedAt = item.updatedAt && new Date(item.updatedAt);
 

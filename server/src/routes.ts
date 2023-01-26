@@ -1,20 +1,11 @@
 import path from 'path';
 import { Express, Request } from 'express';
 import proxy from 'express-http-proxy';
-import { schemaController } from 'src/controllers';
+import bodyParser from 'body-parser';
+import { schemaController, languageController } from 'src/controllers';
 import { authUtils } from 'src/utils';
 
 exports = module.exports = (app: Express) => {
-    app.get('/', (req, res) => {
-        res.sendFile(path.resolve(__dirname, '../../build/index.html'));
-    });
-    app.use('*/static', (req, res) => {
-        console.log(req.url);
-        res.sendFile(path.resolve(__dirname, `../../build/static/${req.url}`));
-    });
-
-    app.get('/schemas', schemaController.getList);
-
     app.use('/proxy', proxy(
         (req) => {
             const url = getProxyUrl(req);
@@ -28,6 +19,30 @@ exports = module.exports = (app: Express) => {
             },
         }
     ));
+
+    app.get('/', (req, res) => {
+        res.sendFile(path.resolve(__dirname, '../../build/index.html'));
+    });
+    app.use('*/static', (req, res) => {
+        console.log(req.url);
+        res.sendFile(path.resolve(__dirname, `../../build/static/${req.url}`));
+    });
+
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ extended: true }));
+
+    // schema
+    app.get('/schemas', schemaController.getList);
+    app.post('/schemas', schemaController.add);
+    app.get('/schema/current', schemaController.getCurrent);
+    app.get('/schema/:id', schemaController.get);
+    app.put('/schema/:id', schemaController.setCurrent);
+    app.post('/schema/:id', schemaController.update);
+    app.delete('/schema/:id', schemaController.remove);
+
+    //language
+    app.get('/languages', languageController.getLanguages);
+    app.post('/languages', languageController.storeLanguages);
 };
 
 function getProxyUrl(req: Request) {

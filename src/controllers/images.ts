@@ -3,12 +3,20 @@ import { apiUtils } from 'src/utils';
 interface Props {
     url: string,
     userAgent: string,
+    token: string,
 }
 
 export function get(props: Props) {
-    return fetch(`${apiUtils.getApiUrl()}/proxy?url=${encodeURIComponent(props.url)}`, {
+    const {
+        url,
+        userAgent,
+        token,
+    } = props;
+
+    return fetch(`${apiUtils.getApiUrl()}/proxy?url=${encodeURIComponent(url)}`, {
         headers: {
-            'user-agent': props.userAgent,
+            'authorization': token,
+            'user-agent': userAgent,
         }
     }).then(async (response) => {
         const text = await response.text();

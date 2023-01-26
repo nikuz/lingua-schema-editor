@@ -52,7 +52,7 @@ const menuItems = [{
 }];
 
 export default function App() {
-    const [user, loading] = useAuthState(authInstance);
+    const [user, loading] = useAuthState();
     const location = useLocation();
     const navigate = useNavigate();
     const onLoginPage = useMemo(() => (

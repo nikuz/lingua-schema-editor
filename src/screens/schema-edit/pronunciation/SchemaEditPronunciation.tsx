@@ -5,6 +5,7 @@ import {
     Form,
 } from 'src/components';
 import { translationController } from 'src/controllers';
+import { useAuthTokenId } from 'src/providers/firebase';
 import { jsonUtils } from 'src/utils';
 import {
     FormFields,
@@ -29,6 +30,7 @@ const {
 } = process.env;
 
 export default function SchemaEditPronunciation() {
+    const [userTokenId] = useAuthTokenId();
     const [cache, setCache, languages]: [SchemaEditCache, SetSchemaEditCacheCallback, LanguagesType] = useOutletContext();
     const [fields, setFields] = useState<FormFields>({
         url: {
@@ -78,6 +80,10 @@ export default function SchemaEditPronunciation() {
     }, [cache, setCache]);
 
     const requestHandler = useCallback((): Promise<void> => {
+        if (!userTokenId) {
+            return Promise.resolve();
+        }
+
         return new Promise((resolve, reject) => {
             // clear response text and json states
             if (cache.pronunciation.responseText && cache.pronunciation.responseJson) {
@@ -106,6 +112,7 @@ export default function SchemaEditPronunciation() {
             translationController.translate({
                 url: fields.url.value,
                 body,
+                token: userTokenId,
             }).then(response => {
                 if (marker) {
                     const translationRawStrings = response?.split('\n') ?? [];
@@ -151,7 +158,7 @@ export default function SchemaEditPronunciation() {
                 reject(err);
             });
         });
-    }, [fields, cache, setCache]);
+    }, [userTokenId, fields, cache, setCache]);
 
     const populateSchemaHandler = useCallback((schemaPath: string, dataPath: string) => {
         const schema = jsonUtils.populateJsonByPath(cache.pronunciation.schema || {}, schemaPath, dataPath);

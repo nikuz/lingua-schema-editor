@@ -18,7 +18,7 @@ import './Login.css';
 
 export default function Login() {
     const navigate = useNavigate();
-    const [user, authLoading, authError] = useAuthState(authInstance);
+    const [user, authLoading, authError] = useAuthState();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loginLoading, setLoginLoading] = useState(false);

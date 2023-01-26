@@ -2,6 +2,7 @@ import React, {useState, useCallback, useEffect} from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Form, Collapsable } from 'src/components';
 import { imagesController } from 'src/controllers';
+import { useAuthTokenId } from 'src/providers/firebase';
 import {
     FormFields,
     ImagesSchemaTypeFieldsName,
@@ -24,6 +25,7 @@ const {
 } = process.env;
 
 export default function SchemaEditImages() {
+    const [userTokenId] = useAuthTokenId();
     const [cache, setCache]: [SchemaEditCache, SetSchemaEditCacheCallback] = useOutletContext();
     const [fields, setFields] = useState<FormFields>({
         url: {
@@ -75,6 +77,10 @@ export default function SchemaEditImages() {
     }, [cache, setCache]);
 
     const requestHandler = useCallback((): Promise<void> => {
+        if (!userTokenId) {
+            return Promise.resolve();
+        }
+
         return new Promise((resolve, reject) => {
             setCache(SchemaEditCacheKeys.images, {
                 ...cache.images,
@@ -93,6 +99,7 @@ export default function SchemaEditImages() {
             imagesController.get({
                 url,
                 userAgent: fields.userAgent.value,
+                token: userTokenId,
             }).then(response => {
                 const regExp = new RegExp(fields.regExp.value, 'g');
                 const imagesMatch = response.match(regExp);
@@ -125,7 +132,7 @@ export default function SchemaEditImages() {
                 reject(err);
             });
         });
-    }, [fields, cache, setCache]);
+    }, [userTokenId, fields, cache, setCache]);
 
     // set fields values from cloud
     useEffect(() => {

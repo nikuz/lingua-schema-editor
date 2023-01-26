@@ -4,7 +4,7 @@ export function getList(token: string) {
     return fetch(`${apiUtils.getApiUrl()}/schemas`, {
         headers: {
             'content-type': 'application/json',
-            'Authorization': token,
+            'authorization': token,
         },
     }).then(async (response) => {
         const text = await response.text();

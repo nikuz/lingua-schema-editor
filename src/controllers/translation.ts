@@ -3,15 +3,23 @@ import { apiUtils } from 'src/utils';
 interface Props {
     url: string,
     body: URLSearchParams,
+    token: string,
 }
 
 export function translate(props: Props) {
-    return fetch(`${apiUtils.getApiUrl()}/proxy?url=${encodeURIComponent(props.url)}`, {
+    const {
+        url,
+        body,
+        token,
+    } = props;
+
+    return fetch(`${apiUtils.getApiUrl()}/proxy?url=${encodeURIComponent(url)}`, {
         method: 'POST',
         headers: {
+            'authorization': token,
             'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
         },
-        body: props.body,
+        body: body,
     }).then(async (response) => {
         const text = await response.text();
         if (response.status === 200) {

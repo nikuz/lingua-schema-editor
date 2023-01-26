@@ -9,7 +9,6 @@ export interface ResultSchemaType {
 }
 
 export interface CloudSchemaType {
-    id: string,
     version: string,
     schema: string, // JSON stringify of ResultSchemaType
     current: boolean,

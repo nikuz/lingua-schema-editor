@@ -13,20 +13,20 @@ import {
     IconButton,
     Button,
     TextField,
-    Alert,
+    Alert, Snackbar,
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Loading, Prompt, SaveHotkey } from '../../components';
+import { Loading, Prompt, SaveHotkey } from 'src/components';
 import { routerConstants } from 'src/constants';
 import { routerUtils, schemaUtils } from 'src/utils';
-import { useStoredLanguages } from 'src/hooks';
+import { useGetLanguages } from 'src/providers/language';
+import { useAuthTokenId } from 'src/providers/firebase';
 import {
-    firestoreInstance,
-    firestoreDoc,
-    firestoreGetDoc,
-    firestoreSetDoc,
-} from 'src/providers/firebase/controller';
+    useGetSchema,
+    useAddSchema,
+    useUpdateSchema,
+} from 'src/providers/schema';
 import { ResultSchemaType } from 'src/types';
 import {
     SchemaEditCache,
@@ -49,20 +49,37 @@ export default function SchemaEdit() {
     const location = useLocation();
     const navigate = useNavigate();
     const params = useParams();
+    const [userTokenId, userTokenLoading, userTokenIdError] = useAuthTokenId();
     const [activeTab, setActiveTab] = useState(0);
     const [savingPrompt, setSavingPrompt] = useState(false);
     const [newSchemaVersionName, setNewSchemaVersionName] = useState('');
-    const [pageLoading, setPageLoading] = useState(false);
-    const [pageError, setPageError] = useState<Error>();
-    const [schemaFromCloud, setSchemaFromCloud] = useState<ResultSchemaType>();
-    const isNew = useMemo(() => params.version === 'new', [params]);
+    const version = useMemo(() => params.version, [params]);
+    const isNew = useMemo(() => version === 'new', [version]);
+    const [snackbarIsOpen, setSnackbarIsOpen] = useState(false);
     // cache container to keep schemas and API responses states of individual tabs
     const [cache, setCache] = useState<SchemaEditCache>({
         translation: { initiated: isNew },
         pronunciation: { initiated: isNew },
         images: { initiated: isNew },
     });
-    const [storedLanguages, storedLanguagesLoading, storedLanguagesError] = useStoredLanguages();
+    const [getLanguages, {
+        loading: getLanguagesLoading,
+        error: getLanguagesError,
+        data: storedLanguages,
+    }] = useGetLanguages();
+    const [getSchema, {
+        loading: getSchemaLoading,
+        error: getSchemaError,
+        data: schemaFromCloud,
+    }] = useGetSchema();
+    const [addSchema, {
+        loading: addSchemaLoading,
+        error: addSchemaError,
+    }] = useAddSchema();
+    const [updateSchema, {
+        loading: updateSchemaLoading,
+        error: updateSchemaError,
+    }] = useUpdateSchema();
     const isSaveEnabled = useMemo(() => {
         return schemaUtils.validateIntegrity({
             translation: cache.translation.schema,
@@ -73,8 +90,8 @@ export default function SchemaEdit() {
     const newVersionNameError = useMemo<boolean>(() => (
         newSchemaVersionName.trim() === '' || isNaN(Number(newSchemaVersionName))
     ), [newSchemaVersionName]);
-    const loading = pageLoading || storedLanguagesLoading;
-    const error = pageError || storedLanguagesError;
+    const loading = userTokenLoading || getLanguagesLoading || getSchemaLoading || addSchemaLoading || updateSchemaLoading;
+    const error = userTokenIdError || getLanguagesError || getSchemaError || addSchemaError || updateSchemaError;
 
     const setCacheHandler: SetSchemaEditCacheCallback = useCallback((key, cachePart) => {
         const cacheClone = {
@@ -89,9 +106,15 @@ export default function SchemaEdit() {
         navigate(url);
     }, [navigate, params]);
 
+    const closeSnackbarHandler = useCallback(async () => {
+        setSnackbarIsOpen(false);
+    }, []);
+
     const saveResultSchema = useCallback(() => {
-        setPageLoading(true);
-        setPageError(undefined);
+        if (!userTokenId) {
+            return;
+        }
+
         const schema = JSON.stringify({
             translation: cache.translation.schema,
             pronunciation: cache.pronunciation.schema,
@@ -99,65 +122,32 @@ export default function SchemaEdit() {
         });
 
         if (isNew) {
-            const newSchemaReference = firestoreDoc(firestoreInstance, 'schemas', newSchemaVersionName);
-            firestoreGetDoc(newSchemaReference).then(result => {
-                if (result.exists()) {
-                    setPageLoading(false);
-                    setPageError(new Error('Schema with this version name already exists. Please make unique name'));
-                } else {
-                    firestoreSetDoc(
-                        firestoreDoc(firestoreInstance, 'schemas', newSchemaVersionName),
-                        {
-                            version: newSchemaVersionName,
-                            schema,
-                            current: false,
-                            createdAt: Date.now(),
-                        }
-                    ).then(() => {
-                        navigate(routerConstants.HOME);
-                    }).catch(err => {
-                        setPageLoading(false);
-                        setPageError(err);
-                    });
-                }
-            }).catch(err => {
-                setPageLoading(false);
-                setPageError(err);
+            addSchema({
+                schema: {
+                    version: newSchemaVersionName,
+                    schema,
+                    current: false,
+                    createdAt: Date.now(),
+                    updatedAt: Date.now(),
+                },
+                token: userTokenId,
+            }).then(() => {
+                setSnackbarIsOpen(true);
             });
-        } else if (params.version) {
-            const existingSchemaReference = firestoreDoc(firestoreInstance, 'schemas', params.version);
-            firestoreSetDoc(
-                existingSchemaReference,
-                {
+        } else if (version && schemaFromCloud) {
+            updateSchema({
+                id: version,
+                schema: {
+                    ...schemaFromCloud,
                     schema,
                     updatedAt: Date.now(),
                 },
-                { merge: true }
-            ).then(() => {
-                navigate(routerConstants.HOME);
-                // update current schema also
-                firestoreGetDoc(existingSchemaReference).then(result => {
-                    const docData = result.data();
-                    if (docData && docData.current === true) {
-                        firestoreSetDoc(
-                            firestoreDoc(firestoreInstance, 'schemas', 'current'),
-                            {
-                                schema,
-                                updatedAt: Date.now(),
-                            },
-                            { merge: true }
-                        ).catch(err => {
-                            setPageLoading(false);
-                            setPageError(err);
-                        })
-                    }
-                });
-            }).catch(err => {
-                setPageLoading(false);
-                setPageError(err);
+                token: userTokenId,
+            }).then(() => {
+                setSnackbarIsOpen(true);
             });
         }
-    }, [cache, newSchemaVersionName, isNew, params, navigate]);
+    }, [userTokenId, cache, newSchemaVersionName, isNew, version, schemaFromCloud, addSchema, updateSchema]);
 
     const saveButtonClickHandler = useCallback(() => {
         if (!isSaveEnabled || error) {
@@ -171,48 +161,6 @@ export default function SchemaEdit() {
     }, [isNew, isSaveEnabled, error, saveResultSchema]);
 
     useEffect(() => {
-        if (!isNew && params.version && !schemaFromCloud && !loading && !error) {
-            setPageLoading(true);
-            const schemaReference = firestoreDoc(firestoreInstance, 'schemas', params.version);
-            firestoreGetDoc(schemaReference).then(result => {
-                setPageLoading(false);
-                const docData = result.data();
-                if (docData) {
-                    let schema: ResultSchemaType | undefined;
-                    try {
-                        schema = JSON.parse(docData.schema);
-                    } catch (e) {
-                        setPageError(new Error('Can\'t parse schema from cloud'));
-                    }
-                    if (schema) {
-                        setSchemaFromCloud(schema);
-                        setCache({
-                            translation: {
-                                initiated: false,
-                                schema: schema.translation,
-                                // responseJson: data,
-                            },
-                            pronunciation: {
-                                initiated: false,
-                                schema: schema.pronunciation,
-                            },
-                            images: {
-                                initiated: false,
-                                schema: schema.images,
-                            },
-                        });
-                    }
-                } else {
-                    setPageError(new Error('Can\'t find document in cloud'));
-                }
-            }).catch(err => {
-                setPageLoading(false);
-                setPageError(err);
-            });
-        }
-    }, [params, isNew, loading, error, schemaFromCloud]);
-
-    useEffect(() => {
         const activeTabIndex = tabs.findIndex(item => {
             const url = routerUtils.setParams(item.url, [':version'], [params.version]);
             return url === location.pathname;
@@ -221,6 +169,48 @@ export default function SchemaEdit() {
             setActiveTab(activeTabIndex);
         }
     }, [activeTab, location, params]);
+
+    useEffect(() => {
+        if (userTokenId && !storedLanguages && !getLanguagesLoading && !getLanguagesError) {
+            getLanguages({ token: userTokenId });
+        }
+    }, [userTokenId, storedLanguages, getLanguagesLoading, getLanguagesError, getLanguages]);
+
+    useEffect(() => {
+        if (userTokenId && !isNew && version && !schemaFromCloud && !getSchemaLoading && !getSchemaError) {
+            getSchema({
+                token: userTokenId,
+                id: version,
+            });
+        }
+    }, [userTokenId, isNew, version, schemaFromCloud, getSchemaLoading, getSchemaError, getSchema]);
+
+    useEffect(() => {
+        if (schemaFromCloud) {
+            let schema: ResultSchemaType | undefined;
+            try {
+                schema = JSON.parse(schemaFromCloud.schema);
+            } catch (e) {
+                console.log(e);
+            }
+            if (schema) {
+                setCache({
+                    translation: {
+                        initiated: false,
+                        schema: schema.translation,
+                    },
+                    pronunciation: {
+                        initiated: false,
+                        schema: schema.pronunciation,
+                    },
+                    images: {
+                        initiated: false,
+                        schema: schema.images,
+                    },
+                });
+            }
+        }
+    }, [schemaFromCloud]);
 
     return <>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
@@ -298,6 +288,15 @@ export default function SchemaEdit() {
         <SaveHotkey
             onSave={saveButtonClickHandler}
         />
+        <Snackbar
+            open={snackbarIsOpen}
+            autoHideDuration={3000}
+            onClose={closeSnackbarHandler}
+        >
+            <Alert onClose={closeSnackbarHandler} severity="success" sx={{ width: '100%' }}>
+                Schema is saved
+            </Alert>
+        </Snackbar>
         {loading && <Loading blocker fixed />}
         {error && (
             <Alert severity="error">{error.message}</Alert>
