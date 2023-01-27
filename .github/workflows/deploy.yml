@@ -22,7 +22,9 @@ jobs:
         key: ${{ secrets.HETZNER_DEPLOY_KEY }}
         port: 22
         envs: ENV_SECRET,FIREBASE_SERVER_CONFIG,FIREBASE_WEB_CONFIG
+        script_stop: true
         script: |
+          ssh-add -L
           git clone git@github.com:nikuz/lingua-schema-editor.git lingua-schema-editor-deploy
           cd lingua-schema-editor-deploy
           echo $FIREBASE_WEB_CONFIG > src/wisual-web-firebase.json
@@ -34,7 +36,7 @@ jobs:
           npm install
           npm run build
           cd ~
-          pm2 stop wisual
+          pm2 stop wisual 2> /dev/null
           rm -rf lingua-schema-editor
           mv lingua-schema-editor-deploy lingua-schema-editor
           pm2 start lingua-schema-editor/server/server-build/index.js --name wisual
