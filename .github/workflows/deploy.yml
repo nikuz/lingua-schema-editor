@@ -13,7 +13,7 @@ jobs:
     - name: Deploy using SSH
       uses: appleboy/ssh-action@master
       env:
-        ENV_SECRET: ${{ secrets.ENV_SECRET }}
+        ENV_SECRET: ${{ secrets.ENV_SECRET_BASE64 }}
         FIREBASE_SERVER_CONFIG: ${{ secrets.FIREBASE_SERVER_CONFIG }}
         FIREBASE_WEB_CONFIG: ${{ secrets.FIREBASE_WEB_CONFIG }}
       with:
@@ -27,18 +27,20 @@ jobs:
         script: |
           eval `ssh-agent -s`
           ssh-add /home/nikuz/.ssh/github
+          rm -rf lingua-schema-editor-deploy
           git clone git@github.com:nikuz/lingua-schema-editor.git lingua-schema-editor-deploy
           eval `/usr/bin/ssh-agent -k`
           cd lingua-schema-editor-deploy
           echo $FIREBASE_WEB_CONFIG > src/wisual-web-firebase.json
           echo $FIREBASE_SERVER_CONFIG > server/src/wisual-firebase.json
-          echo $ENV_SECRET > .env.secret
+          echo $ENV_SECRET | base64 --decode > .env.secret
           npm install
           npm run build
           cd server
           npm install
           npm run build
-          cd ~
+          echo $HOME
+          cd $HOME
           pm2 stop wisual 2> /dev/null
           rm -rf lingua-schema-editor
           mv lingua-schema-editor-deploy lingua-schema-editor
