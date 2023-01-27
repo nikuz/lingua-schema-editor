@@ -23,9 +23,12 @@ jobs:
         port: 22
         envs: ENV_SECRET,FIREBASE_SERVER_CONFIG,FIREBASE_WEB_CONFIG
         script_stop: true
+        debug: true
         script: |
-          ssh-add -L
+          eval `ssh-agent -s`
+          ssh-add /home/nikuz/.ssh/github
           git clone git@github.com:nikuz/lingua-schema-editor.git lingua-schema-editor-deploy
+          eval `/usr/bin/ssh-agent -k`
           cd lingua-schema-editor-deploy
           echo $FIREBASE_WEB_CONFIG > src/wisual-web-firebase.json
           echo $FIREBASE_SERVER_CONFIG > server/src/wisual-firebase.json
