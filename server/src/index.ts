@@ -26,8 +26,9 @@ routes(app);
 if (env === 'production') {
     const keysPath = process.env.KEYS_PATH;
     const certificateProps = {
-        key: fs.readFileSync(`${keysPath}/privkey.pem`),
-        cert: fs.readFileSync(`${keysPath}/cert.pem`),
+        key: fs.readFileSync(`${keysPath}/privkey.pem`, 'utf8'),
+        cert: fs.readFileSync(`${keysPath}/cert.pem`, 'utf8'),
+        ca: fs.readFileSync(`${keysPath}/chain.pem`, 'utf8'),
     };
     https.createServer(certificateProps, app).listen(port, () => {
         console.log('Node client started on port:', port);

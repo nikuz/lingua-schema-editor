@@ -1,0 +1,40 @@
+name: Deploy to Hetzner VPS
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy using SSH
+      uses: appleboy/ssh-action@master
+      env:
+        ENV_SECRET: ${{ secrets.ENV_SECRET }}
+        FIREBASE_SERVER_CONFIG: ${{ secrets.FIREBASE_SERVER_CONFIG }}
+        FIREBASE_WEB_CONFIG: ${{ secrets.FIREBASE_WEB_CONFIG }}
+      with:
+        host: ${{ secrets.HETZNER_DEPLOY_IP }}
+        username: ${{ secrets.HETZNER_DEPLOY_USERNAME }}
+        key: ${{ secrets.HETZNER_DEPLOY_KEY }}
+        port: 22
+        envs: ENV_SECRET,FIREBASE_SERVER_CONFIG,FIREBASE_WEB_CONFIG
+        script: |
+          git clone git@github.com:nikuz/lingua-schema-editor.git lingua-schema-editor-deploy
+          cd lingua-schema-editor-deploy
+          echo $FIREBASE_WEB_CONFIG > src/wisual-web-firebase.json
+          echo $FIREBASE_SERVER_CONFIG > server/src/wisual-firebase.json
+          echo $ENV_SECRET > .env.secret
+          npm install
+          npm run build
+          cd server
+          npm install
+          npm run build
+          cd ~
+          pm2 stop wisual
+          rm -rf lingua-schema-editor
+          mv lingua-schema-editor-deploy lingua-schema-editor
+          pm2 start lingua-schema-editor/server/server-build/index.js --name wisual
