@@ -39,9 +39,8 @@ jobs:
           cd server
           npm install
           npm run build
-          echo $HOME
           cd $HOME
-          pm2 stop wisual 2> /dev/null
+          pm2 stop all
           rm -rf lingua-schema-editor
           mv lingua-schema-editor-deploy lingua-schema-editor
           pm2 start lingua-schema-editor/server/server-build/index.js --name wisual
