@@ -44,7 +44,7 @@ exports = module.exports = (app: Express) => {
                     headers: proxyRes.headers,
                     text: proxyResData.toString(),
                 });
-            }
+            },
         }
     ));
 
