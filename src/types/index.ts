@@ -5,3 +5,4 @@ export * from './images-schema';
 export * from './form';
 export * from './language';
 export * from './common';
+export * from './proxy';

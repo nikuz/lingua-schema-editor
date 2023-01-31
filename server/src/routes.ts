@@ -17,6 +17,34 @@ exports = module.exports = (app: Express) => {
                 const url = getProxyUrl(req);
                 return `${url.pathname}${url.search}`;
             },
+            proxyReqOptDecorator: function(proxyReqOpts) {
+                const headers = proxyReqOpts.headers;
+                if (headers) {
+                    delete headers['authorization'];
+                    if (headers['authorization-cookie']) {
+                        headers['cookie'] = headers['authorization-cookie'];
+                        delete headers['authorization-cookie'];
+                    }
+                    if (headers['authorization-origin']) {
+                        headers['origin'] = headers['authorization-origin'];
+                        headers['referer'] = headers['authorization-origin'];
+                        delete headers['authorization-origin'];
+                    }
+                }
+                return proxyReqOpts;
+            },
+            userResDecorator: function(proxyRes, proxyResData, userReq, userRes) {
+                // always answer with 200 success, original status is set in 'statusCode' body parameter
+                userRes.statusCode = 200;
+                // fix proxy CORS
+                userRes.setHeader('Access-Control-Allow-Origin', '*');
+
+                return JSON.stringify({
+                    statusCode: proxyRes.statusCode,
+                    headers: proxyRes.headers,
+                    text: proxyResData.toString(),
+                });
+            }
         }
     ));
 

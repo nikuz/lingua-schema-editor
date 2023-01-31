@@ -1,17 +1,41 @@
 import { apiUtils } from 'src/utils';
-import { LanguagesType } from 'src/types';
+import {
+    LanguagesType,
+    ObjectDataString,
+    ProxyResponse,
+} from 'src/types';
+import * as consentController from './consent';
 
 const languageCodesRegExp = /data:\s?(\[\[\["auto",\s?"Detect language"[^\n]+]]]),/;
 
-export function retrieve(url: string, token: string): Promise<LanguagesType> {
+interface Props {
+    url: string,
+    token: string,
+    cookie?: string[],
+}
+
+export function retrieve(props: Props): Promise<LanguagesType> {
+    const {
+        url,
+        token,
+        cookie,
+    } = props;
+
+    const headers: ObjectDataString = {
+        'authorization': token,
+        'authorization-origin': new URL(url).origin,
+    };
+
+    if (cookie) {
+        headers['authorization-cookie'] = cookie.join('; ');
+    }
+
     return fetch(`${apiUtils.getApiUrl()}/api/proxy?url=${encodeURIComponent(url)}`, {
-        headers: {
-            'authorization': token,
-        },
+        headers,
     }).then(async (response) => {
-        const text = await response.text();
-        if (response.status === 200) {
-            const languageCodesStrings = text.match(languageCodesRegExp);
+        const data: ProxyResponse = await response.json();
+        if (data.statusCode === 200) {
+            const languageCodesStrings = data.text.match(languageCodesRegExp);
 
             if (!languageCodesStrings || !languageCodesStrings[0]) {
                 throw new Error('Can\'t retrieve list of languages from server response');
@@ -33,7 +57,26 @@ export function retrieve(url: string, token: string): Promise<LanguagesType> {
             }
 
             return Object.fromEntries(supportedLanguages);
+        } else if (data.statusCode === 302 && data.headers['location'].includes('consent')) {
+            let newCookie = data.headers['set-cookie'];
+            if (newCookie && Array.isArray(newCookie)) {
+                let consentCookie: string[];
+                try {
+                    consentCookie = await consentController.acquire({
+                        url: data.headers['location'],
+                        token,
+                        cookie: newCookie,
+                    });
+                    return retrieve({
+                        url,
+                        token,
+                        cookie: apiUtils.mergeCookie([newCookie, consentCookie]),
+                    });
+                } catch (e) {
+                    //
+                }
+            }
         }
-        throw new Error(text || response.status.toString());
+        throw new Error(data.text || data.statusCode.toString());
     });
 }

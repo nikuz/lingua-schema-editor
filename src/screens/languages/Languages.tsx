@@ -49,7 +49,10 @@ export default function Languages() {
             return Promise.resolve();
         }
         return new Promise((resolve, reject) => {
-            languagesController.retrieve(fields.url.value, userTokenId).then(response => {
+            languagesController.retrieve({
+                url: fields.url.value,
+                token: userTokenId,
+            }).then(response => {
                 setLanguages(response)
                 resolve();
             }).catch((err) => {

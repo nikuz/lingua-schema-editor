@@ -1,3 +1,5 @@
+import { ObjectDataString } from './common';
+
 export interface FormField {
     label: string,
     value: string,
@@ -5,7 +7,7 @@ export interface FormField {
     fullWidth?: boolean,
     variables?: string[],
     variablesError?: boolean,
-    variablesValues?: { [name: string]: string },
+    variablesValues?: ObjectDataString,
 }
 
 export type FormFields = { [name: string]: FormField };
