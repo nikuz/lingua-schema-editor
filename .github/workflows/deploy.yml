@@ -23,7 +23,6 @@ jobs:
         port: 22
         envs: ENV_SECRET,FIREBASE_SERVER_CONFIG,FIREBASE_WEB_CONFIG
         script_stop: true
-        debug: true
         script: |
           eval `ssh-agent -s`
           ssh-add /home/nikuz/.ssh/github
