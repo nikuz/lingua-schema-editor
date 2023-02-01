@@ -80,9 +80,7 @@ exports = module.exports = (app: Express) => {
 
 function getProxyUrl(req: Request) {
     let urlParam = req.query.url?.toString();
-    if (urlParam) {
-        urlParam = decodeURIComponent(urlParam);
-    } else {
+    if (!urlParam) {
         urlParam = req.originalUrl;
     }
 

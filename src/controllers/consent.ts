@@ -1,8 +1,8 @@
 import { apiUtils } from 'src/utils';
 import { ProxyResponse } from 'src/types';
 
-const formRegExp = /<form (.|\n)+?<\/form>/;
-const inputRegExp = /<input [^>]*>/g;
+const formRegExp = /<form\s(.|\n)+?<\/form>/;
+const inputRegExp = /<input\s[^>]*>/g;
 const paramRegExpBase = '{param}=["|\']([^\'"]+)[\'|"]';
 const actionRegExp = new RegExp(paramRegExpBase.replace('{param}', 'action'));
 const nameRegExp = new RegExp(paramRegExpBase.replace('{param}', 'name'));
@@ -11,20 +11,24 @@ const valueRegExp = new RegExp(paramRegExpBase.replace('{param}', 'value'));
 interface Props {
     url: string,
     token: string,
-    cookie: string[],
 }
 
-export function acquire(props: Props): Promise<string[]> {
+export function acquire(props: Props): Promise<void> {
     const {
         url,
         token,
-        cookie,
     } = props;
+
+    const cookie = apiUtils.getCookie();
+
+    if (!cookie) {
+        throw new Error('Cookie should be acquired prior saving the consent');
+    }
 
     return fetch(`${apiUtils.getApiUrl()}/api/proxy?url=${encodeURIComponent(url)}`, {
         headers: {
             'authorization': token,
-            'authorization-cookie': cookie.join('; '),
+            'authorization-cookie': cookie?.join('; '),
             'authorization-origin': new URL(url).origin,
         },
     }).then(async (response) => {
@@ -68,7 +72,7 @@ interface SaveProps {
     body: URLSearchParams,
 }
 
-export function save(props: SaveProps): Promise<string[]> {
+export function save(props: SaveProps): Promise<void> {
     const {
         url,
         token,
@@ -88,10 +92,8 @@ export function save(props: SaveProps): Promise<string[]> {
     }).then(async (response) => {
         const data: ProxyResponse = await response.json();
         if (data.statusCode === 303 || data.statusCode === 204) {
-            let cookie = data.headers['set-cookie'];
-            if (Array.isArray(cookie)) {
-                return cookie;
-            }
+            apiUtils.setCookie(apiUtils.mergeCookie([cookie, data.headers['set-cookie']]));
+            return;
         }
         throw new Error(data.text || data.statusCode.toString());
     });

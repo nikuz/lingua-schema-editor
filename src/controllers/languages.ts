@@ -11,14 +11,12 @@ const languageCodesRegExp = /data:\s?(\[\[\["auto",\s?"Detect language"[^\n]+]]]
 interface Props {
     url: string,
     token: string,
-    cookie?: string[],
 }
 
 export function retrieve(props: Props): Promise<LanguagesType> {
     const {
         url,
         token,
-        cookie,
     } = props;
 
     const headers: ObjectDataString = {
@@ -26,6 +24,7 @@ export function retrieve(props: Props): Promise<LanguagesType> {
         'authorization-origin': new URL(url).origin,
     };
 
+    const cookie = apiUtils.getCookie();
     if (cookie) {
         headers['authorization-cookie'] = cookie.join('; ');
     }
@@ -34,6 +33,9 @@ export function retrieve(props: Props): Promise<LanguagesType> {
         headers,
     }).then(async (response) => {
         const data: ProxyResponse = await response.json();
+        if (data.headers['set-cookie']) {
+            apiUtils.setCookie(apiUtils.mergeCookie([cookie, data.headers['set-cookie']]));
+        }
         if (data.statusCode === 200) {
             const languageCodesStrings = data.text.match(languageCodesRegExp);
 
@@ -58,24 +60,11 @@ export function retrieve(props: Props): Promise<LanguagesType> {
 
             return Object.fromEntries(supportedLanguages);
         } else if (data.statusCode === 302 && data.headers['location'].includes('consent')) {
-            let newCookie = data.headers['set-cookie'];
-            if (newCookie && Array.isArray(newCookie)) {
-                let consentCookie: string[];
-                try {
-                    consentCookie = await consentController.acquire({
-                        url: data.headers['location'],
-                        token,
-                        cookie: newCookie,
-                    });
-                    return retrieve({
-                        url,
-                        token,
-                        cookie: apiUtils.mergeCookie([newCookie, consentCookie]),
-                    });
-                } catch (e) {
-                    //
-                }
-            }
+            await consentController.acquire({
+                url: data.headers['location'],
+                token,
+            });
+            return retrieve(props);
         }
         throw new Error(data.text || data.statusCode.toString());
     });
