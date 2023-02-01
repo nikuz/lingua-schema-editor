@@ -6,6 +6,7 @@ module.exports = {
         env: {
             NODE_ENV: 'production',
             STATIC_FILES_DIRECTORY: '/home/nikuz',
+            KEYS_PATH: '/home/nikuz/wisual.app',
         },
     }],
 };
