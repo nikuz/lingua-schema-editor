@@ -42,4 +42,4 @@ jobs:
           pm2 stop wisual
           rm -rf lingua-schema-editor
           mv lingua-schema-editor-deploy lingua-schema-editor
-          pm2 start lingua-schema-editor/server/server-build/index.js --name wisual
+          pm2 start /home/nikuz/lingua-schema-editor/ecosystem.config.js

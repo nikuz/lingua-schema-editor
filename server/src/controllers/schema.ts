@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { authUtils } from '../utils';
 
 let currentSchemaCache: string;
-const schemasDirectoryPath = path.resolve(__dirname, '../../../schemas');
+const schemasDirectoryPath = path.resolve(process.env.STATIC_FILES_DIRECTORY ?? '', 'schemas');
 
 export async function getList(req: Request, res: Response) {
     if (!(await authUtils.isAuthorized(req, res))) {

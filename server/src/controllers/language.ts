@@ -3,7 +3,7 @@ import path from 'path';
 import { Request, Response } from 'express';
 import { authUtils } from '../utils';
 
-const languagesFilePath = path.resolve(__dirname, '../../../languages/languages.json');
+const languagesFilePath = path.resolve(process.env.STATIC_FILES_DIRECTORY ?? '', 'languages/languages.json');
 
 export async function getLanguages(req: Request, res: Response) {
     if (!(await authUtils.isAuthorized(req, res))) {
