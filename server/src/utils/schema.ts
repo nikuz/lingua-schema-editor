@@ -2,7 +2,13 @@ import { ResultSchemaType } from '../types';
 
 export function validateIntegrity(schema: ResultSchemaType): boolean {
     return !(
-        !schema.translation?.fields.url
+        // quick translation
+        !schema.quick_translation?.fields.url
+        || !schema.quick_translation.sentences?.original_word?.value
+        || !schema.quick_translation.sentences.translation?.value
+
+        // translation
+        || !schema.translation?.fields.url
         || !schema.translation?.fields.parameter
         || !schema.translation.fields.body
         || !schema.translation.fields.marker
@@ -11,7 +17,7 @@ export function validateIntegrity(schema: ResultSchemaType): boolean {
         || !schema.translation.auto_language_code?.value
         // transcription
         || !schema.translation.transcription?.value
-        // translation
+        // translations
         || !schema.translation.translations?.value
         || !schema.translation.translations.gender.value
         || !schema.translation.translations.word.value

@@ -159,7 +159,7 @@ export default function SchemaEditImages() {
             onChange={setFieldsHandler}
             onSubmit={requestHandler}
         />
-        <Collapsable title="Schema" headerSize="h5" marginTop={5} marginBottom={3}>
+        <Collapsable title="JSON Schema" headerSize="h5" marginTop={5} marginBottom={3}>
             <pre>
                 {JSON.stringify(cache.images.schema || {}, null, 4)}
             </pre>

@@ -1,7 +1,7 @@
 import React from 'react';
 import cl from 'classnames';
+import jmespath from 'jmespath';
 import {
-    Card,
     CardHeader,
     CardContent,
     Typography,
@@ -9,32 +9,36 @@ import {
     Chip,
 } from '@mui/material';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
-import jmespath from 'jmespath';
+import { Collapsable } from 'src/components';
 import { TranslationSchemaType } from 'src/types';
 import './SchemaEditTranslationPreview.css';
 
 interface Props {
     schema: TranslationSchemaType,
-    translationResponseJson: any,
+    data: any,
 }
 
 export default function SchemaEditTranslationPreview(props: Props) {
     const {
         schema,
-        translationResponseJson: source,
+        data,
     } = props;
 
-    const word = retrieveData(source, schema.word?.value);
-    const autoSpellingFix = retrieveData(source, schema.auto_spelling_fix?.value);
+    if (!data) {
+        return null;
+    }
+
+    const word = retrieveData(data, schema.word?.value);
+    const autoSpellingFix = retrieveData(data, schema.auto_spelling_fix?.value);
     const correctedWord = autoSpellingFix || word;
-    const translation = retrieveData(source, schema.translations?.value);
-    const transcription = retrieveData(source, schema.transcription?.value);
-    const alternativeTranslations = retrieveData(source, schema.alternative_translations?.value);
-    const definitions = retrieveData(source, schema.definitions?.value);
-    const examples = retrieveData(source, schema.examples?.value);
+    const translation = retrieveData(data, schema.translations?.value);
+    const transcription = retrieveData(data, schema.transcription?.value);
+    const alternativeTranslations = retrieveData(data, schema.alternative_translations?.value);
+    const definitions = retrieveData(data, schema.definitions?.value);
+    const examples = retrieveData(data, schema.examples?.value);
 
     return (
-        <Card sx={{ mt: 4 }}>
+        <Collapsable title="Preview" headerSize="h5" marginTop={5} marginBottom={3}>
             <CardHeader
                 title={(
                     <Typography variant="h4">
@@ -217,7 +221,7 @@ export default function SchemaEditTranslationPreview(props: Props) {
                     );
                 })}
             </CardContent>
-        </Card>
+        </Collapsable>
     );
 }
 

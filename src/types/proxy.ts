@@ -1,4 +1,4 @@
-import { ObjectDataString } from './common';
+import { ObjectDataString } from 'server-types';
 
 export interface ProxyResponse {
     headers: ObjectDataString,

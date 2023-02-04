@@ -1,8 +1,10 @@
+import { QuickTranslationSchemaType } from  './schema-quick-translation';
 import { TranslationSchemaType } from  './schema-translation';
 import { PronunciationSchemaType } from  './schema-pronunciation';
 import { ImagesSchemaType } from  './schema-images';
 
 export interface ResultSchemaType {
+    quick_translation?: QuickTranslationSchemaType,
     translation?: TranslationSchemaType,
     pronunciation?: PronunciationSchemaType,
     images?: ImagesSchemaType,

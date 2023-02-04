@@ -21,6 +21,10 @@ export default function SchemaEditTranslationBuilder(props: Props) {
         onDataPathSelect,
     } = props;
 
+    if (!data) {
+        return null;
+    }
+
     return (
         <TranslationSchemaContext.Provider value={{ onDataPathSelect }}>
             <Typography
@@ -28,7 +32,7 @@ export default function SchemaEditTranslationBuilder(props: Props) {
                 sx={{ mt: 3 }}
                 gutterBottom
             >
-                Translation Schema
+                Schema Builder
             </Typography>
             <SchemaItem
                 title="Word"

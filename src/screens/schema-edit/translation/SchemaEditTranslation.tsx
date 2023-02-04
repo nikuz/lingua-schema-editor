@@ -23,6 +23,7 @@ import SchemaEditTranslationPreview from './components/preview';
 
 const {
     REACT_APP_TRANSLATION_URL,
+    REACT_APP_TRANSLATION_URL_PARAMETER_RT,
     REACT_APP_TRANSLATION_MARKER,
     REACT_APP_TRANSLATION_BODY_PARAMETER,
     REACT_APP_TRANSLATION_BODY,
@@ -37,8 +38,13 @@ export default function SchemaEditTranslation() {
             value: cache.translation.schema?.fields.url || REACT_APP_TRANSLATION_URL || '',
             fullWidth: true,
         },
+        url_parameter_rt: {
+            label: 'Request parameter "rt"',
+            value: cache.translation.schema?.fields.url_parameter_rt || REACT_APP_TRANSLATION_URL_PARAMETER_RT || '',
+            fullWidth: true,
+        },
         parameter: {
-            label: 'Parameter',
+            label: 'Body Parameter',
             value: cache.translation.schema?.fields.parameter || REACT_APP_TRANSLATION_BODY_PARAMETER || '',
         },
         body: {
@@ -62,6 +68,7 @@ export default function SchemaEditTranslation() {
                 ...cache.translation.schema,
                 fields: {
                     url: fields.url.value,
+                    url_parameter_rt: fields.url_parameter_rt.value,
                     parameter: fields.parameter.value,
                     body: fields.body.value,
                     marker: bodyVariables
@@ -99,11 +106,17 @@ export default function SchemaEditTranslation() {
                 });
             }
 
+            const urlParams = new URLSearchParams();
+            urlParams.append('rt', 'c');
+
             const body = new URLSearchParams();
             body.append(fields.parameter.value, bodyValue);
 
+            // https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=sulkily&ie=UTF-8&oe=UTF-8
+            // "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ru&dt=t&q=casa&ie=UTF-8&oe=UTF-8"
+
             translationController.translate({
-                url: fields.url.value,
+                url: `${fields.url.value}?${urlParams.toString()}`,
                 body,
                 token: userTokenId,
             }).then(response => {
@@ -194,28 +207,24 @@ export default function SchemaEditTranslation() {
                 onChange={setFieldsHandler}
                 onSubmit={requestHandler}
             />
-            {cache.translation.responseJson && (
-                <SchemaEditTranslationBuilder
-                    data={cache.translation.responseJson}
-                    schema={cache.translation.schema || {} as TranslationSchemaType}
-                    onDataPathSelect={populateSchemaHandler}
-                />
-            )}
-            <Collapsable title="Schema" headerSize="h5" marginTop={5} marginBottom={3}>
+            <SchemaEditTranslationBuilder
+                data={cache.translation.responseJson}
+                schema={cache.translation.schema || {} as TranslationSchemaType}
+                onDataPathSelect={populateSchemaHandler}
+            />
+            <SchemaEditTranslationPreview
+                schema={cache.translation.schema || {} as TranslationSchemaType}
+                data={cache.translation.responseJson}
+            />
+            <Collapsable title="JSON Schema" headerSize="h5" marginBottom={3}>
                 <pre>
                     {JSON.stringify(cache.translation.schema || {}, null, 4)}
                 </pre>
             </Collapsable>
             {cache.translation.responseText && (
-                <Collapsable title="Original response">
+                <Collapsable title="Original response" headerSize="h5">
                     {cache.translation.responseText}
                 </Collapsable>
-            )}
-            {cache.translation.responseJson && (
-                <SchemaEditTranslationPreview
-                    schema={cache.translation.schema || {} as TranslationSchemaType}
-                    translationResponseJson={cache.translation.responseJson}
-                />
             )}
         </>
     );

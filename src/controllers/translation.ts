@@ -4,7 +4,7 @@ import * as consentController from './consent';
 
 interface Props {
     url: string,
-    body: URLSearchParams,
+    body?: URLSearchParams,
     token: string,
 }
 

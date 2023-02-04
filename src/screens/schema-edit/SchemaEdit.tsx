@@ -35,8 +35,11 @@ import {
 // import data from 'src/data/man.json';
 
 const tabs = [{
-    label: 'Translation',
+    label: 'Quick Translation',
     url: routerConstants.SCHEMA_EDIT,
+}, {
+    label: 'Translation',
+    url: routerConstants.SCHEMA_EDIT_TRANSLATION,
 }, {
     label: 'Pronunciation',
     url: routerConstants.SCHEMA_EDIT_PRONUNCIATION,
@@ -58,6 +61,7 @@ export default function SchemaEdit() {
     const [snackbarIsOpen, setSnackbarIsOpen] = useState(false);
     // cache container to keep schemas and API responses states of individual tabs
     const [cache, setCache] = useState<SchemaEditCache>({
+        quick_translation: { initiated: isNew },
         translation: { initiated: isNew },
         pronunciation: { initiated: isNew },
         images: { initiated: isNew },
@@ -81,12 +85,16 @@ export default function SchemaEdit() {
         error: updateSchemaError,
     }] = useUpdateSchema();
     const isSaveEnabled = useMemo(() => {
-        return schemaUtils.validateIntegrity({
-            translation: cache.translation.schema,
-            pronunciation: cache.pronunciation.schema,
-            images: cache.images.schema,
-        });
-    }, [cache]);
+        if (schemaFromCloud?.current) {
+            return schemaUtils.validateIntegrity({
+                quick_translation: cache.quick_translation.schema,
+                translation: cache.translation.schema,
+                pronunciation: cache.pronunciation.schema,
+                images: cache.images.schema,
+            });
+        }
+        return true;
+    }, [cache, schemaFromCloud]);
     const newVersionNameError = useMemo<boolean>(() => (
         newSchemaVersionName.trim() === '' || isNaN(Number(newSchemaVersionName))
     ), [newSchemaVersionName]);
@@ -116,6 +124,7 @@ export default function SchemaEdit() {
         }
 
         const schema = JSON.stringify({
+            quick_translation: cache.quick_translation.schema,
             translation: cache.translation.schema,
             pronunciation: cache.pronunciation.schema,
             images: cache.images.schema,
@@ -195,6 +204,10 @@ export default function SchemaEdit() {
             }
             if (schema) {
                 setCache({
+                    quick_translation: {
+                        initiated: false,
+                        schema: schema.quick_translation,
+                    },
                     translation: {
                         initiated: false,
                         schema: schema.translation,
@@ -299,7 +312,7 @@ export default function SchemaEdit() {
         </Snackbar>
         {loading && <Loading blocker fixed />}
         {error && (
-            <Alert severity="error">{error.message}</Alert>
+            <Alert severity="error" sx={{ mt: '3' }}>{error.message}</Alert>
         )}
     </>;
 }

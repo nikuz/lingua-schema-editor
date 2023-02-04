@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { Request, Response } from 'express';
-import { authUtils } from '../utils';
+import { authUtils, schemaUtils } from '../utils';
+import { ObjectData } from '../types';
 
 let currentSchemaCache: string;
 const schemasDirectoryPath = path.resolve(process.env.STATIC_FILES_DIRECTORY ?? '', 'schemas');
@@ -74,6 +75,12 @@ export async function update(req: Request, res: Response) {
     }
 
     const body = req.body;
+
+    if (body.current && !schemaUtils.validateIntegrity(JSON.parse(body.schema))) {
+        res.status(406);
+        return res.end('Failed schema integrity check');
+    }
+
     const data = JSON.stringify(body);
     fs.writeFileSync(schemaPath, data);
 
@@ -133,7 +140,10 @@ export async function setCurrent(req: Request, res: Response) {
 
     const params = req.params;
     const schemasFiles = fs.readdirSync(schemasDirectoryPath);
-    let currentSchema;
+    let currentSchema: ObjectData | undefined;
+    let currentSchemaFileName: string | undefined;
+    let prevCurrentSchema: ObjectData | undefined;
+    let prevCurrentSchemaFileName: string | undefined;
 
     for (const file of schemasFiles) {
         const filePath = `${schemasDirectoryPath}/${file}`;
@@ -143,26 +153,43 @@ export async function setCurrent(req: Request, res: Response) {
             const schema = JSON.parse(content);
 
             if (schema.current === true) {
-                fs.writeFileSync(filePath, JSON.stringify({
-                    ...schema,
-                    current: false,
-                }));
+                prevCurrentSchema = schema;
+                prevCurrentSchemaFileName = filePath;
             }
             if (schema.version === params.id) {
-                const data = JSON.stringify({
-                    ...schema,
-                    current: true,
-                });
-                currentSchema = data;
-                // update "current" schema memory cache
-                currentSchemaCache = data;
-                fs.writeFileSync(filePath, data);
-                fs.writeFileSync(`${schemasDirectoryPath}/current.json`, data);
+                currentSchema = schema;
+                currentSchemaFileName = filePath;
             }
         }
     }
 
-    return res.end(currentSchema);
+    if (currentSchemaFileName && currentSchema) {
+        if (!schemaUtils.validateIntegrity(JSON.parse(currentSchema.schema))) {
+            res.status(406);
+            return res.end('Failed schema integrity check');
+        }
+
+        if (prevCurrentSchemaFileName && prevCurrentSchema) {
+            fs.writeFileSync(prevCurrentSchemaFileName, JSON.stringify({
+                ...prevCurrentSchema,
+                current: false,
+            }));
+        }
+
+        const data = JSON.stringify({
+            ...currentSchema,
+            current: true,
+        });
+        // update "current" schema memory cache
+        currentSchemaCache = data;
+        fs.writeFileSync(currentSchemaFileName, data);
+        fs.writeFileSync(`${schemasDirectoryPath}/current.json`, data);
+
+        return res.end(data);
+    }
+
+    res.status(404);
+    return res.end('Can\'t update current schema');
 }
 
 export async function remove(req: Request, res: Response) {

@@ -11,6 +11,7 @@ import Dashboard from './dashboard';
 import Login from './login';
 import NotFound from './not-found';
 import SchemaEdit from './schema-edit';
+import SchemaEditQuickTranslation from './schema-edit/quick-translation';
 import SchemaEditTranslation from './schema-edit/translation';
 import SchemaEditPronunciation from './schema-edit/pronunciation';
 import SchemaEditImages from './schema-edit/images';
@@ -36,6 +37,10 @@ export default function AppRoutes() {
                     >
                         <Route
                             path={routerConstants.SCHEMA_EDIT}
+                            element={<SchemaEditQuickTranslation />}
+                        />
+                        <Route
+                            path={routerConstants.SCHEMA_EDIT_TRANSLATION}
                             element={<SchemaEditTranslation />}
                         />
                         <Route
