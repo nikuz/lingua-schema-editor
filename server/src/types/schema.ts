@@ -1,6 +1,6 @@
-import { TranslationSchemaType } from  './translation-schema';
-import { PronunciationSchemaType } from  './pronunciation-schema';
-import { ImagesSchemaType } from  './images-schema';
+import { TranslationSchemaType } from  './schema-translation';
+import { PronunciationSchemaType } from  './schema-pronunciation';
+import { ImagesSchemaType } from  './schema-images';
 
 export interface ResultSchemaType {
     translation?: TranslationSchemaType,

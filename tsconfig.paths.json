@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "server-types": ["server/src/types"],
+      "server-schema-utils": ["server/src/utils/schema.ts"]
+    }
+  }
+}

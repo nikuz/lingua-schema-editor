@@ -14,6 +14,7 @@ export interface TranslationSchemaType {
 
 export interface TranslationSchemaTypeFields {
     url: string,
+    url_parameter_rt: string,
     parameter: string,
     body: string,
     marker: string,
