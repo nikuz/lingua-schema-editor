@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { Request, Response } from 'express';
-import { authUtils, schemaUtils } from '../utils';
+import { authUtils, schemaUtils, cryptoUtils } from '../utils';
 import { ObjectData } from '../types';
 
 let currentSchemaCache: string;
@@ -86,7 +86,7 @@ export async function update(req: Request, res: Response) {
 
     if (body.current === true) {
         fs.writeFileSync(path.resolve(schemasDirectoryPath, 'current.json'), data);
-        currentSchemaCache = data;
+        currentSchemaCache = cryptoUtils.encrypt(data);
     }
 
     return res.end(data);
@@ -121,7 +121,7 @@ export function getCurrent(req: Request, res: Response) {
     if (currentSchemaCache) {
         data = currentSchemaCache;
     } else {
-        data = fs.readFileSync(schemaPath).toString();
+        data = cryptoUtils.encrypt(fs.readFileSync(schemaPath).toString());
         currentSchemaCache = data;
     }
 
@@ -181,7 +181,7 @@ export async function setCurrent(req: Request, res: Response) {
             current: true,
         });
         // update "current" schema memory cache
-        currentSchemaCache = data;
+        currentSchemaCache = cryptoUtils.encrypt(data);
         fs.writeFileSync(currentSchemaFileName, data);
         fs.writeFileSync(`${schemasDirectoryPath}/current.json`, data);
 
