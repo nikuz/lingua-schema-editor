@@ -1,4 +1,5 @@
 import {
+    CookieConsentSchemaType,
     ImagesSchemaType,
     PronunciationSchemaType,
     QuickTranslationSchemaType,
@@ -6,10 +7,19 @@ import {
 } from 'src/types';
 
 export interface SchemaEditCache {
+    cookie_consent: SchemaEditCacheCookieConsent,
     quick_translation: SchemaEditCacheQuickTranslation,
     translation: SchemaEditCacheTranslation,
     pronunciation: SchemaEditCachePronunciation,
     images: SchemaEditCacheImages,
+}
+
+export interface SchemaEditCacheCookieConsent {
+    initiated: boolean,
+    responseText?: string,
+    form?: string,
+    inputs?: string[],
+    schema?: CookieConsentSchemaType,
 }
 
 export interface SchemaEditCacheQuickTranslation {
@@ -40,6 +50,7 @@ export interface SchemaEditCacheImages {
 }
 
 export enum SchemaEditCacheKeys {
+    cookie_consent = 'cookie_consent',
     quick_translation = 'quick_translation',
     translation = 'translation',
     pronunciation = 'pronunciation',
@@ -48,7 +59,8 @@ export enum SchemaEditCacheKeys {
 
 export type SetSchemaEditCacheCallback = (
     key: SchemaEditCacheKeys,
-    cachePart: SchemaEditCacheQuickTranslation
+    cachePart: SchemaEditCacheCookieConsent
+        | SchemaEditCacheQuickTranslation
         | SchemaEditCacheTranslation
         | SchemaEditCachePronunciation
         | SchemaEditCacheImages,

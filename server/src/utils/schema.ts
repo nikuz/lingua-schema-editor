@@ -2,8 +2,13 @@ import { ResultSchemaType } from '../types';
 
 export function validateIntegrity(schema: ResultSchemaType): boolean {
     return !(
+        // cookie consent
+        !schema.cookie_consent?.fields.marker
+        || !schema.cookie_consent.fields.formRegExp
+        || !schema.cookie_consent.fields.inputRegExp
+
         // quick translation
-        !schema.quick_translation?.fields.url
+        || !schema.quick_translation?.fields.url
         || !schema.quick_translation.sentences?.original_word?.value
         || !schema.quick_translation.sentences.translation?.value
 

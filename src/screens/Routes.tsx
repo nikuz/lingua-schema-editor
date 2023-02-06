@@ -11,6 +11,7 @@ import Dashboard from './dashboard';
 import Login from './login';
 import NotFound from './not-found';
 import SchemaEdit from './schema-edit';
+import SchemaEditCookieConsent from './schema-edit/cookie-consent';
 import SchemaEditQuickTranslation from './schema-edit/quick-translation';
 import SchemaEditTranslation from './schema-edit/translation';
 import SchemaEditPronunciation from './schema-edit/pronunciation';
@@ -37,6 +38,10 @@ export default function AppRoutes() {
                     >
                         <Route
                             path={routerConstants.SCHEMA_EDIT}
+                            element={<SchemaEditCookieConsent />}
+                        />
+                        <Route
+                            path={routerConstants.SCHEMA_EDIT_QUICK_TRANSLATION}
                             element={<SchemaEditQuickTranslation />}
                         />
                         <Route

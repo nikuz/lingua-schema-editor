@@ -98,3 +98,48 @@ export function save(props: SaveProps): Promise<void> {
         throw new Error(data.text || data.statusCode.toString());
     });
 }
+
+interface GetPageContentProps {
+    token: string,
+    marker: string,
+}
+
+export function getPageContent(props: GetPageContentProps): Promise<string> {
+    const {
+        token,
+        marker,
+    } = props;
+    const url = 'https://translate.google.com';
+
+    return fetch(`${apiUtils.getApiUrl()}/api/proxy?url=${encodeURIComponent(url)}`, {
+        headers: {
+            'authorization': token,
+            'authorization-origin': new URL(url).origin,
+        },
+    }).then(async (response) => {
+        const data: ProxyResponse = await response.json();
+        const redirectUrl = data.headers['location'];
+
+        if (data.statusCode === 200) {
+            throw new Error('Redirect to consent page isn\'t happening');
+        } else if (data.statusCode === 302 && redirectUrl.includes(marker)) {
+            // retrieve consent page content
+            const cookie = data.headers['set-cookie'];
+            const cookieList = Array.isArray(cookie) ? cookie : [cookie];
+            return fetch(`${apiUtils.getApiUrl()}/api/proxy?url=${encodeURIComponent(redirectUrl)}`, {
+                headers: {
+                    'authorization': token,
+                    'authorization-cookie': cookieList.join('; '),
+                    'authorization-origin': new URL(url).origin,
+                },
+            }).then(async (response) => {
+                const data: ProxyResponse = await response.json();
+                if (data.statusCode === 200) {
+                    return data.text;
+                }
+                throw new Error(data.text || data.statusCode.toString());
+            });
+        }
+        throw new Error(data.text || data.statusCode.toString());
+    });
+}

@@ -35,8 +35,11 @@ import {
 // import data from 'src/data/man.json';
 
 const tabs = [{
-    label: 'Quick Translation',
+    label: 'Cookie Consent',
     url: routerConstants.SCHEMA_EDIT,
+}, {
+    label: 'Quick Translation',
+    url: routerConstants.SCHEMA_EDIT_QUICK_TRANSLATION,
 }, {
     label: 'Translation',
     url: routerConstants.SCHEMA_EDIT_TRANSLATION,
@@ -61,6 +64,7 @@ export default function SchemaEdit() {
     const [snackbarIsOpen, setSnackbarIsOpen] = useState(false);
     // cache container to keep schemas and API responses states of individual tabs
     const [cache, setCache] = useState<SchemaEditCache>({
+        cookie_consent: { initiated: isNew },
         quick_translation: { initiated: isNew },
         translation: { initiated: isNew },
         pronunciation: { initiated: isNew },
@@ -87,6 +91,7 @@ export default function SchemaEdit() {
     const isSaveEnabled = useMemo(() => {
         if (schemaFromCloud?.current) {
             return schemaUtils.validateIntegrity({
+                cookie_consent: cache.cookie_consent.schema,
                 quick_translation: cache.quick_translation.schema,
                 translation: cache.translation.schema,
                 pronunciation: cache.pronunciation.schema,
@@ -124,6 +129,7 @@ export default function SchemaEdit() {
         }
 
         const schema = JSON.stringify({
+            cookie_consent: cache.cookie_consent.schema,
             quick_translation: cache.quick_translation.schema,
             translation: cache.translation.schema,
             pronunciation: cache.pronunciation.schema,
@@ -204,6 +210,10 @@ export default function SchemaEdit() {
             }
             if (schema) {
                 setCache({
+                    cookie_consent: {
+                        initiated: false,
+                        schema: schema.cookie_consent,
+                    },
                     quick_translation: {
                         initiated: false,
                         schema: schema.quick_translation,

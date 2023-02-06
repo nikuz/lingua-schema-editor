@@ -1,9 +1,11 @@
+import { CookieConsentSchemaType } from  './schema-cookie-consent';
 import { QuickTranslationSchemaType } from  './schema-quick-translation';
 import { TranslationSchemaType } from  './schema-translation';
 import { PronunciationSchemaType } from  './schema-pronunciation';
 import { ImagesSchemaType } from  './schema-images';
 
 export interface ResultSchemaType {
+    cookie_consent?: CookieConsentSchemaType,
     quick_translation?: QuickTranslationSchemaType,
     translation?: TranslationSchemaType,
     pronunciation?: PronunciationSchemaType,

@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "lib": ["ES2021"],
+    "target": "ES2021",
+    "module": "commonjs",
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -8,12 +10,10 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "module": "commonjs",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "outDir": "server-build"
   },
-  "lib": ["es20115"],
   "include": [
     "src"
   ]

@@ -15,6 +15,7 @@ interface Props {
     headerSize?: HeaderSize,
     marginTop?: number,
     marginBottom?: number,
+    animated?: boolean,
     children: React.ReactNode,
 }
 
@@ -24,11 +25,13 @@ export default function Collapsable(props: Props) {
         headerSize,
         marginTop,
         marginBottom,
+        animated,
         children,
     } = props;
+    const transitionTimeOut = animated !== false ? 200 : 0;
 
     return (
-        <Accordion disableGutters sx={{ mt: marginTop, mb: marginBottom }}>
+        <Accordion disableGutters sx={{ mt: marginTop, mb: marginBottom }} TransitionProps={{ timeout: transitionTimeOut }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant={headerSize}>
                     {title}
