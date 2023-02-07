@@ -24,6 +24,7 @@ export async function save(req: Request, res: Response) {
     const signature: string = body.signature;
     const word: string = body.word;
     const translation: string = body.translation;
+    const hash: string = body.hash;
     const translateFrom: string = body.translate_from;
     const translateTo: string = body.translate_to;
     const image: string = body.image;
@@ -36,6 +37,7 @@ export async function save(req: Request, res: Response) {
         || !word
         || !translation
         || !checkSignature(signature, word, translation)
+        || !hash
         || !translateFrom
         || !translateTo
         || !image
@@ -58,12 +60,11 @@ export async function save(req: Request, res: Response) {
         return res.end('Failed data structure integrity test');
     }
 
-    let newWord;
-
     try {
-        newWord = await prisma.dictionary.create({
+        await prisma.dictionary.create({
             data: {
                 word,
+                hash,
                 translation,
                 translate_from: translateFromJson,
                 translate_to: translateToJson,
@@ -76,18 +77,19 @@ export async function save(req: Request, res: Response) {
         });
     } catch (err: any) {
         res.status(500);
-        return res.end(`Can't update dictionary entry: ${err?.code}`);
+        return res.end(`Can't save dictionary entry: ${err?.code}`);
     }
 
-    return res.end(newWord.hash);
+    res.status(201);
+    return res.end('OK');
 }
 
 export async function update(req: Request, res: Response) {
     const body = req.body;
     const signature: string = body.signature;
-    const hash: string = body.hash;
     const word: string = body.word;
     const translation: string = body.translation;
+    const hash: string = body.hash;
     const image: string = body.image;
     const pronunciationTo: string = body.pronunciation_to;
     const schemaVersion: string = body.schema_version;

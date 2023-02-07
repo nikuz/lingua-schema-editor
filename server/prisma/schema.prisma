@@ -9,7 +9,7 @@ datasource db {
 
 model dictionary {
   id                  Int         @id @default(autoincrement())
-  hash                String      @unique @default(cuid())
+  hash                String      @unique
   word                String      @db.VarChar(256)
   translation         String      @db.VarChar(256)
   translate_from      Json
