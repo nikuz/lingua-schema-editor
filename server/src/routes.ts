@@ -2,7 +2,11 @@ import path from 'path';
 import { Express, Request } from 'express';
 import proxy from 'express-http-proxy';
 import bodyParser from 'body-parser';
-import { schemaController, languageController } from './controllers';
+import {
+    schemaController,
+    languageController,
+    dictionaryController,
+} from './controllers';
 import { authUtils } from './utils';
 
 exports = module.exports = (app: Express) => {
@@ -60,9 +64,13 @@ exports = module.exports = (app: Express) => {
     app.post('/api/schema/:id', schemaController.update);
     app.delete('/api/schema/:id', schemaController.remove);
 
-    //language
+    // language
     app.get('/api/languages', languageController.getLanguages);
     app.post('/api/languages', languageController.storeLanguages);
+
+    // translation
+    app.post('/api/dictionary', dictionaryController.save);
+    app.put('/api/dictionary', dictionaryController.update);
 
     app.use('/static', (req, res) => {
         res.sendFile(path.resolve(__dirname, `../../build/static/${req.url}`));

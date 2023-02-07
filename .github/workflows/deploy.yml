@@ -13,7 +13,9 @@ jobs:
     - name: Deploy using SSH
       uses: appleboy/ssh-action@master
       env:
-        ENV_SECRET: ${{ secrets.ENV_SECRET_BASE64 }}
+        ADMIN_USER_ID: ${{ secrets.ADMIN_USER_ID }}
+        CRYPTO_SECRET: ${{ secrets.CRYPTO_SECRET }}
+        DBURL: ${{ secrets.DBURL }}
         FIREBASE_SERVER_CONFIG: ${{ secrets.FIREBASE_SERVER_CONFIG }}
         FIREBASE_WEB_CONFIG: ${{ secrets.FIREBASE_WEB_CONFIG }}
       with:
@@ -21,8 +23,9 @@ jobs:
         username: ${{ secrets.HETZNER_DEPLOY_USERNAME }}
         key: ${{ secrets.HETZNER_DEPLOY_KEY }}
         port: 22
-        envs: ENV_SECRET,FIREBASE_SERVER_CONFIG,FIREBASE_WEB_CONFIG
+        envs: ADMIN_USER_ID,CRYPTO_SECRET,DBURL,FIREBASE_SERVER_CONFIG,FIREBASE_WEB_CONFIG
         script_stop: true
+        debug: true
         script: |
           eval `ssh-agent -s`
           ssh-add /home/nikuz/.ssh/github
@@ -32,12 +35,16 @@ jobs:
           cd lingua-schema-editor-deploy
           echo $FIREBASE_WEB_CONFIG > src/wisual-web-firebase.json
           echo $FIREBASE_SERVER_CONFIG > server/src/wisual-firebase.json
-          echo $ENV_SECRET | base64 --decode > .env.secret
+          echo "ADMIN_USER_ID=$ADMIN_USER_ID" >> .env.secret
+          echo "CRYPTO_SECRET=$CRYPTO_SECRET" >> .env.secret
+          echo "DBURL=$DBURL" >> .env.secret
           npm install
           npm run build
           cd server
           npm install
           npm run build
+          npm run prisma-generate
+          DBURL=$DBURL npx prisma migrate deploy
           cd $HOME
           pm2 stop wisual
           rm -rf lingua-schema-editor

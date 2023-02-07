@@ -42,3 +42,14 @@ export function decrypt(text: string): string {
 
     return Buffer.concat([decrypted, decipher.final()]).toString();
 }
+
+export function hash(text: string): string {
+    if (!secret) {
+        throw new Error('Can\'t encrypt text. Secret doesn\'t exist');
+    }
+
+    const hmac = crypto.createHmac(hashMethod, secret);
+    hmac.update(text);
+
+    return hmac.digest('hex');
+}
