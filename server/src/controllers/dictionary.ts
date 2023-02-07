@@ -58,19 +58,26 @@ export async function save(req: Request, res: Response) {
         return res.end('Failed data structure integrity test');
     }
 
-    const newWord = await prisma.dictionary.create({
-        data: {
-            word,
-            translation,
-            translate_from: translateFromJson,
-            translate_to: translateToJson,
-            image,
-            pronunciation_from: pronunciationFrom,
-            pronunciation_to: pronunciationTo,
-            schema_version: schemaVersion,
-            raw,
-        },
-    });
+    let newWord;
+
+    try {
+        newWord = await prisma.dictionary.create({
+            data: {
+                word,
+                translation,
+                translate_from: translateFromJson,
+                translate_to: translateToJson,
+                image,
+                pronunciation_from: pronunciationFrom,
+                pronunciation_to: pronunciationTo,
+                schema_version: schemaVersion,
+                raw,
+            },
+        });
+    } catch (err: any) {
+        res.status(500);
+        return res.end(`Can't update dictionary entry: ${err?.code}`);
+    }
 
     return res.end(newWord.hash);
 }
@@ -98,18 +105,23 @@ export async function update(req: Request, res: Response) {
         return res.end('Incorrect body parameters');
     }
 
-    await prisma.dictionary.update({
-        where: {
-            hash: hash,
-        },
-        data: {
-            translation,
-            image,
-            pronunciation_to: pronunciationTo,
-            schema_version: schemaVersion,
-            updated_at: new Date().toISOString(),
-        },
-    });
+    try {
+        await prisma.dictionary.update({
+            where: {
+                hash: hash,
+            },
+            data: {
+                translation,
+                image,
+                pronunciation_to: pronunciationTo,
+                schema_version: schemaVersion,
+                updated_at: new Date().toISOString(),
+            },
+        });
+    } catch (err: any) {
+        res.status(500);
+        return res.end(`Can't update dictionary entry: ${err?.code}`);
+    }
 
     return res.end('OK');
 }
