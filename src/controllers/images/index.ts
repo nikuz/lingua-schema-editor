@@ -1,0 +1,1 @@
+export * as imagesController from './controller';

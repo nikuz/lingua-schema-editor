@@ -4,18 +4,15 @@ import {
     Collapsable,
     Form,
 } from 'src/components';
-import { consentController } from 'src/controllers';
-import { useAuthTokenId } from 'src/providers/firebase';
+import { consentController, useAuthTokenId } from 'src/controllers';
 import {
     FormFields,
     LanguagesType,
     CookieConsentSchemaTypeFieldsName,
-} from 'src/types';
-import {
     SchemaEditCache,
     SchemaEditCacheKeys,
     SetSchemaEditCacheCallback,
-} from '../types';
+} from 'src/types';
 import SchemaEditCookieConsentPreview from './components/preview';
 
 const {

@@ -1,0 +1,1 @@
+export * as translationController from './controller';

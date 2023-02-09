@@ -20,18 +20,18 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Loading, Prompt, SaveHotkey } from 'src/components';
 import { routerConstants } from 'src/constants';
 import { routerUtils, schemaUtils } from 'src/utils';
-import { useGetLanguages } from 'src/providers/language';
-import { useAuthTokenId } from 'src/providers/firebase';
 import {
+    useGetLanguages,
+    useAuthTokenId,
     useGetSchema,
     useAddSchema,
     useUpdateSchema,
-} from 'src/providers/schema';
+} from 'src/controllers';
 import { ResultSchemaType } from 'src/types';
 import {
     SchemaEditCache,
     SetSchemaEditCacheCallback,
-} from './types';
+} from 'src/types';
 // import data from 'src/data/man.json';
 
 const tabs = [{

@@ -1,17 +1,14 @@
 import React, {useState, useCallback, useEffect} from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Form, Collapsable } from 'src/components';
-import { imagesController } from 'src/controllers';
-import { useAuthTokenId } from 'src/providers/firebase';
+import { imagesController, useAuthTokenId } from 'src/controllers';
 import {
     FormFields,
     ImagesSchemaTypeFieldsName,
-} from 'src/types';
-import {
     SchemaEditCache,
     SchemaEditCacheKeys,
     SetSchemaEditCacheCallback,
-} from '../types';
+} from 'src/types';
 import SchemaEditImagesPreview from './components/preview';
 import './SchemaEditImages.css';
 

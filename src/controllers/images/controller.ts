@@ -1,24 +1,24 @@
 import { apiUtils } from 'src/utils';
-import { ObjectDataString, ProxyResponse } from '../types';
-import * as consentController from './consent';
+import { ObjectDataString, ProxyResponse } from 'src/types';
+import { consentController } from '../consent';
 
 interface Props {
     url: string,
-    body?: URLSearchParams,
+    userAgent: string,
     token: string,
 }
 
-export function translate(props: Props): Promise<string> {
+export function get(props: Props): Promise<string> {
     const {
         url,
-        body,
+        userAgent,
         token,
     } = props;
 
     const headers: ObjectDataString = {
         'authorization': token,
         'authorization-origin': new URL(url).origin,
-        'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        'user-agent': userAgent,
     };
 
     const cookie = apiUtils.getCookie();
@@ -27,9 +27,7 @@ export function translate(props: Props): Promise<string> {
     }
 
     return fetch(`${apiUtils.getApiUrl()}/api/proxy?url=${encodeURIComponent(url)}`, {
-        method: 'POST',
-        headers: headers,
-        body: body,
+        headers
     }).then(async (response) => {
         const data: ProxyResponse = await response.json();
         if (data.headers['set-cookie']) {
@@ -37,12 +35,13 @@ export function translate(props: Props): Promise<string> {
         }
         if (data.statusCode === 200) {
             return data.text;
-        } else if (data.statusCode === 302 && data.headers['location'].includes('consent')) {
+        }
+        else if (data.statusCode === 302 && data.headers['location'].includes('consent')) {
             await consentController.acquire({
                 url: data.headers['location'],
                 token,
             });
-            return translate(props);
+            return get(props);
         }
         throw new Error(data.text || response.status.toString());
     });

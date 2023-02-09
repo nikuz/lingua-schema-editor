@@ -1,4 +1,6 @@
-export * as translationController from './translation';
-export * as imagesController from './images';
-export * as languagesController from './languages';
-export * as consentController from './consent';
+export * from './consent';
+export * from './firebase';
+export * from './images';
+export * from './language';
+export * from './schema';
+export * from './translation';

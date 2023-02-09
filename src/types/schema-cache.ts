@@ -4,7 +4,7 @@ import {
     PronunciationSchemaType,
     QuickTranslationSchemaType,
     TranslationSchemaType,
-} from 'src/types';
+} from 'server-types';
 
 export interface SchemaEditCache {
     cookie_consent: SchemaEditCacheCookieConsent,

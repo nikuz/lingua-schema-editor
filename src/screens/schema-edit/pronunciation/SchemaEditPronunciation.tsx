@@ -4,20 +4,17 @@ import {
     Collapsable,
     Form,
 } from 'src/components';
-import { translationController } from 'src/controllers';
-import { useAuthTokenId } from 'src/providers/firebase';
+import { translationController, useAuthTokenId } from 'src/controllers';
 import { jsonUtils } from 'src/utils';
 import {
     FormFields,
     PronunciationSchemaType,
     PronunciationSchemaTypeFieldsName,
     LanguagesType,
-} from 'src/types';
-import {
     SchemaEditCache,
     SchemaEditCacheKeys,
     SetSchemaEditCacheCallback,
-} from '../types';
+} from 'src/types';
 import SchemaEditPronunciationBuilder from './components/schema-builder';
 import SchemaEditPronunciationPreview from './components/preview';
 

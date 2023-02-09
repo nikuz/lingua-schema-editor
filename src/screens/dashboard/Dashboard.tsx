@@ -24,12 +24,12 @@ import {
     Loading,
     Prompt,
 } from 'src/components';
-import { useAuthTokenId } from 'src/providers/firebase';
 import {
+    useAuthTokenId,
     useGetSchemaList,
     useSetCurrentSchema,
     useRemoveSchema,
-} from 'src/providers/schema';
+} from 'src/controllers';
 import { routerConstants } from 'src/constants';
 import { routerUtils } from 'src/utils';
 import './Dashboard.css';

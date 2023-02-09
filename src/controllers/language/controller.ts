@@ -4,16 +4,16 @@ import {
     ObjectDataString,
     ProxyResponse,
 } from 'src/types';
-import * as consentController from './consent';
+import { consentController } from '../consent';
 
 const languageCodesRegExp = /data:\s?(\[\[\["auto",\s?"Detect language"[^\n]+]]]),/;
 
-interface Props {
+interface RetrieveProps {
     url: string,
     token: string,
 }
 
-export function retrieve(props: Props): Promise<LanguagesType> {
+export function retrieve(props: RetrieveProps): Promise<LanguagesType> {
     const {
         url,
         token,
@@ -67,5 +67,62 @@ export function retrieve(props: Props): Promise<LanguagesType> {
             return retrieve(props);
         }
         throw new Error(data.text || data.statusCode.toString());
+    });
+}
+
+
+export interface GetLanguagesProps {
+    token: string,
+    signal?: AbortSignal,
+}
+
+export function getLanguages(props: GetLanguagesProps): Promise<LanguagesType> {
+    const {
+        token,
+        signal,
+    } = props;
+
+    return fetch(`${apiUtils.getApiUrl()}/api/auth/languages`, {
+        signal,
+        headers: {
+            'content-type': 'application/json',
+            'authorization': token,
+        },
+    }).then(async (response) => {
+        if (response.ok) {
+            return await response.json();
+        }
+        const text = await response.text();
+        throw new Error(text || response.status.toString());
+    });
+}
+
+export interface StoreLanguagesProps {
+    token: string,
+    languages: LanguagesType,
+    signal?: AbortSignal,
+}
+
+export function storeLanguages(props: StoreLanguagesProps): Promise<LanguagesType> {
+    const {
+        token,
+        languages,
+        signal,
+    } = props;
+
+    return fetch(`${apiUtils.getApiUrl()}/api/auth/languages`, {
+        method: 'POST',
+        signal,
+        headers: {
+            'content-type': 'application/json',
+            'authorization': token,
+        },
+        body: JSON.stringify(languages),
+    }).then(async (response) => {
+        if (response.ok) {
+            return await response.json();
+        }
+        const text = await response.text();
+        throw new Error(text || response.status.toString());
     });
 }

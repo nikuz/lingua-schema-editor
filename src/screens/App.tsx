@@ -23,7 +23,7 @@ import {
     useAuthState,
     authInstance,
     signOut,
-} from 'src/providers/firebase';
+} from 'src/controllers';
 import './App.css';
 
 const DRAWER_WIDTH = 64;

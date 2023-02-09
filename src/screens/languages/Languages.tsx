@@ -13,9 +13,12 @@ import {
     Form,
     Loading,
 } from 'src/components';
-import { languagesController } from 'src/controllers';
-import { useGetLanguages, useStoreLanguages } from 'src/providers/language';
-import { useAuthTokenId } from 'src/providers/firebase';
+import {
+    languageController,
+    useGetLanguages,
+    useStoreLanguages,
+} from 'src/controllers';
+import { useAuthTokenId } from 'src/controllers/firebase';
 import { FormFields, LanguagesType } from 'src/types';
 import './Languages.css';
 
@@ -49,7 +52,7 @@ export default function Languages() {
             return Promise.resolve();
         }
         return new Promise((resolve, reject) => {
-            languagesController.retrieve({
+            languageController.retrieve({
                 url: fields.url.value,
                 token: userTokenId,
             }).then(response => {

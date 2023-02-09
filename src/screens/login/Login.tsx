@@ -12,7 +12,7 @@ import {
     authInstance,
     useAuthState,
     signInWithEmailAndPassword,
-} from 'src/providers/firebase';
+} from 'src/controllers';
 import { routerConstants } from 'src/constants';
 import './Login.css';
 
