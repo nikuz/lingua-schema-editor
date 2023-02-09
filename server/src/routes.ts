@@ -56,17 +56,17 @@ exports = module.exports = (app: Express) => {
     app.use(bodyParser.urlencoded({ extended: true }));
 
     // schema
-    app.get('/api/schemas', schemaController.getList);
-    app.post('/api/schemas', schemaController.add);
-    app.get('/api/schema/current', schemaController.getCurrent);
-    app.get('/api/schema/:id', schemaController.get);
-    app.put('/api/schema/:id', schemaController.setCurrent);
-    app.post('/api/schema/:id', schemaController.update);
-    app.delete('/api/schema/:id', schemaController.remove);
+    app.get('/api/auth/schemas', schemaController.getList);
+    app.post('/api/auth/schemas', schemaController.add);
+    app.get('/api/auth/schema/:id', schemaController.get);
+    app.get('/api/schema/:id', schemaController.getEncrypted);
+    app.put('/api/auth/schema/:id', schemaController.setCurrent);
+    app.post('/api/auth/schema/:id', schemaController.update);
+    app.delete('/api/auth/schema/:id', schemaController.remove);
 
     // language
-    app.get('/api/languages', languageController.getLanguages);
-    app.post('/api/languages', languageController.storeLanguages);
+    app.get('/api/auth/languages', languageController.getLanguages);
+    app.post('/api/auth/languages', languageController.storeLanguages);
 
     // translation
     app.post('/api/dictionary', dictionaryController.save);

@@ -2,14 +2,18 @@ import fs from 'fs';
 import path from 'path';
 import { Request, Response } from 'express';
 import { authUtils, schemaUtils, cryptoUtils } from '../utils';
-import { ObjectData } from '../types';
+import {
+    CloudSchemaType,
+    ObjectData,
+    ObjectDataString,
+} from '../types';
 
-let currentSchemaCache: string;
+const encryptedSchemasCache: ObjectDataString = {};
 const schemasDirectoryPath = path.resolve(process.env.STATIC_FILES_DIRECTORY ?? '', 'schemas');
 
 export async function getList(req: Request, res: Response) {
-    if (!(await authUtils.isAuthorized(req, res))) {
-        return;
+    if (!(await authUtils.isAuthorized(req))) {
+        return authUtils.respondUnauthorized(res);
     }
 
     if (!fs.existsSync(schemasDirectoryPath)) {
@@ -39,8 +43,8 @@ export async function getList(req: Request, res: Response) {
 }
 
 export async function add(req: Request, res: Response) {
-    if (!(await authUtils.isAuthorized(req, res))) {
-        return;
+    if (!(await authUtils.isAuthorized(req))) {
+        return authUtils.respondUnauthorized(res);
     }
 
     if (!fs.existsSync(schemasDirectoryPath)) {
@@ -58,12 +62,14 @@ export async function add(req: Request, res: Response) {
     const data = JSON.stringify(body);
     fs.writeFileSync(filePath, data);
 
+    encryptedSchemasCache[body.version] = cryptoUtils.encrypt(data);
+
     return res.end(data);
 }
 
 export async function update(req: Request, res: Response) {
-    if (!(await authUtils.isAuthorized(req, res))) {
-        return;
+    if (!(await authUtils.isAuthorized(req))) {
+        return authUtils.respondUnauthorized(res);
     }
 
     const params = req.params;
@@ -74,7 +80,7 @@ export async function update(req: Request, res: Response) {
         return res.end('Can\'t find schema with provided id');
     }
 
-    const body = req.body;
+    const body: CloudSchemaType = req.body;
 
     if (body.current && !schemaUtils.validateIntegrity(JSON.parse(body.schema))) {
         res.status(406);
@@ -84,17 +90,18 @@ export async function update(req: Request, res: Response) {
     const data = JSON.stringify(body);
     fs.writeFileSync(schemaPath, data);
 
-    if (body.current === true) {
+    if (body.current) {
         fs.writeFileSync(path.resolve(schemasDirectoryPath, 'current.json'), data);
-        currentSchemaCache = cryptoUtils.encrypt(data);
     }
+
+    encryptedSchemasCache[body.version] = cryptoUtils.encrypt(data);
 
     return res.end(data);
 }
 
 export async function get(req: Request, res: Response) {
-    if (!(await authUtils.isAuthorized(req, res))) {
-        return;
+    if (!(await authUtils.isAuthorized(req))) {
+        return authUtils.respondUnauthorized(res);
     }
 
     const params = req.params;
@@ -105,32 +112,33 @@ export async function get(req: Request, res: Response) {
         return res.end('Can\'t find schema with provided id');
     }
 
-    return res.end(fs.readFileSync(schemaPath));
+    res.end(fs.readFileSync(schemaPath));
 }
 
-export function getCurrent(req: Request, res: Response) {
-    const schemaPath = path.resolve(schemasDirectoryPath, 'current.json');
+export function getEncrypted(req: Request, res: Response) {
+    const params = req.params;
+    const schemaPath = path.resolve(schemasDirectoryPath, `${params.id}.json`);
 
     if (!fs.existsSync(schemaPath)) {
         res.status(404);
-        return res.end('Can\'t find "current" schema');
+        return res.end('Can\'t find schema with provided id');
     }
 
     // take "current" schema from memory cache if available
     let data;
-    if (currentSchemaCache) {
-        data = currentSchemaCache;
+    if (encryptedSchemasCache[params.id]) {
+        data = encryptedSchemasCache[params.id];
     } else {
         data = cryptoUtils.encrypt(fs.readFileSync(schemaPath).toString());
-        currentSchemaCache = data;
+        encryptedSchemasCache[params.id] = data;
     }
 
     return res.end(data);
 }
 
 export async function setCurrent(req: Request, res: Response) {
-    if (!(await authUtils.isAuthorized(req, res))) {
-        return;
+    if (!(await authUtils.isAuthorized(req))) {
+        return authUtils.respondUnauthorized(res);
     }
 
     if (!fs.existsSync(schemasDirectoryPath)) {
@@ -181,7 +189,7 @@ export async function setCurrent(req: Request, res: Response) {
             current: true,
         });
         // update "current" schema memory cache
-        currentSchemaCache = cryptoUtils.encrypt(data);
+        encryptedSchemasCache.current = cryptoUtils.encrypt(data);
         fs.writeFileSync(currentSchemaFileName, data);
         fs.writeFileSync(`${schemasDirectoryPath}/current.json`, data);
 
@@ -193,8 +201,8 @@ export async function setCurrent(req: Request, res: Response) {
 }
 
 export async function remove(req: Request, res: Response) {
-    if (!(await authUtils.isAuthorized(req, res))) {
-        return;
+    if (!(await authUtils.isAuthorized(req))) {
+        return authUtils.respondUnauthorized(res);
     }
 
     const params = req.params;

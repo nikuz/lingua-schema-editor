@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { firebaseController } from '../controllers';
 
-export async function isAuthorized(req: Request, res: Response) {
+export async function isAuthorized(req: Request) {
     const authToken = req.headers['authorization']?.toString();
     let isAuthorized = false;
 
@@ -13,10 +13,10 @@ export async function isAuthorized(req: Request, res: Response) {
         }
     }
 
-    if (!isAuthorized) {
-        res.status(403);
-        res.end('Unauthorized');
-    }
-
     return isAuthorized;
+}
+
+export async function respondUnauthorized(res: Response) {
+    res.status(403);
+    res.end('Unauthorized');
 }

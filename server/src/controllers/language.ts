@@ -6,8 +6,8 @@ import { authUtils } from '../utils';
 const languagesFilePath = path.resolve(process.env.STATIC_FILES_DIRECTORY ?? '', 'languages/languages.json');
 
 export async function getLanguages(req: Request, res: Response) {
-    if (!(await authUtils.isAuthorized(req, res))) {
-        return;
+    if (!(await authUtils.isAuthorized(req))) {
+        return authUtils.respondUnauthorized(res);
     }
 
     if (!fs.existsSync(languagesFilePath)) {
@@ -18,8 +18,8 @@ export async function getLanguages(req: Request, res: Response) {
 }
 
 export async function storeLanguages(req: Request, res: Response) {
-    if (!(await authUtils.isAuthorized(req, res))) {
-        return;
+    if (!(await authUtils.isAuthorized(req))) {
+        return authUtils.respondUnauthorized(res);
     }
 
     const directory = path.dirname(languagesFilePath);
