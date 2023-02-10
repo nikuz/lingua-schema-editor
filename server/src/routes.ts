@@ -65,7 +65,7 @@ exports = module.exports = (app: Express) => {
     app.delete('/api/auth/schema/:id', schemaController.remove);
 
     // language
-    app.get('/api/auth/languages', languageController.getLanguages);
+    app.get('/api/languages', languageController.getLanguages);
     app.post('/api/auth/languages', languageController.storeLanguages);
 
     // translation

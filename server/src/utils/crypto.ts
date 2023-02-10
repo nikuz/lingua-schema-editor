@@ -8,7 +8,7 @@ const iv = crypto.randomBytes(16);
 
 function normalizeSecret(secret?: string): string | undefined {
     if (secret) {
-        return crypto.createHash(hashMethod).update(String(secret)).digest('base64').substring(0, numKeyBytes);
+        return crypto.createHash(hashMethod).update(secret).digest('base64').substring(0, numKeyBytes);
     }
 
     return undefined;

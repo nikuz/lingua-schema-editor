@@ -39,6 +39,7 @@ export async function getList(req: Request, res: Response) {
         }
     }
 
+    res.setHeader('content-type', 'application/json');
     return res.end(JSON.stringify(schemas));
 }
 
@@ -64,6 +65,7 @@ export async function add(req: Request, res: Response) {
 
     encryptedSchemasCache[body.version] = cryptoUtils.encrypt(data);
 
+    res.setHeader('content-type', 'application/json');
     return res.end(data);
 }
 
@@ -96,6 +98,7 @@ export async function update(req: Request, res: Response) {
 
     encryptedSchemasCache[body.version] = cryptoUtils.encrypt(data);
 
+    res.setHeader('content-type', 'application/json');
     return res.end(data);
 }
 
@@ -112,6 +115,7 @@ export async function get(req: Request, res: Response) {
         return res.end('Can\'t find schema with provided id');
     }
 
+    res.setHeader('content-type', 'application/json');
     res.end(fs.readFileSync(schemaPath));
 }
 
@@ -193,6 +197,7 @@ export async function setCurrent(req: Request, res: Response) {
         fs.writeFileSync(currentSchemaFileName, data);
         fs.writeFileSync(`${schemasDirectoryPath}/current.json`, data);
 
+        res.setHeader('content-type', 'application/json');
         return res.end(data);
     }
 

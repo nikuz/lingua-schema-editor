@@ -82,7 +82,7 @@ export function getLanguages(props: GetLanguagesProps): Promise<LanguagesType> {
         signal,
     } = props;
 
-    return fetch(`${apiUtils.getApiUrl()}/api/auth/languages`, {
+    return fetch(`${apiUtils.getApiUrl()}/api/languages`, {
         signal,
         headers: {
             'content-type': 'application/json',
