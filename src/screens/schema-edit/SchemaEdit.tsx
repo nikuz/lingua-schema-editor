@@ -27,7 +27,6 @@ import {
     useAddSchema,
     useUpdateSchema,
 } from 'src/controllers';
-import { ResultSchemaType } from 'src/types';
 import {
     SchemaEditCache,
     SetSchemaEditCacheCallback,
@@ -128,13 +127,13 @@ export default function SchemaEdit() {
             return;
         }
 
-        const schema = JSON.stringify({
+        const schema = {
             cookie_consent: cache.cookie_consent.schema,
             quick_translation: cache.quick_translation.schema,
             translation: cache.translation.schema,
             pronunciation: cache.pronunciation.schema,
             images: cache.images.schema,
-        });
+        };
 
         if (isNew) {
             addSchema({
@@ -202,12 +201,7 @@ export default function SchemaEdit() {
 
     useEffect(() => {
         if (schemaFromCloud) {
-            let schema: ResultSchemaType | undefined;
-            try {
-                schema = JSON.parse(schemaFromCloud.schema);
-            } catch (e) {
-                console.log(e);
-            }
+            let schema = schemaFromCloud.schema;
             if (schema) {
                 setCache({
                     cookie_consent: {

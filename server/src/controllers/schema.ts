@@ -4,7 +4,6 @@ import { Request, Response } from 'express';
 import { authUtils, schemaUtils, cryptoUtils } from '../utils';
 import {
     CloudSchemaType,
-    ObjectData,
     ObjectDataString,
 } from '../types';
 
@@ -84,7 +83,7 @@ export async function update(req: Request, res: Response) {
 
     const body: CloudSchemaType = req.body;
 
-    if (body.current && !schemaUtils.validateIntegrity(JSON.parse(body.schema))) {
+    if (body.current && !schemaUtils.validateIntegrity(body.schema)) {
         res.status(406);
         return res.end('Failed schema integrity check');
     }
@@ -152,9 +151,9 @@ export async function setCurrent(req: Request, res: Response) {
 
     const params = req.params;
     const schemasFiles = fs.readdirSync(schemasDirectoryPath);
-    let currentSchema: ObjectData | undefined;
+    let currentSchema: CloudSchemaType | undefined;
     let currentSchemaFileName: string | undefined;
-    let prevCurrentSchema: ObjectData | undefined;
+    let prevCurrentSchema: CloudSchemaType | undefined;
     let prevCurrentSchemaFileName: string | undefined;
 
     for (const file of schemasFiles) {
@@ -176,7 +175,7 @@ export async function setCurrent(req: Request, res: Response) {
     }
 
     if (currentSchemaFileName && currentSchema) {
-        if (!schemaUtils.validateIntegrity(JSON.parse(currentSchema.schema))) {
+        if (!schemaUtils.validateIntegrity(currentSchema.schema)) {
             res.status(406);
             return res.end('Failed schema integrity check');
         }
