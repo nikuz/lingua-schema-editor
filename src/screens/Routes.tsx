@@ -17,7 +17,6 @@ import SchemaEditTranslation from './schema-edit/translation';
 import SchemaEditPronunciation from './schema-edit/pronunciation';
 import SchemaEditImages from './schema-edit/images';
 import Languages from './languages';
-import PrivacyPolicy from './privacy-policy';
 
 export default function AppRoutes() {
     return (
@@ -61,7 +60,6 @@ export default function AppRoutes() {
                         path={routerConstants.LANGUAGES}
                         element={<Languages />}
                     />
-                    <Route path={routerConstants.PRIVACY_POLICY} element={<PrivacyPolicy />}/>
                     <Route path='*' element={<NotFound />}/>
                 </Route>
             </Routes>

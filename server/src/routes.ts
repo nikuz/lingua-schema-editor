@@ -72,6 +72,11 @@ exports = module.exports = (app: Express) => {
     app.post('/api/dictionary', dictionaryController.save);
     app.put('/api/dictionary', dictionaryController.update);
 
+    // privacy policy
+    app.get('/privacy-policy', (req, res) => {
+        res.sendFile(path.resolve(__dirname, '../../build/privacy-policy.html'));
+    });
+
     app.use('/static', (req, res) => {
         res.sendFile(path.resolve(__dirname, `../../build/static/${req.url}`));
     });

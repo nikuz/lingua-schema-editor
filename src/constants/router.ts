@@ -6,4 +6,3 @@ export const SCHEMA_EDIT_QUICK_TRANSLATION = '/schema-edit/:version/quick-transl
 export const SCHEMA_EDIT_TRANSLATION = '/schema-edit/:version/translation';
 export const SCHEMA_EDIT_PRONUNCIATION = '/schema-edit/:version/pronunciation';
 export const SCHEMA_EDIT_IMAGES = '/schema-edit/:version/images';
-export const PRIVACY_POLICY = '/privacy-policy';
