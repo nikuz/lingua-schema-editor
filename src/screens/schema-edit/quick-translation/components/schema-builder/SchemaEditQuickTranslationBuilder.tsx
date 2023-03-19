@@ -35,6 +35,12 @@ export default function SchemaEditQuickTranslationBuilder(props: Props) {
                 Schema Builder
             </Typography>
             <SchemaItem
+                title="Auto language code"
+                data={data}
+                schema={schema}
+                schemaPath="auto_language_code.value"
+            />
+            <SchemaItem
                 title="Sentences"
                 renderType={SchemaItemRenderType.list}
                 data={data}

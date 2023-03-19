@@ -9,6 +9,7 @@ export function validateIntegrity(schema: ResultSchemaType): boolean {
 
         // quick translation
         || !schema.quick_translation?.fields.url
+        || !schema.quick_translation.auto_language_code?.value
         || !schema.quick_translation.sentences?.original_word?.value
         || !schema.quick_translation.sentences.translation?.value
 
