@@ -22,15 +22,8 @@ function checkSignature(signature: string, word: string, translation: string): b
     return signatureData && signatureData.word === word && signatureData.translation === translation;
 }
 
-function checkImage(image: string, res: Response): boolean {
-    const imageData = image.match(IMAGE_BASE64_REG);
-    if (!imageData) {
-        res.status(406);
-        res.end('Image is not in base64 format');
-        return false;
-    }
-
-    return true;
+function checkImage(image: string): boolean {
+    return !!image.match(IMAGE_BASE64_REG);
 }
 
 function saveImage(id: number, word: string, image: string): string | undefined {
@@ -51,15 +44,8 @@ function saveImage(id: number, word: string, image: string): string | undefined 
     return `/images/${fileName}`;
 }
 
-function checkPronunciation(pronunciation: string, res: Response): boolean {
-    const pronunciationData = pronunciation.match(PRONUNCIATION_BASE64_REG);
-    if (!pronunciationData) {
-        res.status(406);
-        res.end('Pronunciation is not in base64 format');
-        return false;
-    }
-
-    return true;
+function checkPronunciation(pronunciation: string): boolean {
+    return !!pronunciation.match(PRONUNCIATION_BASE64_REG);
 }
 
 function savePronunciation(id: number, prefix: string, word: string, pronunciation: string): string | undefined {
@@ -105,20 +91,16 @@ export async function save(req: Request, res: Response) {
         || !translateFrom
         || !translateTo
         || !image
+        || !checkImage(image)
         || !pronunciationFrom
+        || !checkPronunciation(pronunciationFrom)
         || !pronunciationTo
+        || !checkPronunciation(pronunciationTo)
         || !schemaVersion
         || !raw
     ) {
         res.status(406);
         return res.end('Incorrect body parameters');
-    }
-
-    if (!checkImage(image, res)
-        || !checkPronunciation(pronunciationFrom, res)
-        || !checkPronunciation(pronunciationTo, res)
-    ) {
-        return;
     }
 
     let translateFromJson;
@@ -185,15 +167,13 @@ export async function update(req: Request, res: Response) {
         || !checkSignature(signature, word, translation)
         || !hash
         || !image
+        || !checkImage(image)
         || !pronunciationTo
+        || !checkPronunciation(pronunciationTo)
         || !schemaVersion
     ) {
         res.status(406);
         return res.end('Incorrect body parameters');
-    }
-
-    if (!checkImage(image, res) || !checkPronunciation(pronunciationTo, res)) {
-        return;
     }
 
     const dictionaryEntry = await prisma.dictionary.findFirst({
