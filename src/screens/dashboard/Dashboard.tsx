@@ -14,12 +14,13 @@ import {
     Alert,
     Typography,
     Box,
+    Container,
 } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import StarHalfIcon from '@mui/icons-material/StarHalf';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import {
     Loading,
     Prompt,
@@ -99,98 +100,113 @@ export default function Dashboard() {
         }
     }, [userTokenId, getSchemasListLoading, getSchemasListError, schemasList, getSchemasList]);
 
-    return <>
-        <TableContainer component={Paper}>
-            <Table aria-label="simple table">
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Current</TableCell>
-                        <TableCell>Version</TableCell>
-                        <TableCell>Created At</TableCell>
-                        <TableCell>Updated At</TableCell>
-                        <TableCell>Actions</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {schemasList?.map((item, key) => {
-                        const createdAt = item.createdAt && new Date(item.createdAt);
-                        const updatedAt = item.updatedAt && new Date(item.updatedAt);
-
-                        return (
-                            <TableRow key={key}>
-                                <TableCell sx={{ pl: 3 }}>
-                                    {item.current && <StarIcon color="warning" />}
-                                </TableCell>
-                                <TableCell>
-                                    {item.version}
-                                </TableCell>
-                                <TableCell>{createdAt && `${createdAt.toLocaleDateString()} ${createdAt.toLocaleTimeString()}`}</TableCell>
-                                <TableCell>{updatedAt && `${updatedAt.toLocaleDateString()} ${updatedAt.toLocaleTimeString()}`}</TableCell>
-                                <TableCell sx={{ width: 190 }}>
-                                    <IconButton
-                                        className="dashboard-action-btn"
-                                        onClick={() => navigate(getSchemaEditUrl(item.version))}
-                                    >
-                                        <CreateIcon color="primary" />
-                                    </IconButton>
-                                    <IconButton
-                                        className={cl('dashboard-action-btn', { disabled: item.current })}
-                                        disabled={item.current}
-                                        onClick={() => setChangeCurrentPrompt(item.version)}
-                                    >
-                                        <StarHalfIcon color={item.current ? 'inherit' : 'primary'} />
-                                    </IconButton>
-                                    <IconButton
-                                        className={cl('dashboard-action-btn', { disabled: item.current })}
-                                        disabled={item.current}
-                                        onClick={() => setRemovePrompt(item.version)}
-                                    >
-                                        <DeleteIcon color={item.current ? 'inherit' : 'error'} />
-                                    </IconButton>
-                                </TableCell>
-                            </TableRow>
-                        );
-                    })}
-                </TableBody>
-            </Table>
-        </TableContainer>
-        {error && (
-            <Alert sx={{ mt: 3 }} severity="error">{error.message}</Alert>
-        )}
-        <Button
-            variant="contained"
-            color="success"
-            sx={{ mt: 3 }}
-            onClick={() => navigate(getSchemaEditUrl('new'))}
-        >
-            <AddIcon />
-            Add
-        </Button>
-        {schemasList && schemasList.length === 0 && (
-            <Box sx={{ mt: 3, textAlign: 'center' }}>
-                <Typography variant="body2">No schemas found</Typography>
+    return (
+        <Container>
+            <Box
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    mb: 2,
+                }}
+            >
+                <Typography variant="h4">
+                    <AccountTreeIcon fontSize="large" sx={{ verticalAlign: 'middle', mr: 1 }} />
+                    <span style={{ verticalAlign: 'middle' }}>
+                    Schemas
+                </span>
+                </Typography>
+                <Button
+                    variant="contained"
+                    color="success"
+                    onClick={() => navigate(getSchemaEditUrl('new'))}
+                >
+                    Create new scheme
+                </Button>
             </Box>
-        )}
-        {changeCurrentPrompt && (
-            <Prompt
-                isOpen
-                title={`Change current schema to "${changeCurrentPrompt}"?`}
-                onCancel={() => {
-                    setChangeCurrentPrompt(undefined);
-                }}
-                onConfirm={changeCurrentHandler}
-            />
-        )}
-        {removePrompt && (
-            <Prompt
-                isOpen
-                title={`Remove schema "${removePrompt}"?`}
-                onCancel={() => {
-                    setRemovePrompt(undefined);
-                }}
-                onConfirm={removeSchemaHandler}
-            />
-        )}
-        {loading && <Loading blocker fixed />}
-    </>
+            <TableContainer component={Paper}>
+                <Table aria-label="simple table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Current</TableCell>
+                            <TableCell>Version</TableCell>
+                            <TableCell>Created At</TableCell>
+                            <TableCell>Updated At</TableCell>
+                            <TableCell>Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {schemasList?.map((item, key) => {
+                            const createdAt = item.createdAt && new Date(item.createdAt);
+                            const updatedAt = item.updatedAt && new Date(item.updatedAt);
+
+                            return (
+                                <TableRow key={key}>
+                                    <TableCell sx={{ pl: 3 }}>
+                                        {item.current && <StarIcon color="warning" />}
+                                    </TableCell>
+                                    <TableCell>
+                                        {item.version}
+                                    </TableCell>
+                                    <TableCell>{createdAt && `${createdAt.toLocaleDateString()} ${createdAt.toLocaleTimeString()}`}</TableCell>
+                                    <TableCell>{updatedAt && `${updatedAt.toLocaleDateString()} ${updatedAt.toLocaleTimeString()}`}</TableCell>
+                                    <TableCell sx={{ width: 190 }}>
+                                        <IconButton
+                                            className="dashboard-action-btn"
+                                            onClick={() => navigate(getSchemaEditUrl(item.version))}
+                                        >
+                                            <CreateIcon color="primary" />
+                                        </IconButton>
+                                        <IconButton
+                                            className={cl('dashboard-action-btn', { disabled: item.current })}
+                                            disabled={item.current}
+                                            onClick={() => setChangeCurrentPrompt(item.version)}
+                                        >
+                                            <StarHalfIcon color={item.current ? 'inherit' : 'primary'} />
+                                        </IconButton>
+                                        <IconButton
+                                            className={cl('dashboard-action-btn', { disabled: item.current })}
+                                            disabled={item.current}
+                                            onClick={() => setRemovePrompt(item.version)}
+                                        >
+                                            <DeleteIcon color={item.current ? 'inherit' : 'error'} />
+                                        </IconButton>
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            {error && (
+                <Alert sx={{ mt: 3 }} severity="error">{error.message}</Alert>
+            )}
+            {schemasList && schemasList.length === 0 && (
+                <Box sx={{ mt: 3, textAlign: 'center' }}>
+                    <Typography variant="body2">No schemas found</Typography>
+                </Box>
+            )}
+            {changeCurrentPrompt && (
+                <Prompt
+                    isOpen
+                    title={`Change current schema to "${changeCurrentPrompt}"?`}
+                    onCancel={() => {
+                        setChangeCurrentPrompt(undefined);
+                    }}
+                    onConfirm={changeCurrentHandler}
+                />
+            )}
+            {removePrompt && (
+                <Prompt
+                    isOpen
+                    title={`Remove schema "${removePrompt}"?`}
+                    onCancel={() => {
+                        setRemovePrompt(undefined);
+                    }}
+                    onConfirm={removeSchemaHandler}
+                />
+            )}
+            {loading && <Loading blocker fixed />}
+        </Container>
+    );
 }

@@ -6,6 +6,7 @@ import {
     useParams,
 } from 'react-router-dom';
 import {
+    Container,
     Box,
     Tabs,
     Tab,
@@ -13,7 +14,8 @@ import {
     IconButton,
     Button,
     TextField,
-    Alert, Snackbar,
+    Alert,
+    Snackbar,
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -100,7 +102,7 @@ export default function SchemaEdit() {
         return true;
     }, [cache, schemaFromCloud]);
     const newVersionNameError = useMemo<boolean>(() => (
-        newSchemaVersionName.trim() === '' || isNaN(Number(newSchemaVersionName))
+        newSchemaVersionName.trim() !== '' && isNaN(Number(newSchemaVersionName))
     ), [newSchemaVersionName]);
     const loading = userTokenLoading || getLanguagesLoading || getSchemaLoading || addSchemaLoading || updateSchemaLoading;
     const error = userTokenIdError || getLanguagesError || getSchemaError || addSchemaError || updateSchemaError;
@@ -229,94 +231,96 @@ export default function SchemaEdit() {
         }
     }, [schemaFromCloud]);
 
-    return <>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <IconButton
-                    onClick={() => navigate(routerConstants.HOME)}
-                    sx={{ mr: 1 }}
-                >
-                    <ArrowBackIcon />
-                </IconButton>
-                <Typography variant="h6">
-                    {isNew ? 'New schema' : `Schema "${params.version}"`}
-                </Typography>
-            </Box>
-            <Button
-                variant="outlined"
-                size="small"
-                color="success"
-                disabled={!isSaveEnabled || !!error}
-                onClick={saveButtonClickHandler}
-            >
-                <SaveIcon sx={{ mr: 1 }} />
-                Save
-            </Button>
-        </Box>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs
-                value={activeTab}
-                variant="fullWidth"
-                onChange={tabChangeHandler}
-            >
-                {tabs.map((item, key) => (
-                    <Tab key={key} label={item.label} />
-                ))}
-            </Tabs>
-        </Box>
-        <Box sx={{ pt: 3 }}>
-            <Outlet
-                context={[
-                    cache,
-                    setCacheHandler,
-                    storedLanguages,
-                ]}
-            />
-        </Box>
-        {savingPrompt && (
-            <Prompt
-                isOpen
-                title={`Make a version name for new schema`}
-                onCancel={() => {
-                    setSavingPrompt(false);
-                }}
-                disabled={newVersionNameError}
-                onConfirm={() => {
-                    setSavingPrompt(false);
-                    saveResultSchema();
-                }}
-            >
-                <TextField
-                    variant="outlined"
-                    label="Name"
+    return (
+        <Container>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <IconButton
+                        onClick={() => navigate(routerConstants.HOME)}
+                        sx={{ mr: 1 }}
+                    >
+                        <ArrowBackIcon />
+                    </IconButton>
+                    <Typography variant="h6">
+                        {isNew ? 'New schema' : `Schema "${params.version}"`}
+                    </Typography>
+                </Box>
+                <Button
+                    variant="contained"
                     size="small"
-                    value={newSchemaVersionName}
-                    sx={{ mt: 1 }}
-                    fullWidth
-                    error={newVersionNameError}
-                    helperText="Has to be unique number"
-                    autoFocus
-                    onChange={(event) => {
-                        setNewSchemaVersionName(event.target.value);
-                    }}
+                    color="success"
+                    disabled={!isSaveEnabled || !!error}
+                    onClick={saveButtonClickHandler}
+                >
+                    <SaveIcon sx={{ mr: 1 }} />
+                    Save
+                </Button>
+            </Box>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Tabs
+                    value={activeTab}
+                    variant="fullWidth"
+                    onChange={tabChangeHandler}
+                >
+                    {tabs.map((item, key) => (
+                        <Tab key={key} label={item.label} />
+                    ))}
+                </Tabs>
+            </Box>
+            <Box sx={{ pt: 3 }}>
+                <Outlet
+                    context={[
+                        cache,
+                        setCacheHandler,
+                        storedLanguages,
+                    ]}
                 />
-            </Prompt>
-        )}
-        <SaveHotkey
-            onSave={saveButtonClickHandler}
-        />
-        <Snackbar
-            open={snackbarIsOpen}
-            autoHideDuration={3000}
-            onClose={closeSnackbarHandler}
-        >
-            <Alert onClose={closeSnackbarHandler} severity="success" sx={{ width: '100%' }}>
-                Schema is saved
-            </Alert>
-        </Snackbar>
-        {loading && <Loading blocker fixed />}
-        {error && (
-            <Alert severity="error" sx={{ mt: '3' }}>{error.message}</Alert>
-        )}
-    </>;
+            </Box>
+            {savingPrompt && (
+                <Prompt
+                    isOpen
+                    title={`Make a name for new schema`}
+                    onCancel={() => {
+                        setSavingPrompt(false);
+                    }}
+                    disabled={newSchemaVersionName.trim() === '' || newVersionNameError}
+                    onConfirm={() => {
+                        setSavingPrompt(false);
+                        saveResultSchema();
+                    }}
+                >
+                    <TextField
+                        variant="outlined"
+                        label="Name"
+                        size="small"
+                        value={newSchemaVersionName}
+                        sx={{ mt: 1 }}
+                        fullWidth
+                        error={newVersionNameError}
+                        helperText="Has to be unique number"
+                        autoFocus
+                        onChange={(event) => {
+                            setNewSchemaVersionName(event.target.value);
+                        }}
+                    />
+                </Prompt>
+            )}
+            <SaveHotkey
+                onSave={saveButtonClickHandler}
+            />
+            <Snackbar
+                open={snackbarIsOpen}
+                autoHideDuration={3000}
+                onClose={closeSnackbarHandler}
+            >
+                <Alert onClose={closeSnackbarHandler} severity="success" sx={{ width: '100%' }}>
+                    Schema is saved
+                </Alert>
+            </Snackbar>
+            {loading && <Loading blocker fixed />}
+            {error && (
+                <Alert severity="error" sx={{ mt: '3' }}>{error.message}</Alert>
+            )}
+        </Container>
+    );
 }
