@@ -23,7 +23,7 @@ function checkSignature(signature: string, word: string, translation: string): b
 }
 
 function checkImage(image: string, res: Response): boolean {
-    let imageData = image.match(IMAGE_BASE64_REG);
+    const imageData = image.match(IMAGE_BASE64_REG);
     if (!imageData) {
         res.status(406);
         res.end('Image is not in base64 format');
@@ -34,7 +34,7 @@ function checkImage(image: string, res: Response): boolean {
 }
 
 function saveImage(id: number, word: string, image: string): string | undefined {
-    let imageData = image.match(IMAGE_BASE64_REG);
+    const imageData = image.match(IMAGE_BASE64_REG);
     if (!imageData) {
         return;
     }
@@ -52,7 +52,7 @@ function saveImage(id: number, word: string, image: string): string | undefined 
 }
 
 function checkPronunciation(pronunciation: string, res: Response): boolean {
-    let pronunciationData = pronunciation.match(PRONUNCIATION_BASE64_REG);
+    const pronunciationData = pronunciation.match(PRONUNCIATION_BASE64_REG);
     if (!pronunciationData) {
         res.status(406);
         res.end('Pronunciation is not in base64 format');
@@ -63,7 +63,7 @@ function checkPronunciation(pronunciation: string, res: Response): boolean {
 }
 
 function savePronunciation(id: number, prefix: string, word: string, pronunciation: string): string | undefined {
-    let pronunciationData = pronunciation.match(PRONUNCIATION_BASE64_REG);
+    const pronunciationData = pronunciation.match(PRONUNCIATION_BASE64_REG);
     if (!pronunciationData) {
         return;
     }
