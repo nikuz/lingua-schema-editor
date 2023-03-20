@@ -28,6 +28,8 @@ scripts/retrieve-supported-languages/*.html
 *firebase.json
 schemas/*
 languages/*
+images/*
+pronunciations/*
 .env.secret
 server-build
 server/keys

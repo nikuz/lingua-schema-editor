@@ -14,9 +14,9 @@ model dictionary {
   translation         String      @db.VarChar(256)
   translate_from      Json
   translate_to        Json
-  image               String
-  pronunciation_from  String
-  pronunciation_to    String
+  image               String?
+  pronunciation_from  String?
+  pronunciation_to    String?
   schema_version      String      @db.VarChar(10)
   raw                 String
   created_at          DateTime    @default(now())
