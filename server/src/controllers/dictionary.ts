@@ -74,20 +74,18 @@ export async function save(req: Request, res: Response) {
     const signature: string = body.signature;
     const word: string = body.word;
     const translation: string = body.translation;
-    const hash: string = body.hash;
     const translateFrom: string = body.translate_from;
     const translateTo: string = body.translate_to;
     const image: string = body.image;
     const pronunciationFrom: string = body.pronunciation_from;
     const pronunciationTo: string = body.pronunciation_to;
     const schemaVersion: string = body.schema_version;
-    const raw: string = body.raw;
+    const raw: JSON = body.raw;
 
     if (!signature
         || !word
         || !translation
         || !checkSignature(signature, word, translation)
-        || !hash
         || !translateFrom
         || !translateTo
         || !image
@@ -118,12 +116,11 @@ export async function save(req: Request, res: Response) {
         newDictionaryEntry = await prisma.dictionary.create({
             data: {
                 word,
-                hash,
                 translation,
                 translate_from: translateFromJson,
                 translate_to: translateToJson,
                 schema_version: schemaVersion,
-                raw,
+                raw: JSON.stringify(raw),
             },
         });
     } catch (err: any) {
@@ -131,45 +128,39 @@ export async function save(req: Request, res: Response) {
         return res.end(`Can't save dictionary entry: ${err?.code}`);
     }
 
-    if (newDictionaryEntry) {
-        const imagePath = saveImage(newDictionaryEntry.id, word, image);
-        const pronunciationFromPath = savePronunciation(newDictionaryEntry.id, 'from', word, pronunciationFrom);
-        const pronunciationToPath = savePronunciation(newDictionaryEntry.id, 'to', word, pronunciationTo);
-        await prisma.dictionary.update({
-            where: {
-                id: newDictionaryEntry.id,
-            },
-            data: {
-                image: imagePath,
-                pronunciation_from: pronunciationFromPath,
-                pronunciation_to: pronunciationToPath,
-            },
-        });
-    }
+    const imagePath = saveImage(newDictionaryEntry.id, word, image);
+    const pronunciationFromPath = savePronunciation(newDictionaryEntry.id, 'from', word, pronunciationFrom);
+    const pronunciationToPath = savePronunciation(newDictionaryEntry.id, 'to', word, pronunciationTo);
+    await prisma.dictionary.update({
+        where: {
+            id: newDictionaryEntry.id,
+        },
+        data: {
+            image: imagePath,
+            pronunciation_from: pronunciationFromPath,
+            pronunciation_to: pronunciationToPath,
+        },
+    });
 
     res.status(201);
-    return res.end('OK');
+    return res.end(newDictionaryEntry.id.toString());
 }
 
 export async function update(req: Request, res: Response) {
     const body = req.body;
     const signature: string = body.signature;
+    const id: number = body.id;
     const word: string = body.word;
     const translation: string = body.translation;
-    const hash: string = body.hash;
     const image: string = body.image;
     const pronunciationTo: string = body.pronunciation_to;
     const schemaVersion: string = body.schema_version;
 
     if (!signature
+        || !id
         || !word
         || !translation
         || !checkSignature(signature, word, translation)
-        || !hash
-        || !image
-        || !checkImage(image)
-        || !pronunciationTo
-        || !checkPronunciation(pronunciationTo)
         || !schemaVersion
     ) {
         res.status(406);
@@ -177,20 +168,20 @@ export async function update(req: Request, res: Response) {
     }
 
     const dictionaryEntry = await prisma.dictionary.findFirst({
-        where: {
-            hash: hash,
-        },
+        where: { id },
     });
 
     if (dictionaryEntry) {
-        saveImage(dictionaryEntry.id, word, image);
-        savePronunciation(dictionaryEntry.id, 'to', word, pronunciationTo);
+        if (image && checkImage(image)) {
+            saveImage(dictionaryEntry.id, word, image);
+        }
+        if (pronunciationTo && checkPronunciation(pronunciationTo)) {
+            savePronunciation(dictionaryEntry.id, 'to', word, pronunciationTo);
+        }
 
         try {
             await prisma.dictionary.update({
-                where: {
-                    hash: hash,
-                },
+                where: { id },
                 data: {
                     translation,
                     schema_version: schemaVersion,
