@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { Request, Response } from 'express';
-import { authUtils } from '../utils';
+import { authenticationController } from '../controllers';
 
 const languagesFilePath = path.resolve(process.env.STATIC_FILES_DIRECTORY ?? '', 'languages/languages.json');
 
@@ -15,8 +15,8 @@ export async function getLanguages(req: Request, res: Response) {
 }
 
 export async function storeLanguages(req: Request, res: Response) {
-    if (!(await authUtils.isAuthorized(req))) {
-        return authUtils.respondUnauthorized(res);
+    if (!(await authenticationController.isAuthorized(req))) {
+        return authenticationController.respondUnauthorized(res);
     }
 
     const directory = path.dirname(languagesFilePath);

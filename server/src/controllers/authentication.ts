@@ -1,3 +1,4 @@
+import { Request, Response } from 'express';
 import * as firebaseAdmin from 'firebase-admin';
 import serviceAccount from '../wisual-firebase.json';
 
@@ -20,4 +21,24 @@ export async function isAdmin(token: string) {
             }
         }).catch(reject);
     });
+}
+
+export async function isAuthorized(req: Request) {
+    const authToken = req.headers['authorization']?.toString();
+    let isAuthorized = false;
+
+    if (authToken) {
+        try {
+            isAuthorized = await isAdmin(authToken);
+        } catch (err) {
+            //
+        }
+    }
+
+    return isAuthorized;
+}
+
+export async function respondUnauthorized(res: Response) {
+    res.status(403);
+    res.end('Unauthorized');
 }

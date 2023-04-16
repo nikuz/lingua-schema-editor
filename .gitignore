@@ -25,7 +25,9 @@ yarn-error.log*
 
 scripts/retrieve-supported-languages/*.json
 scripts/retrieve-supported-languages/*.html
-*firebase.json
+wisual-web-firebase.json
+wisual-firebase.json
+wisual-play-console.json
 schemas/*
 languages/*
 images/*

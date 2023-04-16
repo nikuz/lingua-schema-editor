@@ -6,8 +6,9 @@ import {
     schemaController,
     languageController,
     dictionaryController,
+    authenticationController,
+    googlePlayController,
 } from './controllers';
-import { authUtils } from './utils';
 
 exports = module.exports = (app: Express) => {
     app.use('/api/proxy', proxy(
@@ -16,7 +17,7 @@ exports = module.exports = (app: Express) => {
             return `${url.protocol}//${url.host}`;
         },
         {
-            filter: authUtils.isAuthorized,
+            filter: authenticationController.isAuthorized,
             proxyReqPathResolver: (req) => {
                 const url = getProxyUrl(req);
                 return `${url.pathname}${url.search}`;
@@ -71,6 +72,9 @@ exports = module.exports = (app: Express) => {
     // translation
     app.post('/api/dictionary', dictionaryController.save);
     app.put('/api/dictionary', dictionaryController.update);
+
+    // google play
+    app.get('/api/google-play/verify-purchase', googlePlayController.verifyPurchase);
 
     // privacy policy
     app.get('/privacy-policy', (req, res) => {

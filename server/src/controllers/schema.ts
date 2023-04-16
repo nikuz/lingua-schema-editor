@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { Request, Response } from 'express';
-import { authUtils, schemaUtils, cryptoUtils } from '../utils';
+import { authenticationController } from '../controllers';
+import { schemaUtils, cryptoUtils } from '../utils';
 import {
     CloudSchemaType,
     ObjectDataString,
@@ -11,8 +12,8 @@ const encryptedSchemasCache: ObjectDataString = {};
 const schemasDirectoryPath = path.resolve(process.env.STATIC_FILES_DIRECTORY ?? '', 'schemas');
 
 export async function getList(req: Request, res: Response) {
-    if (!(await authUtils.isAuthorized(req))) {
-        return authUtils.respondUnauthorized(res);
+    if (!(await authenticationController.isAuthorized(req))) {
+        return authenticationController.respondUnauthorized(res);
     }
 
     if (!fs.existsSync(schemasDirectoryPath)) {
@@ -43,8 +44,8 @@ export async function getList(req: Request, res: Response) {
 }
 
 export async function add(req: Request, res: Response) {
-    if (!(await authUtils.isAuthorized(req))) {
-        return authUtils.respondUnauthorized(res);
+    if (!(await authenticationController.isAuthorized(req))) {
+        return authenticationController.respondUnauthorized(res);
     }
 
     if (!fs.existsSync(schemasDirectoryPath)) {
@@ -69,8 +70,8 @@ export async function add(req: Request, res: Response) {
 }
 
 export async function update(req: Request, res: Response) {
-    if (!(await authUtils.isAuthorized(req))) {
-        return authUtils.respondUnauthorized(res);
+    if (!(await authenticationController.isAuthorized(req))) {
+        return authenticationController.respondUnauthorized(res);
     }
 
     const params = req.params;
@@ -102,8 +103,8 @@ export async function update(req: Request, res: Response) {
 }
 
 export async function get(req: Request, res: Response) {
-    if (!(await authUtils.isAuthorized(req))) {
-        return authUtils.respondUnauthorized(res);
+    if (!(await authenticationController.isAuthorized(req))) {
+        return authenticationController.respondUnauthorized(res);
     }
 
     const params = req.params;
@@ -140,8 +141,8 @@ export function getEncrypted(req: Request, res: Response) {
 }
 
 export async function setCurrent(req: Request, res: Response) {
-    if (!(await authUtils.isAuthorized(req))) {
-        return authUtils.respondUnauthorized(res);
+    if (!(await authenticationController.isAuthorized(req))) {
+        return authenticationController.respondUnauthorized(res);
     }
 
     if (!fs.existsSync(schemasDirectoryPath)) {
@@ -205,8 +206,8 @@ export async function setCurrent(req: Request, res: Response) {
 }
 
 export async function remove(req: Request, res: Response) {
-    if (!(await authUtils.isAuthorized(req))) {
-        return authUtils.respondUnauthorized(res);
+    if (!(await authenticationController.isAuthorized(req))) {
+        return authenticationController.respondUnauthorized(res);
     }
 
     const params = req.params;
