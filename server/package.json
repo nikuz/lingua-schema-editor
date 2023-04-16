@@ -1,6 +1,6 @@
 {
   "name": "lingua-backend",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "Backend Node client for lingua (Wisual) project",
   "main": "src/index.js",
   "scripts": {
