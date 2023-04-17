@@ -17,13 +17,14 @@ jobs:
         CRYPTO_SECRET: ${{ secrets.CRYPTO_SECRET }}
         DBURL: ${{ secrets.DBURL }}
         FIREBASE_SERVER_CONFIG: ${{ secrets.FIREBASE_SERVER_CONFIG }}
+        PLAY_MARKET_CONFIG: ${{ secrets.PLAY_MARKET_CONFIG }}
         FIREBASE_WEB_CONFIG: ${{ secrets.FIREBASE_WEB_CONFIG }}
       with:
         host: ${{ secrets.HETZNER_DEPLOY_IP }}
         username: ${{ secrets.HETZNER_DEPLOY_USERNAME }}
         key: ${{ secrets.HETZNER_DEPLOY_KEY }}
         port: 22
-        envs: ADMIN_USER_ID,CRYPTO_SECRET,DBURL,FIREBASE_SERVER_CONFIG,FIREBASE_WEB_CONFIG
+        envs: ADMIN_USER_ID,CRYPTO_SECRET,DBURL,FIREBASE_SERVER_CONFIG,PLAY_MARKET_CONFIG,FIREBASE_WEB_CONFIG
         script_stop: true
         debug: true
         script: |
@@ -35,6 +36,7 @@ jobs:
           cd lingua-schema-editor-deploy
           echo $FIREBASE_WEB_CONFIG > src/wisual-web-firebase.json
           echo $FIREBASE_SERVER_CONFIG > server/src/wisual-firebase.json
+          echo $PLAY_MARKET_CONFIG > server/src/wisual-play-console.json
           echo "ADMIN_USER_ID=$ADMIN_USER_ID" >> .env.secret
           echo "CRYPTO_SECRET=$CRYPTO_SECRET" >> .env.secret
           echo "DBURL=$DBURL" >> .env.secret
