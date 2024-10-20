@@ -27,12 +27,12 @@ exports = module.exports = (app: Express) => {
                 if (headers) {
                     delete headers['authorization'];
                     if (headers['authorization-cookie']) {
-                        headers['cookie'] = headers['authorization-cookie'];
+                        headers['cookie'] = headers['authorization-cookie'].toString();
                         delete headers['authorization-cookie'];
                     }
                     if (headers['authorization-origin']) {
-                        headers['origin'] = headers['authorization-origin'];
-                        headers['referer'] = headers['authorization-origin'];
+                        headers['origin'] = headers['authorization-origin'].toString();
+                        headers['referer'] = headers['authorization-origin'].toString();
                         delete headers['authorization-origin'];
                     }
                 }

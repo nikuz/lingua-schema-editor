@@ -7,11 +7,12 @@ const languagesFilePath = path.resolve(process.env.STATIC_FILES_DIRECTORY ?? '',
 
 export async function getLanguages(req: Request, res: Response) {
     if (!fs.existsSync(languagesFilePath)) {
-        return res.end('{}');
+        res.end('{}');
+        return;
     }
 
     res.setHeader('content-type', 'application/json');
-    return res.end(fs.readFileSync(languagesFilePath));
+    res.end(fs.readFileSync(languagesFilePath));
 }
 
 export async function storeLanguages(req: Request, res: Response) {
@@ -27,5 +28,5 @@ export async function storeLanguages(req: Request, res: Response) {
     const data = JSON.stringify(req.body);
     fs.writeFileSync(languagesFilePath, data);
 
-    return res.end(data);
+    res.end(data);
 }

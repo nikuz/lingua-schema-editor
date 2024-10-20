@@ -15,7 +15,7 @@ dotenv.config({
 const routes = require('./routes');
 
 const app = express();
-const port = process.env.REACT_APP_SERVER_PORT;
+const port = process.env.VITE_SERVER_PORT;
 const env = process.env.NODE_ENV;
 
 app.use(cors());

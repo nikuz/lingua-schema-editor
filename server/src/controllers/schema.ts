@@ -3,12 +3,9 @@ import path from 'path';
 import { Request, Response } from 'express';
 import { authenticationController } from '../controllers';
 import { schemaUtils, cryptoUtils } from '../utils';
-import {
-    CloudSchemaType,
-    ObjectDataString,
-} from '../types';
+import { CloudSchemaType } from '../types';
 
-const encryptedSchemasCache: ObjectDataString = {};
+const encryptedSchemasCache: Record<string, string> = {};
 const schemasDirectoryPath = path.resolve(process.env.STATIC_FILES_DIRECTORY ?? '', 'schemas');
 
 export async function getList(req: Request, res: Response) {
@@ -17,7 +14,8 @@ export async function getList(req: Request, res: Response) {
     }
 
     if (!fs.existsSync(schemasDirectoryPath)) {
-        return res.end('[]');
+        res.end('[]');
+        return;
     }
 
     const schemas = [];
@@ -40,7 +38,7 @@ export async function getList(req: Request, res: Response) {
     }
 
     res.setHeader('content-type', 'application/json');
-    return res.end(JSON.stringify(schemas));
+    res.end(JSON.stringify(schemas));
 }
 
 export async function add(req: Request, res: Response) {
@@ -57,7 +55,8 @@ export async function add(req: Request, res: Response) {
 
     if (fs.existsSync(filePath)) {
         res.status(409);
-        return res.end('Schema with provided ID already exists');
+        res.end('Schema with provided ID already exists');
+        return;
     }
 
     const data = JSON.stringify(body);
@@ -66,7 +65,7 @@ export async function add(req: Request, res: Response) {
     encryptedSchemasCache[body.version] = cryptoUtils.encrypt(data);
 
     res.setHeader('content-type', 'application/json');
-    return res.end(data);
+    res.end(data);
 }
 
 export async function update(req: Request, res: Response) {
@@ -79,14 +78,16 @@ export async function update(req: Request, res: Response) {
 
     if (!fs.existsSync(schemaPath)) {
         res.status(404);
-        return res.end('Can\'t find schema with provided id');
+        res.end('Can\'t find schema with provided id');
+        return;
     }
 
     const body: CloudSchemaType = req.body;
 
     if (body.current && !schemaUtils.validateIntegrity(body.schema)) {
         res.status(406);
-        return res.end('Failed schema integrity check');
+        res.end('Failed schema integrity check');
+        return;
     }
 
     const data = JSON.stringify(body);
@@ -99,7 +100,7 @@ export async function update(req: Request, res: Response) {
     encryptedSchemasCache[body.version] = cryptoUtils.encrypt(data);
 
     res.setHeader('content-type', 'application/json');
-    return res.end(data);
+    res.end(data);
 }
 
 export async function get(req: Request, res: Response) {
@@ -112,7 +113,8 @@ export async function get(req: Request, res: Response) {
 
     if (!fs.existsSync(schemaPath)) {
         res.status(404);
-        return res.end('Can\'t find schema with provided id');
+        res.end('Can\'t find schema with provided id');
+        return;
     }
 
     res.setHeader('content-type', 'application/json');
@@ -125,7 +127,8 @@ export function getEncrypted(req: Request, res: Response) {
 
     if (!fs.existsSync(schemaPath)) {
         res.status(404);
-        return res.end('Can\'t find schema with provided id');
+        res.end('Can\'t find schema with provided id');
+        return;
     }
 
     // take "current" schema from memory cache if available
@@ -137,7 +140,7 @@ export function getEncrypted(req: Request, res: Response) {
         encryptedSchemasCache[params.id] = data;
     }
 
-    return res.end(data);
+    res.end(data);
 }
 
 export async function setCurrent(req: Request, res: Response) {
@@ -147,7 +150,8 @@ export async function setCurrent(req: Request, res: Response) {
 
     if (!fs.existsSync(schemasDirectoryPath)) {
         res.status(404);
-        return res.end('Can\'t update current schema');
+        res.end('Can\'t update current schema');
+        return;
     }
 
     const params = req.params;
@@ -178,7 +182,8 @@ export async function setCurrent(req: Request, res: Response) {
     if (currentSchemaFileName && currentSchema) {
         if (!schemaUtils.validateIntegrity(currentSchema.schema)) {
             res.status(406);
-            return res.end('Failed schema integrity check');
+            res.end('Failed schema integrity check');
+            return;
         }
 
         if (prevCurrentSchemaFileName && prevCurrentSchema) {
@@ -198,11 +203,12 @@ export async function setCurrent(req: Request, res: Response) {
         fs.writeFileSync(`${schemasDirectoryPath}/current.json`, data);
 
         res.setHeader('content-type', 'application/json');
-        return res.end(data);
+        res.end(data);
+        return;
     }
 
     res.status(404);
-    return res.end('Can\'t update current schema');
+    res.end('Can\'t update current schema');
 }
 
 export async function remove(req: Request, res: Response) {
@@ -215,7 +221,8 @@ export async function remove(req: Request, res: Response) {
 
     if (!fs.existsSync(schemaPath)) {
         res.status(404);
-        return res.end('Can\'t find schema with provided id');
+        res.end('Can\'t find schema with provided id');
+        return;
     }
 
     const content = fs.readFileSync(schemaPath).toString();
@@ -225,5 +232,5 @@ export async function remove(req: Request, res: Response) {
         fs.rmSync(schemaPath);
     }
 
-    return res.end(params.id);
+    res.end(params.id);
 }

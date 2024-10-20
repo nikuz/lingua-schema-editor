@@ -15,8 +15,8 @@ function checkSignature(signature: string, word: string, translation: string): b
     try {
         const decodedSignature = cryptoUtils.decrypt(signature);
         signatureData = JSON.parse(decodedSignature);
-    } catch (e) {
-        //
+    } catch (ex) {
+        // continue regardless of error
     }
 
     return signatureData && signatureData.word === word && signatureData.translation === translation;
@@ -98,7 +98,8 @@ export async function save(req: Request, res: Response) {
         || !raw
     ) {
         res.status(406);
-        return res.end('Incorrect body parameters');
+        res.end('Incorrect body parameters');
+        return;
     }
 
     let translateFromJson;
@@ -106,9 +107,10 @@ export async function save(req: Request, res: Response) {
     try {
         translateFromJson = JSON.parse(translateFrom);
         translateToJson = JSON.parse(translateTo);
-    } catch (e) {
+    } catch (ex) {
         res.status(406);
-        return res.end('Failed data structure integrity test');
+        res.end('Failed data structure integrity test');
+        return;
     }
 
     let newDictionaryEntry;
@@ -125,7 +127,8 @@ export async function save(req: Request, res: Response) {
         });
     } catch (err: any) {
         res.status(500);
-        return res.end(`Can't save dictionary entry: ${err?.code}`);
+        res.end(`Can't save dictionary entry: ${err?.code}`);
+        return;
     }
 
     const imagePath = saveImage(newDictionaryEntry.id, word, image);
@@ -143,7 +146,7 @@ export async function save(req: Request, res: Response) {
     });
 
     res.status(201);
-    return res.end(newDictionaryEntry.id.toString());
+    res.end(newDictionaryEntry.id.toString());
 }
 
 export async function update(req: Request, res: Response) {
@@ -164,7 +167,8 @@ export async function update(req: Request, res: Response) {
         || !schemaVersion
     ) {
         res.status(406);
-        return res.end('Incorrect body parameters');
+        res.end('Incorrect body parameters');
+        return;
     }
 
     const dictionaryEntry = await prisma.dictionary.findFirst({
@@ -190,12 +194,14 @@ export async function update(req: Request, res: Response) {
             });
         } catch (err: any) {
             res.status(500);
-            return res.end(`Can't update dictionary entry: ${err?.code}`);
+            res.end(`Can't update dictionary entry: ${err?.code}`);
+            return;
         }
     } else {
         res.status(404);
-        return res.end('Can\'t find dictionary entry');
+        res.end('Can\'t find dictionary entry');
+        return;
     }
 
-    return res.end('OK');
+    res.end('OK');
 }

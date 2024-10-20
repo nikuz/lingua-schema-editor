@@ -30,8 +30,8 @@ export async function isAuthorized(req: Request) {
     if (authToken) {
         try {
             isAuthorized = await isAdmin(authToken);
-        } catch (err) {
-            //
+        } catch (ex) {
+            // continue regardless of error
         }
     }
 

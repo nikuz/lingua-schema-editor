@@ -4,4 +4,3 @@ export * from './schema-quick-translation';
 export * from './schema-translation';
 export * from './schema-pronunciation';
 export * from './schema-images';
-export * from './common';
