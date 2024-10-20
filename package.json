@@ -1,7 +1,7 @@
 {
-  "name": "lingua-schema-editor-vite",
+  "name": "lingua-schema-editor",
   "private": true,
-  "version": "0.1.6",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "npm run start-server & vite",
