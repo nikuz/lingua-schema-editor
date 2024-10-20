@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box } from '@mui/material';
 import jmespath from 'jmespath';
 import { PronunciationSchemaType } from 'src/types';

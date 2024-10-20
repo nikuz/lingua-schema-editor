@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import {
     Collapsable,
@@ -18,9 +18,7 @@ import {
 import SchemaEditQuickTranslationBuilder from './components/schema-builder';
 import SchemaEditQuickTranslationPreview from './components/preview';
 
-const {
-    REACT_APP_QUICK_TRANSLATION_URL,
-} = process.env;
+const { VITE_QUICK_TRANSLATION_URL } = import.meta.env;
 
 export default function SchemaEditQuickTranslation() {
     const [userTokenId] = useAuthTokenId();
@@ -28,7 +26,7 @@ export default function SchemaEditQuickTranslation() {
     const [fields, setFields] = useState<FormFields>({
         url: {
             label: 'Url',
-            value: cache.quick_translation.schema?.fields.url || REACT_APP_QUICK_TRANSLATION_URL || '',
+            value: cache.quick_translation.schema?.fields.url || VITE_QUICK_TRANSLATION_URL || '',
             fullWidth: true,
             variables: ['{word}', '{sourceLanguage}', '{targetLanguage}'],
         }

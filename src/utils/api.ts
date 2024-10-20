@@ -1,7 +1,7 @@
 export function getApiUrl() {
     let port = '';
-    if (process.env.NODE_ENV === 'development') {
-        port = `:${process.env.REACT_APP_SERVER_PORT}`;
+    if (import.meta.env.DEV) {
+        port = `:${import.meta.env.VITE_SERVER_PORT}`;
     }
     return `//${window.location.hostname}${port}`;
 }

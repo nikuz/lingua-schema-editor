@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
     Container,
     Alert,
@@ -23,14 +23,14 @@ import { useAuthTokenId } from 'src/controllers/firebase';
 import { FormFields, LanguagesType } from 'src/types';
 import './Languages.css';
 
-const { REACT_APP_LANGUAGES_URL } = process.env;
+const { VITE_LANGUAGES_URL } = import.meta.env;
 
 export default function Languages() {
     const [userTokenId, userTokenLoading, userTokenIdError] = useAuthTokenId();
     const [fields, setFields] = useState<FormFields>({
         url: {
             label: 'Url',
-            value: REACT_APP_LANGUAGES_URL || '',
+            value: VITE_LANGUAGES_URL || '',
             fullWidth: true,
         }
     });
@@ -57,7 +57,7 @@ export default function Languages() {
                 url: fields.url.value,
                 token: userTokenId,
             }).then(response => {
-                setLanguages(response)
+                setLanguages(response);
                 resolve();
             }).catch((err) => {
                 reject(err);

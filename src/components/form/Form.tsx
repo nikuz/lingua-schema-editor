@@ -55,7 +55,7 @@ export default function Form(props: Props) {
                     value: fieldValue,
                     variablesError: !fields[fieldId].variablesError,
                 }
-            }
+            };
             onChange(fieldsClone);
         }
     }, [fields, onChange]);

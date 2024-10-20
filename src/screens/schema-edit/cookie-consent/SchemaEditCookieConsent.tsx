@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import {
     Collapsable,
@@ -16,10 +16,10 @@ import {
 import SchemaEditCookieConsentPreview from './components/preview';
 
 const {
-    REACT_APP_COOKIE_CONSENT_MARKER,
-    REACT_APP_COOKIE_CONSENT_FORM_REG_EXP,
-    REACT_APP_COOKIE_CONSENT_INPUT_REG_EXP,
-} = process.env;
+    VITE_COOKIE_CONSENT_MARKER,
+    VITE_COOKIE_CONSENT_FORM_REG_EXP,
+    VITE_COOKIE_CONSENT_INPUT_REG_EXP,
+} = import.meta.env;
 
 export default function SchemaEditCookieConsent() {
     const [userTokenId] = useAuthTokenId();
@@ -27,15 +27,15 @@ export default function SchemaEditCookieConsent() {
     const [fields, setFields] = useState<FormFields>({
         marker: {
             label: 'Marker',
-            value: cache.cookie_consent.schema?.fields.marker || REACT_APP_COOKIE_CONSENT_MARKER || '',
+            value: cache.cookie_consent.schema?.fields.marker || VITE_COOKIE_CONSENT_MARKER || '',
         },
         formRegExp: {
             label: 'Form RegExp',
-            value: cache.cookie_consent.schema?.fields.formRegExp || REACT_APP_COOKIE_CONSENT_FORM_REG_EXP || '',
+            value: cache.cookie_consent.schema?.fields.formRegExp || VITE_COOKIE_CONSENT_FORM_REG_EXP || '',
         },
         inputRegExp: {
             label: 'Input RegExp',
-            value: cache.cookie_consent.schema?.fields.inputRegExp || REACT_APP_COOKIE_CONSENT_INPUT_REG_EXP || '',
+            value: cache.cookie_consent.schema?.fields.inputRegExp || VITE_COOKIE_CONSENT_INPUT_REG_EXP || '',
         },
     });
 

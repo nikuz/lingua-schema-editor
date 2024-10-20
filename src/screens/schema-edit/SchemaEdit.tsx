@@ -115,7 +115,7 @@ export default function SchemaEdit() {
         setCache(cacheClone);
     }, [cache]);
 
-    const tabChangeHandler = useCallback((e: React.SyntheticEvent, index: number) => {
+    const tabChangeHandler = useCallback((_: React.SyntheticEvent, index: number) => {
         const url = routerUtils.setParams(tabs[index].url, [':version'], [params.version]);
         navigate(url);
     }, [navigate, params]);
@@ -203,7 +203,7 @@ export default function SchemaEdit() {
 
     useEffect(() => {
         if (schemaFromCloud) {
-            let schema = schemaFromCloud.schema;
+            const schema = schemaFromCloud.schema;
             if (schema) {
                 setCache({
                     cookie_consent: {
@@ -279,7 +279,7 @@ export default function SchemaEdit() {
             {savingPrompt && (
                 <Prompt
                     isOpen
-                    title={`Make a name for new schema`}
+                    title="Make a name for new schema"
                     onCancel={() => {
                         setSavingPrompt(false);
                     }}

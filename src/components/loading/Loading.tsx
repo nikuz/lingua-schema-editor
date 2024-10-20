@@ -1,4 +1,3 @@
-import React from 'react';
 import cl from 'classnames';
 import { CircularProgress } from '@mui/material';
 import './Loading.css';
@@ -16,5 +15,5 @@ export default function Loading(props: Props) {
         <div className={className}>
             <CircularProgress />
         </div>
-    )
+    );
 }

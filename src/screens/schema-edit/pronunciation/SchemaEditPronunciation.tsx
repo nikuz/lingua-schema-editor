@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import {
     Collapsable,
@@ -19,12 +19,12 @@ import SchemaEditPronunciationBuilder from './components/schema-builder';
 import SchemaEditPronunciationPreview from './components/preview';
 
 const {
-    REACT_APP_TRANSLATION_URL,
-    REACT_APP_PRONUNCIATION_MARKER,
-    REACT_APP_TRANSLATION_BODY_PARAMETER,
-    REACT_APP_PRONUNCIATION_BODY,
-    REACT_APP_PRONUNCIATION_BASE64_PREFIX,
-} = process.env;
+    VITE_TRANSLATION_URL,
+    VITE_PRONUNCIATION_MARKER,
+    VITE_TRANSLATION_BODY_PARAMETER,
+    VITE_PRONUNCIATION_BODY,
+    VITE_PRONUNCIATION_BASE64_PREFIX,
+} = import.meta.env;
 
 export default function SchemaEditPronunciation() {
     const [userTokenId] = useAuthTokenId();
@@ -32,26 +32,26 @@ export default function SchemaEditPronunciation() {
     const [fields, setFields] = useState<FormFields>({
         url: {
             label: 'Url',
-            value: cache.pronunciation.schema?.fields.url || REACT_APP_TRANSLATION_URL || '',
+            value: cache.pronunciation.schema?.fields.url || VITE_TRANSLATION_URL || '',
             fullWidth: true,
         },
         parameter: {
             label: 'Parameter',
-            value: cache.pronunciation.schema?.fields.parameter || REACT_APP_TRANSLATION_BODY_PARAMETER || '',
+            value: cache.pronunciation.schema?.fields.parameter || VITE_TRANSLATION_BODY_PARAMETER || '',
         },
         body: {
             label: 'Body',
-            value: cache.pronunciation.schema?.fields.body || REACT_APP_PRONUNCIATION_BODY || '',
+            value: cache.pronunciation.schema?.fields.body || VITE_PRONUNCIATION_BODY || '',
             variables: ['{marker}', '{word}', '{sourceLanguage}'],
             variablesValues: {
-                '{marker}': cache.pronunciation.schema?.fields.marker || REACT_APP_PRONUNCIATION_MARKER || '',
+                '{marker}': cache.pronunciation.schema?.fields.marker || VITE_PRONUNCIATION_MARKER || '',
             },
             type: 'textarea',
             fullWidth: true,
         },
         base64Prefix: {
             label: 'Base 64 prefix',
-            value: cache.pronunciation.schema?.fields.base64Prefix || REACT_APP_PRONUNCIATION_BASE64_PREFIX || '',
+            value: cache.pronunciation.schema?.fields.base64Prefix || VITE_PRONUNCIATION_BASE64_PREFIX || '',
             fullWidth: true,
         }
     });
@@ -179,7 +179,7 @@ export default function SchemaEditPronunciation() {
                     fieldsClone.body.variablesValues = {
                         ...fieldsClone.body.variablesValues,
                         '{marker}': schemaFields[key],
-                    }
+                    };
                 }
             });
             setFields(fieldsClone);

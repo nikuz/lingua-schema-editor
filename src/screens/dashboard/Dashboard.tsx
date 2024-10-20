@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import cl from 'classnames';
 import {
@@ -113,8 +113,8 @@ export default function Dashboard() {
                 <Typography variant="h4">
                     <AccountTreeIcon fontSize="large" sx={{ verticalAlign: 'middle', mr: 1 }} />
                     <span style={{ verticalAlign: 'middle' }}>
-                    Schemas
-                </span>
+                        Schemas
+                    </span>
                 </Typography>
                 <Button
                     variant="contained"

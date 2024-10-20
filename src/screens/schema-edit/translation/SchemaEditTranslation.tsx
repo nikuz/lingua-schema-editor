@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import {
     Collapsable,
@@ -19,12 +19,12 @@ import SchemaEditTranslationBuilder from './components/schema-builder';
 import SchemaEditTranslationPreview from './components/preview';
 
 const {
-    REACT_APP_TRANSLATION_URL,
-    REACT_APP_TRANSLATION_URL_PARAMETER_RT,
-    REACT_APP_TRANSLATION_MARKER,
-    REACT_APP_TRANSLATION_BODY_PARAMETER,
-    REACT_APP_TRANSLATION_BODY,
-} = process.env;
+    VITE_TRANSLATION_URL,
+    VITE_TRANSLATION_URL_PARAMETER_RT,
+    VITE_TRANSLATION_MARKER,
+    VITE_TRANSLATION_BODY_PARAMETER,
+    VITE_TRANSLATION_BODY,
+} = import.meta.env;
 
 export default function SchemaEditTranslation() {
     const [userTokenId] = useAuthTokenId();
@@ -32,24 +32,24 @@ export default function SchemaEditTranslation() {
     const [fields, setFields] = useState<FormFields>({
         url: {
             label: 'Url',
-            value: cache.translation.schema?.fields.url || REACT_APP_TRANSLATION_URL || '',
+            value: cache.translation.schema?.fields.url || VITE_TRANSLATION_URL || '',
             fullWidth: true,
         },
         url_parameter_rt: {
             label: 'Request parameter "rt"',
-            value: cache.translation.schema?.fields.url_parameter_rt || REACT_APP_TRANSLATION_URL_PARAMETER_RT || '',
+            value: cache.translation.schema?.fields.url_parameter_rt || VITE_TRANSLATION_URL_PARAMETER_RT || '',
             fullWidth: true,
         },
         parameter: {
             label: 'Body Parameter',
-            value: cache.translation.schema?.fields.parameter || REACT_APP_TRANSLATION_BODY_PARAMETER || '',
+            value: cache.translation.schema?.fields.parameter || VITE_TRANSLATION_BODY_PARAMETER || '',
         },
         body: {
             label: 'Body',
-            value: cache.translation.schema?.fields.body || REACT_APP_TRANSLATION_BODY || '',
+            value: cache.translation.schema?.fields.body || VITE_TRANSLATION_BODY || '',
             variables: ['{marker}', '{word}', '{sourceLanguage}', '{targetLanguage}'],
             variablesValues: {
-                '{marker}': cache.translation.schema?.fields.marker || REACT_APP_TRANSLATION_MARKER || '',
+                '{marker}': cache.translation.schema?.fields.marker || VITE_TRANSLATION_MARKER || '',
             },
             type: 'textarea',
             fullWidth: true,
@@ -185,7 +185,7 @@ export default function SchemaEditTranslation() {
                     fieldsClone.body.variablesValues = {
                         ...fieldsClone.body.variablesValues,
                         '{marker}': schemaFields[key],
-                    }
+                    };
                 }
             });
             setFields(fieldsClone);

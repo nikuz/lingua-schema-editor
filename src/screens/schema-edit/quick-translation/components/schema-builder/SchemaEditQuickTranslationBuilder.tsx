@@ -1,12 +1,11 @@
-import React from 'react';
 import {
     ListItem,
     Stack,
     Typography,
 } from '@mui/material';
 import { TranslationSchemaContext } from 'src/helpers';
-import { QuickTranslationSchemaType } from 'src/types';
-import { SchemaItem, SchemaItemRenderType } from 'src/components';
+import { QuickTranslationSchemaType, SchemaItemRenderType } from 'src/types';
+import { SchemaItem } from 'src/components';
 
 interface Props {
     data: any,

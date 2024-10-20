@@ -27,7 +27,7 @@ export function acquire(props: Props): Promise<void> {
 
     return fetch(`${apiUtils.getApiUrl()}/api/proxy?url=${encodeURIComponent(url)}`, {
         headers: {
-            'authorization': token,
+            authorization: token,
             'authorization-cookie': cookie?.join('; '),
             'authorization-origin': new URL(url).origin,
         },
@@ -83,7 +83,7 @@ export function save(props: SaveProps): Promise<void> {
     return fetch(`${apiUtils.getApiUrl()}/api/proxy?url=${encodeURIComponent(url)}`, {
         method: 'POST',
         headers: {
-            'authorization': token,
+            authorization: token,
             'authorization-cookie': cookie.join('; '),
             'authorization-origin': new URL(url).origin,
             'content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
@@ -113,7 +113,7 @@ export function getPageContent(props: GetPageContentProps): Promise<string> {
 
     return fetch(`${apiUtils.getApiUrl()}/api/proxy?url=${encodeURIComponent(url)}`, {
         headers: {
-            'authorization': token,
+            authorization: token,
             'authorization-origin': new URL(url).origin,
         },
     }).then(async (response) => {
@@ -128,7 +128,7 @@ export function getPageContent(props: GetPageContentProps): Promise<string> {
             const cookieList = Array.isArray(cookie) ? cookie : [cookie];
             return fetch(`${apiUtils.getApiUrl()}/api/proxy?url=${encodeURIComponent(redirectUrl)}`, {
                 headers: {
-                    'authorization': token,
+                    authorization: token,
                     'authorization-cookie': cookieList.join('; '),
                     'authorization-origin': new URL(url).origin,
                 },

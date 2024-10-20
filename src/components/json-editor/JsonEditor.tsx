@@ -72,7 +72,7 @@ export default class JsonEditor extends React.Component<Props> {
         }
 
         return JMESPath;
-    }
+    };
 
     render() {
         return (

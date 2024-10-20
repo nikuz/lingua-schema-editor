@@ -11,15 +11,11 @@ import {
     TextField,
     Button,
 } from '@mui/material';
+import { TranslationSchemaContext } from 'src/helpers';
+import { SchemaItemRenderType } from 'src/types';
 import Collapsable from '../collapsable';
 import JsonEditor from '../json-editor';
-import { TranslationSchemaContext } from 'src/helpers';
 import './SchemaItem.css';
-
-export enum SchemaItemRenderType {
-    string,
-    list,
-}
 
 interface Props {
     title: string,
@@ -166,5 +162,5 @@ export default function SchemaItem({
                 </div>
             </Modal>
         )}
-    </>
+    </>;
 }

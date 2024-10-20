@@ -1,5 +1,4 @@
 import { useCallback, useRef, useState } from 'react';
-import { ObjectData } from 'src/types';
 
 type Handler = (props: any) => Promise<any>
 
@@ -10,7 +9,7 @@ export interface FetchState {
 }
 
 type ResponseTuple = [
-    (parameters?: ObjectData) => Promise<any>,
+    (parameters?: Record<string, any>) => Promise<any>,
     FetchState,
 ];
 
@@ -20,7 +19,7 @@ export function useFetch({ handler }: { handler: Handler }): ResponseTuple {
     const [data, setData] = useState<any>();
     const requestSignal = useRef<AbortController>();
 
-    const requestHandler = useCallback((parameters?: ObjectData) => {
+    const requestHandler = useCallback((parameters?: Record<string, any>) => {
         setError(undefined);
         setLoading(true);
         requestSignal.current?.abort();

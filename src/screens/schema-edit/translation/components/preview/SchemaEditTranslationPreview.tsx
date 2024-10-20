@@ -1,4 +1,3 @@
-import React from 'react';
 import cl from 'classnames';
 import jmespath from 'jmespath';
 import {
@@ -55,16 +54,16 @@ export default function SchemaEditTranslationPreview(props: Props) {
                                     {word}
                                     {gender && <>
                                         {gender}
-                                        {key < translation.length - 1 && ", "}
+                                        {key < translation.length - 1 && ', '}
                                     </>}
                                     {Array.isArray(sentences) && sentences.map((sentence, key) => {
                                         const word = retrieveData(sentence, schema.translations?.sentences?.word?.value);
                                         return (
                                             <Box component="span" key={key}>
                                                 {word}
-                                                {key < sentences.length - 1 && " "}
+                                                {key < sentences.length - 1 && ' '}
                                             </Box>
-                                        )
+                                        );
                                     })}
                                 </Box>
                             );
@@ -125,7 +124,7 @@ export default function SchemaEditTranslationPreview(props: Props) {
                                 );
                             })}
                         </Box>
-                    )
+                    );
                 })}
 
                 {definitions && (
@@ -194,10 +193,10 @@ export default function SchemaEditTranslationPreview(props: Props) {
                                                                 sx={{ margin: '3px 2px' }}
                                                                 className="translation-grey"
                                                             />
-                                                        )
+                                                        );
                                                     })}
                                                 </Box>
-                                            )
+                                            );
                                         })}
                                     </Box>
                                 );

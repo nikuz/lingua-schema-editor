@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { onAuthStateChanged, User } from "firebase/auth";
+import { onAuthStateChanged, User } from 'firebase/auth';
 import { authInstance } from './controller';
 
 type UseAuthStateTuple = [

@@ -1,7 +1,6 @@
 import { apiUtils } from 'src/utils';
 import {
     LanguagesType,
-    ObjectDataString,
     ProxyResponse,
 } from 'src/types';
 import { consentController } from '../consent';
@@ -19,8 +18,8 @@ export function retrieve(props: RetrieveProps): Promise<LanguagesType> {
         token,
     } = props;
 
-    const headers: ObjectDataString = {
-        'authorization': token,
+    const headers: Record<string, string> = {
+        authorization: token,
         'authorization-origin': new URL(url).origin,
     };
 
@@ -86,7 +85,7 @@ export function getLanguages(props: GetLanguagesProps): Promise<LanguagesType> {
         signal,
         headers: {
             'content-type': 'application/json',
-            'authorization': token,
+            authorization: token,
         },
     }).then(async (response) => {
         if (response.ok) {
@@ -115,7 +114,7 @@ export function storeLanguages(props: StoreLanguagesProps): Promise<LanguagesTyp
         signal,
         headers: {
             'content-type': 'application/json',
-            'authorization': token,
+            authorization: token,
         },
         body: JSON.stringify(languages),
     }).then(async (response) => {

@@ -1,5 +1,3 @@
-import { ObjectDataString } from 'server-types';
-
 export interface FormField {
     label: string,
     value: string,
@@ -7,7 +5,7 @@ export interface FormField {
     fullWidth?: boolean,
     variables?: string[],
     variablesError?: boolean,
-    variablesValues?: ObjectDataString,
+    variablesValues?: Record<string, string>,
 }
 
 export type FormFields = { [name: string]: FormField };

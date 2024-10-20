@@ -1,9 +1,8 @@
-import React from 'react';
 import {
     BrowserRouter,
     Routes,
     Route,
-    } from 'react-router-dom';
+} from 'react-router-dom';
 import { routerConstants } from 'src/constants';
 
 import App from './App';

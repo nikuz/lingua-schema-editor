@@ -1,4 +1,3 @@
-import React from 'react';
 import { Typography } from '@mui/material';
 import { TranslationSchemaContext } from 'src/helpers';
 import { TranslationSchemaType } from 'src/types';

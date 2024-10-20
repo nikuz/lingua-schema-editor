@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
     Outlet,
     useNavigate,
@@ -61,7 +61,7 @@ export default function App() {
 
     useEffect(() => {
         if (!onLoginPage && !loading && !user) {
-            navigate(routerConstants.LOGIN)
+            navigate(routerConstants.LOGIN);
         }
     }, [loading, user, onLoginPage, navigate]);
 
@@ -128,5 +128,5 @@ export default function App() {
                 <Loading blocker />
             )}
         </Box>
-    )
+    );
 }

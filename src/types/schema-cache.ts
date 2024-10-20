@@ -65,3 +65,8 @@ export type SetSchemaEditCacheCallback = (
         | SchemaEditCachePronunciation
         | SchemaEditCacheImages,
 ) => void;
+
+export enum SchemaItemRenderType {
+    string,
+    list,
+}

@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import {useState, useCallback, useEffect} from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Form, Collapsable } from 'src/components';
 import { imagesController, useAuthTokenId } from 'src/controllers';
@@ -13,13 +13,13 @@ import SchemaEditImagesPreview from './components/preview';
 import './SchemaEditImages.css';
 
 const {
-    REACT_APP_IMAGE_URL,
-    REACT_APP_IMAGE_USER_AGENT,
-    REACT_APP_IMAGE_REG_EXP,
-    REACT_APP_IMAGE_MIN_SIZE,
-    REACT_APP_IMAGE_SAFE_SEARCH_URL,
-    REACT_APP_IMAGE_SAFE_SEARCH_SIGNATURE_REG_EXP,
-} = process.env;
+    VITE_IMAGE_URL,
+    VITE_IMAGE_USER_AGENT,
+    VITE_IMAGE_REG_EXP,
+    VITE_IMAGE_MIN_SIZE,
+    VITE_IMAGE_SAFE_SEARCH_URL,
+    VITE_IMAGE_SAFE_SEARCH_SIGNATURE_REG_EXP,
+} = import.meta.env;
 
 export default function SchemaEditImages() {
     const [userTokenId] = useAuthTokenId();
@@ -27,31 +27,31 @@ export default function SchemaEditImages() {
     const [fields, setFields] = useState<FormFields>({
         url: {
             label: 'URL',
-            value: cache.images.schema?.fields.url || REACT_APP_IMAGE_URL || '',
+            value: cache.images.schema?.fields.url || VITE_IMAGE_URL || '',
             fullWidth: true,
             variables: ['{word}'],
         },
         userAgent: {
             label: 'User Agent',
-            value: cache.images.schema?.fields.userAgent || REACT_APP_IMAGE_USER_AGENT || '',
+            value: cache.images.schema?.fields.userAgent || VITE_IMAGE_USER_AGENT || '',
             fullWidth: true,
         },
         regExp: {
             label: 'RegExp',
-            value: cache.images.schema?.fields.regExp || REACT_APP_IMAGE_REG_EXP || '',
+            value: cache.images.schema?.fields.regExp || VITE_IMAGE_REG_EXP || '',
         },
         minSize: {
             label: 'Min base64 image size',
-            value: cache.images.schema?.fields.minSize || REACT_APP_IMAGE_MIN_SIZE || '',
+            value: cache.images.schema?.fields.minSize || VITE_IMAGE_MIN_SIZE || '',
         },
         safeSearchUrl: {
             label: 'Safe search URL',
-            value: cache.images.schema?.fields.safeSearchUrl || REACT_APP_IMAGE_SAFE_SEARCH_URL || '',
+            value: cache.images.schema?.fields.safeSearchUrl || VITE_IMAGE_SAFE_SEARCH_URL || '',
             fullWidth: true,
         },
         safeSearchSignatureRegExp: {
             label: 'Safe search signature RegExp',
-            value: cache.images.schema?.fields.safeSearchSignatureRegExp || REACT_APP_IMAGE_SAFE_SEARCH_SIGNATURE_REG_EXP || '',
+            value: cache.images.schema?.fields.safeSearchSignatureRegExp || VITE_IMAGE_SAFE_SEARCH_SIGNATURE_REG_EXP || '',
         },
     });
 

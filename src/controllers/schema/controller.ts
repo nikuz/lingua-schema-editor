@@ -16,7 +16,7 @@ export function getList(props: GetListProps): Promise<CloudSchemaType[]> {
         signal,
         headers: {
             'content-type': 'application/json',
-            'authorization': token,
+            authorization: token,
         },
     }).then(async (response) => {
         if (response.ok) {
@@ -44,7 +44,7 @@ export function get(props: GetProps): Promise<CloudSchemaType> {
         signal,
         headers: {
             'content-type': 'application/json',
-            'authorization': token,
+            authorization: token,
         },
     }).then(async (response) => {
         if (response.ok) {
@@ -73,7 +73,7 @@ export function setCurrent(props: SetCurrentProps): Promise<CloudSchemaType> {
         signal,
         headers: {
             'content-type': 'application/json',
-            'authorization': token,
+            authorization: token,
         },
     }).then(async (response) => {
         if (response.ok) {
@@ -102,7 +102,7 @@ export function add(props: AddProps): Promise<CloudSchemaType> {
         signal,
         headers: {
             'content-type': 'application/json',
-            'authorization': token,
+            authorization: token,
         },
         body: JSON.stringify(schema),
     }).then(async (response) => {
@@ -134,7 +134,7 @@ export function update(props: UpdateProps): Promise<CloudSchemaType> {
         signal,
         headers: {
             'content-type': 'application/json',
-            'authorization': token,
+            authorization: token,
         },
         body: JSON.stringify(schema),
     }).then(async (response) => {
@@ -164,7 +164,7 @@ export function remove(props: RemoveProps): Promise<number> {
         signal,
         headers: {
             'content-type': 'application/json',
-            'authorization': token,
+            authorization: token,
         },
     }).then(async (response) => {
         if (response.ok) {

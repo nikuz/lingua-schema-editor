@@ -1,5 +1,5 @@
 import { apiUtils } from 'src/utils';
-import { ObjectDataString, ProxyResponse } from 'src/types';
+import { ProxyResponse } from 'src/types';
 import { consentController } from '../consent';
 
 interface Props {
@@ -15,8 +15,8 @@ export function get(props: Props): Promise<string> {
         token,
     } = props;
 
-    const headers: ObjectDataString = {
-        'authorization': token,
+    const headers: Record<string, string> = {
+        authorization: token,
         'authorization-origin': new URL(url).origin,
         'user-agent': userAgent,
     };

@@ -1,4 +1,3 @@
-import React from 'react';
 import jmespath from 'jmespath';
 import { Typography } from '@mui/material';
 import { Collapsable } from 'src/components';

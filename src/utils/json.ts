@@ -2,7 +2,7 @@ export function findAllJsonStrings(json: any, result?: string[]): string[] {
     const strings = result || [];
     const values = Object.values(json);
 
-    for (let item of values) {
+    for (const item of values) {
         if (typeof item === 'object' && item !== null) {
             findAllJsonStrings(item, strings);
         } else if (typeof item === 'string' && item.indexOf('"') !== -1) {
